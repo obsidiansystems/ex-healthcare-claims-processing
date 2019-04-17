@@ -1,0 +1,112 @@
+--
+-- Copyright (c) 2019, Digital Asset (Switzerland) GmbH and/or its affiliates. All rights reserved.
+-- SPDX-License-Identifier: Apache-2.0
+--
+
+daml 1.2 module Main.Claim where
+
+import Main.Types
+import Main.Policy
+
+-- A payment claim between the healthcare provider and the insurance company (payer)
+template Claim
+  with
+    operator : Party
+    provider : Party
+    payer : Party
+    encounterDetails : EncounterDetails
+    claimId : Text
+    amount : Decimal
+  where
+    signatory provider
+
+    controller payer can
+      PayClaim : (ContractId PaymentReceipt, ContractId InsurancePolicy)
+        with policyCid : ContractId InsurancePolicy
+        do
+        let
+          procedureCode = encounterDetails.procedureCode
+          maybePatientResp = encounterDetails.patientResponsibility
+        updatedPolicy <- case maybePatientResp of
+          Some patientResponsibility ->
+            do
+              exercise policyCid UpdatePolicyOnTreatmentCompletion with
+                procedureCode; patientResponsibility
+          None -> do
+            exercise policyCid UpdatePolicyOnTreatmentCompletion with
+              procedureCode; patientResponsibility = 0.0
+        receipt <- create PaymentReceipt with
+          recipient = provider
+          sender = payer
+          paymentId = claimId, ..
+        return (receipt, updatedPolicy)
+
+-- A payment obligation between the patient and the healthcare provider
+template PatientObligation
+  with
+    operator : Party
+    provider : Party
+    patient : Party
+    encounterDetails : EncounterDetails
+    paymentId : Text
+    amount : Decimal
+  where
+    signatory provider
+
+    controller patient can
+      PayPatientObligation : ContractId PaymentReceipt
+        do
+        create PaymentReceipt with
+          recipient = provider
+          sender = patient, ..
+
+-- The result of the patient paying an obligation
+template PaymentReceipt
+  with
+    operator : Party
+    recipient : Party
+    sender : Party
+    paymentId : Text
+    amount : Decimal
+  where
+    signatory sender
+
+    observer recipient
+
+-- A payment request which the insurance company (payer) can accept
+template ClaimRequest
+  with
+    operator : Party
+    provider : Party
+    payer : Party
+    encounterDetails : EncounterDetails
+    claimId : Text
+    amount : Decimal
+  where
+
+    ensure amount > 0.0
+
+    signatory provider
+
+    controller payer can
+      AcceptClaimRequest : ContractId Claim
+        do create Claim with ..
+
+-- A payment request which the patient can accept
+template PatientPaymentRequest
+  with
+    operator : Party
+    provider : Party
+    patient : Party
+    encounterDetails : EncounterDetails
+    paymentId : Text
+    amount : Decimal
+  where
+
+    ensure amount > 0.0
+
+    signatory provider
+
+    controller patient can
+      AcceptPatientObligation : ContractId PatientObligation
+        do create PatientObligation with ..

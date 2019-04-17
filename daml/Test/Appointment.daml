@@ -1,0 +1,62 @@
+--
+-- Copyright (c) 2019, Digital Asset (Switzerland) GmbH and/or its affiliates. All rights reserved.
+-- SPDX-License-Identifier: Apache-2.0
+--
+
+daml 1.2
+module Test.Appointment where
+
+import DA.Either
+import DA.Optional
+import Main.Provider
+import Main.Appointment
+import Test.ReferenceData
+import Test.Referral
+import Main.RuleTypes
+import Main.Policy
+
+data AppointmentScenarioOutput =
+  AppointmentScenarioOutput with
+    provider2Role : ContractId Provider
+    appointmentCid : (ContractId Appointment, ContractId NotifyPayer)
+    appointmentDetails : RuleParameters
+    originalPolicy : ContractId InsurancePolicy
+    appointmentDate: Date
+
+appointmentTest = scenario
+  do
+    referralScenario <- referralTest
+    operator <- getParty "Operator"
+    payer1 <- getParty "Insurance Company"
+    provider1 <- getParty "PrimaryCareProvider"
+    provider2 <- getParty "Specialist"
+    patient1 <- getParty "John Doe"
+
+
+    let
+      provider2Role = referralScenario.provider2Role
+      appointmentDetails = referralScenario.ruleParameters
+      referralDetails = referralScenario.referralDetails
+      originalPolicy = referralScenario.originalPolicy
+      disclosureList = [provider1, provider2]
+
+    appointmentCid <- provider2 `submit` do
+      scheduleResult <- exercise referralDetails ScheduleAppointment with
+        appointmentDate = patient1_appointmentTime
+      return $ fromSome $ eitherToOptional $ scheduleResult
+
+    (updatedPolicy, notifyPatient) <- payer1 `submit`
+      exercise (snd appointmentCid) AcknowledgeAndLock with policyCid = originalPolicy
+
+    newDisclosedPolicy <- patient1 `submit`
+      exercise notifyPatient AcknowledgeAndDisclose
+        with
+          policyCid = updatedPolicy
+          receivers = disclosureList
+
+    let updatedApptDetails = updatePolicyParam appointmentDetails newDisclosedPolicy
+
+    return AppointmentScenarioOutput with
+      appointmentDetails = updatedApptDetails
+      originalPolicy = updatedPolicy
+      appointmentDate = patient1_appointmentTime, ..

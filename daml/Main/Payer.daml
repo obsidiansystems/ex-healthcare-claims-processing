@@ -1,0 +1,54 @@
+--
+-- Copyright (c) 2019, Digital Asset (Switzerland) GmbH and/or its affiliates. All rights reserved.
+-- SPDX-License-Identifier: Apache-2.0
+--
+
+daml 1.2 module Main.Payer where
+
+import Main.Policy
+import Main.Types
+import Main.Procedure
+
+-- Invitation from the operator that the insurance company can accept
+template PayerInvitation
+  with
+    operator : Party
+    payer : Party
+  where
+
+    signatory operator
+
+    controller payer can
+      AcceptPayerInvitation : ContractId Payer
+        with
+            payerName : Text
+            demographics : PayerDemographics
+        do create Payer with ..
+
+-- Payer reference data and actions the payer can initiante in the workflow
+template Payer
+  with
+    operator : Party
+    payer : Party
+    payerName : Text
+    demographics : PayerDemographics
+  where
+    signatory operator
+    signatory payer
+
+    controller payer can
+      nonconsuming CreateInsurancePolicy : ContractId InsurancePolicy
+        with
+          patient : Party
+          patientName : Text
+          insuranceID : Text
+          policyType : PolicyType
+          annualDeductible : Decimal
+          currentDeductible : Decimal
+          procedureList : ProcedureMap
+          policyEndDate : Date
+          isPolicyInGoodStanding : Bool
+        do
+          updatedProcedureList <- discloseProcedureMap [patient] procedureList
+          create InsurancePolicy with
+            procedureList = updatedProcedureList, ..

@@ -1,0 +1,66 @@
+--
+-- Copyright (c) 2019, Digital Asset (Switzerland) GmbH and/or its affiliates. All rights reserved.
+-- SPDX-License-Identifier: Apache-2.0
+--
+
+daml 1.2
+module Main.Appointment where
+
+import DA.Date
+
+import Main.Treatment
+import Main.Types
+import Main.Policy
+import Main.Rules
+import Main.RuleTypes
+import qualified Main.CostCalculation as CC
+
+-- A scheduled appointment
+template Appointment
+  with
+    operator : Party
+    provider : Party
+    patient : Party
+    policy : ContractId DisclosedPolicy
+    encounterDetails : RuleParameters
+    appointmentDate: Date
+  where
+    signatory provider
+    observer patient
+
+    controller provider can
+
+      CheckInPatient : Either (ContractId FailedCheckIn) (ContractId Treatment)
+        do
+          now <- getTime
+          let today = toDateUTC now
+          assertMsg ("Check-in should happen on appointment date: " <> show appointmentDate) $ appointmentDate == today
+          rulesCheck <- create RulesCheck with
+            requestingParty = provider
+            ruleParams = encounterDetails
+          rulesResult <- do exercise rulesCheck CheckAdjudication
+          case rulesResult of
+            None ->
+              do
+                p <- fetch encounterDetails.policy
+                assert (elem provider p.receivers == True)
+                newEncounterDetails <- (CC.calculateCosts encounterDetails CC.Treatment)
+                apptReq <- create Treatment with
+                  policy = encounterDetails.policy
+                  encounterDetails = newEncounterDetails, ..
+                return $ Right apptReq
+            Some reason ->
+              do
+                failed <- create FailedCheckIn with ..
+                return $ Left failed
+
+-- The error state in case the check-in doesn't pass the rules check
+template FailedCheckIn
+  with
+    operator : Party
+    provider : Party
+    patient: Party
+    appointmentDate: Date
+    reason : Text
+  where
+    signatory provider

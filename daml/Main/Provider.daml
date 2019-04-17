@@ -1,0 +1,244 @@
+--
+-- Copyright (c) 2019, Digital Asset (Switzerland) GmbH and/or its affiliates. All rights reserved.
+-- SPDX-License-Identifier: Apache-2.0
+--
+
+daml 1.2 module Main.Provider where
+
+import Main.Payer
+import Main.Policy
+import Main.Types
+import Main.Referral
+import Main.Appointment
+import Main.NetworkContract
+import Main.Rules
+import Main.RuleTypes
+import qualified Main.CostCalculation as CC
+
+-- Invitation from the operator that the provider can accept
+template ProviderInvitation
+  with
+    operator : Party
+    provider : Party
+  where
+
+    signatory operator
+
+    controller provider can
+      AcceptProviderInvitation : ContractId Provider
+        with
+          providerName : Text
+          demographics : ProviderDemographics
+        do create Provider with ..
+
+-- Provider reference data and actions the provider can initiante in the workflow
+template Provider
+  with
+    operator : Party
+    provider : Party
+    providerName : Text
+    demographics : ProviderDemographics
+  where
+    signatory operator
+    signatory provider
+
+    controller provider can
+      nonconsuming RequestNetworkContract : ContractId ProviderRequestsPayer
+        with
+          payer : Party
+        do create ProviderRequestsPayer with ..
+
+      nonconsuming CreateReferral : ContractId ReferralRequest
+        with
+          receiver : Party
+          policy : ContractId DisclosedPolicy
+          encounterId : Text
+          procedureCode : ProcedureCode
+          diagnosisCode : DiagnosisCode
+          siteServiceCode : Text
+          appointmentPriority : Text
+        do
+          disclosedPolicy <- do exercise policy Disclose with newReceiver = receiver
+          let encounterDetails = EncounterDetails with
+                allowedAmount = None
+                coPay = None
+                patientResponsibility = None; ..
+          create ReferralRequest with
+            policy = disclosedPolicy, ..
+
+-- Provider's request to the insurance company to join its provider network
+template ProviderRequestsPayer
+  with
+    operator : Party
+    payer : Party
+    provider : Party
+    providerName : Text
+    demographics : ProviderDemographics
+  where
+
+    signatory provider
+
+    controller payer can
+      AcceptNetworkContractRequest : ContractId ProviderNetworkContract
+        with
+          payerCid : ContractId Payer
+          feeSchedule : FeeSchedule
+        do
+          p <- fetch payerCid
+          assert (p.payer == payer)
+          create ProviderNetworkContract with
+            payerName = p.payerName, ..
+
+      RejectNetworkContractRequest : ContractId PayerRejectsNetworkContract
+        with
+          reason : Text
+        do create PayerRejectsNetworkContract with ..
+
+-- Request made by the primary provider which the specialist (receiver) can run checks against and create the actual Referral
+template ReferralRequest
+  with
+    operator : Party
+    provider : Party
+    receiver : Party
+    policy : ContractId DisclosedPolicy
+    encounterDetails : EncounterDetails
+  where
+
+    signatory provider
+
+    controller receiver can
+      EvaluateReferral : Either (ContractId FailedReferral) (ContractId Referral, ContractId ReferralDetails)
+          with
+          networkContractCid : ContractId ProviderNetworkContract
+        do
+          networkContract <- fetch networkContractCid
+          assert (networkContract.provider == receiver)
+          let ruleParameters = RuleParameters with
+                networkContract = networkContractCid
+                referral = None, ..
+          rulesCheck <- create RulesCheck with
+            requestingParty = receiver
+            ruleParams = ruleParameters
+          policy <- fetch ruleParameters.policy
+          rulesResult <- do exercise rulesCheck CheckEligibility
+          case rulesResult of
+            None ->
+              do
+                assert (elem provider policy.receivers == True)
+                newEncounterDetails <- (CC.calculateCosts ruleParameters CC.Referral)
+                refReq <- create Referral with
+                  referringProvider = provider
+                  renderingProvider = receiver
+                  encounterDetails = newEncounterDetails, ..
+                refDet <- create ReferralDetails with
+                  referringProvider = provider
+                  renderingProvider = receiver
+                  referralDetails = ruleParameters, ..
+                return (Right (refReq, refDet))
+            Some reason ->
+              do
+                failedRef <- create FailedReferral with
+                  patient = policy.patient, ..
+                return (Left failedRef)
+
+-- Template to notify the patient and the insurance company once a specialist schedules an appointment
+template NotifyPayer
+  with
+    operator : Party
+    payer : Party
+    patient : Party
+    provider : Party
+    referralDetails : RuleParameters
+  where
+
+    signatory provider
+
+    controller payer can
+      AcknowledgeAndLock : (ContractId InsurancePolicy, ContractId NotifyPatient)
+        with policyCid : ContractId InsurancePolicy
+        do
+          policy <- do
+            exercise policyCid LockProcedureOnAppointmentCreation
+              with procedureCode = referralDetails.encounterDetails.procedureCode
+          notifyPatient <- create NotifyPatient with ..
+          return (policy, notifyPatient)
+
+template NotifyPatient
+  with
+    operator : Party
+    payer : Party
+    patient : Party
+    provider : Party
+  where
+
+    signatory provider
+
+    controller patient can
+      AcknowledgeAndDisclose : ContractId DisclosedPolicy
+        with
+          policyCid : ContractId InsurancePolicy
+          receivers : [Party]
+        do
+          policy <- do
+            exercise policyCid DisclosePolicy with receivers
+          return policy
+
+-- Parameters of a referral
+template ReferralDetails
+  with
+    operator : Party
+    referringProvider : Party
+    renderingProvider : Party
+    referralDetails : RuleParameters
+  where
+    signatory referringProvider
+
+    controller renderingProvider can
+      UpdateReferralDetails : ContractId ReferralDetails
+        with
+          referralCid : ContractId Referral
+        do
+          let newReferralDetails = updateReferralParam referralDetails referralCid
+          create this with referralDetails = newReferralDetails
+
+      nonconsuming ScheduleAppointment : Either (ContractId FailedSchedulingAppointment) (ContractId Appointment, ContractId NotifyPayer)
+        with
+          appointmentDate : Date
+        do
+          rulesCheck <- create RulesCheck with
+            requestingParty = renderingProvider
+            ruleParams = referralDetails
+          rulesResult <- do exercise rulesCheck CheckPreAuthorization
+          p <- fetch referralDetails.policy
+          let patient = p.patient
+              payer = p.payer
+          case rulesResult of
+            None ->
+              do
+                assert (elem renderingProvider p.receivers == True)
+                newEncounterDetails <- (CC.calculateCosts referralDetails CC.Appointment)
+                let appointmentDetails = updateEncounterParam referralDetails newEncounterDetails
+                apptReq <- create Appointment with
+                  policy = referralDetails.policy
+                  encounterDetails = appointmentDetails
+                  provider = renderingProvider, ..
+                notifyCid <- create NotifyPayer with
+                  referralDetails = referralDetails
+                  provider = renderingProvider, ..
+                return $ Right (apptReq, notifyCid)
+            Some reason ->
+              do
+                failed <- create FailedSchedulingAppointment with
+                  provider = renderingProvider, ..
+                return $ Left failed
+
+-- The error state in case the appointment scheduling doesn't pass the rules check
+template FailedSchedulingAppointment
+  with
+    operator : Party
+    provider : Party
+    patient: Party
+    appointmentDate: Date
+    reason : Text
+  where
+    signatory provider

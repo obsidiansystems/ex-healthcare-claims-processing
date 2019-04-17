@@ -1,0 +1,97 @@
+--
+-- Copyright (c) 2019, Digital Asset (Switzerland) GmbH and/or its affiliates. All rights reserved.
+-- SPDX-License-Identifier: Apache-2.0
+--
+
+daml 1.2
+module Main.CostCalculation where
+
+import Main.Types
+import Main.RuleTypes
+import qualified DA.Map as M
+import DA.Optional
+
+-- Encounter stage on which the cost calculation depends on
+data EncounterStage = Referral|Appointment|Treatment deriving Eq
+
+calculateCosts : RuleParameters -> EncounterStage -> Update EncounterDetails
+calculateCosts ruleParams encounterStage =
+  do
+    policy <- fetch ruleParams.policy
+    networkContract <- fetch ruleParams.networkContract
+    let
+      encounterDetails = ruleParams.encounterDetails
+      procedureCode = encounterDetails.procedureCode
+      maybeProcedureCid = M.lookup procedureCode policy.procedureList
+    case maybeProcedureCid of
+      Some procedureCid ->
+        if encounterStage == Referral then
+          do
+            procedure <- fetch procedureCid
+            let updatedEncounter = EncounterDetails with
+                    encounterId = encounterDetails.encounterId
+                    diagnosisCode = encounterDetails.diagnosisCode
+                    allowedAmount = None
+                    coPay = Some procedure.copay
+                    patientResponsibility = None
+                    siteServiceCode = encounterDetails.siteServiceCode
+                    appointmentPriority = encounterDetails.appointmentPriority, ..
+            return updatedEncounter
+        else
+          do
+            procedure <- fetch procedureCid
+            let
+              feeSchedule = networkContract.feeSchedule
+              maybeAmt = M.lookup procedureCode feeSchedule
+              copayAmount = fromSome (Some procedure.copay)
+            case maybeAmt of
+              Some allowedAmount ->
+                let updatedEncounter = EncounterDetails with
+                        encounterId = encounterDetails.encounterId
+                        diagnosisCode = encounterDetails.diagnosisCode
+                        allowedAmount = Some allowedAmount
+                        coPay = Some procedure.copay
+                        patientResponsibility = Some (calculatePatientResp policy.currentDeductible allowedAmount copayAmount)
+                        siteServiceCode = encounterDetails.siteServiceCode
+                        appointmentPriority = encounterDetails.appointmentPriority, ..
+                in
+                return updatedEncounter
+              None ->
+                let updatedEncounter = EncounterDetails with
+                        encounterId = encounterDetails.encounterId
+                        procedureCode
+                        diagnosisCode = encounterDetails.diagnosisCode
+                        allowedAmount = None
+                        coPay = Some procedure.copay
+                        patientResponsibility = None
+                        siteServiceCode = encounterDetails.siteServiceCode
+                        appointmentPriority = encounterDetails.appointmentPriority
+                in
+                return updatedEncounter
+      None ->
+        let updatedEncounter = EncounterDetails with
+                encounterId = encounterDetails.encounterId
+                procedureCode
+                diagnosisCode = encounterDetails.diagnosisCode
+                allowedAmount = None
+                coPay = None
+                patientResponsibility = None
+                siteServiceCode = encounterDetails.siteServiceCode
+                appointmentPriority = encounterDetails.appointmentPriority
+        in
+        return updatedEncounter
+
+calculatePatientResp : Decimal -> Decimal -> Decimal -> Decimal
+calculatePatientResp deductible allowedAmount copay
+  =
+  if deductible >= allowedAmount
+    then copay + allowedAmount
+  else if deductible > 0.0 && deductible < allowedAmount
+    then copay + deductible
+  else
+    copay
+
+calculatePayerPayment : Decimal -> Decimal -> Decimal
+calculatePayerPayment allowedAmount patientResp
+  =
+    max 0.0 (allowedAmount - patientResp)

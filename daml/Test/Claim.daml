@@ -1,0 +1,39 @@
+--
+-- Copyright (c) 2019, Digital Asset (Switzerland) GmbH and/or its affiliates. All rights reserved.
+-- SPDX-License-Identifier: Apache-2.0
+--
+
+daml 1.2
+module Test.Claim where
+
+import Test.Treatment
+import Main.Claim
+
+
+claimTest = scenario do
+
+    treatmentScenario <- treatmentTest
+    operator <- getParty "Operator"
+    payer1 <- getParty "Insurance Company"
+    provider1 <- getParty "PrimaryCareProvider"
+    provider2 <- getParty "Specialist"
+    patient1 <- getParty "John Doe"
+
+    let
+      paymentReq = treatmentScenario.paymentReq
+      originalPolicy = treatmentScenario.originalPolicy
+
+    claim <- payer1 `submit`
+      exercise paymentReq.claimReq AcceptClaimRequest
+
+    _claimReceipt <- payer1 `submit` do
+      _c <- fetch claim
+      exercise claim PayClaim with policyCid = originalPolicy
+
+    patientObligation <- patient1 `submit`
+      exercise paymentReq.patientReq AcceptPatientObligation
+
+    _patientReceipt <- patient1 `submit`
+      exercise patientObligation PayPatientObligation
+
+    return ()

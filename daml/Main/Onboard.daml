@@ -1,0 +1,32 @@
+--
+-- Copyright (c) 2019, Digital Asset (Switzerland) GmbH and/or its affiliates. All rights reserved.
+-- SPDX-License-Identifier: Apache-2.0
+--
+
+daml 1.2
+module Main.Onboard where
+
+import Main.Payer
+import Main.Provider
+import Main.Patient
+
+-- The very first contract in the workflow created by the operator
+-- Other roles can be created off of this "master" contract
+template OnboardEntityMaster
+  with
+    operator : Party
+  where
+    signatory operator
+    controller operator can
+      nonconsuming InvitePayer : ContractId PayerInvitation
+          with payer : Party
+          do create PayerInvitation with ..
+
+
+      nonconsuming InviteProvider : ContractId ProviderInvitation
+          with provider : Party
+          do create ProviderInvitation with ..
+
+      nonconsuming InvitePatient : ContractId PatientInvitation
+          with patient : Party
+          do create PatientInvitation with ..

@@ -1,0 +1,10 @@
+.navigator.conf
+*.log
+target
+.idea
+node_modules
+.metals
+.bloop
+*.iml
+healthcare-backend/src/main/resources/frontend
+dist

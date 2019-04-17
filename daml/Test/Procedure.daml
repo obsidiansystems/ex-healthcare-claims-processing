@@ -1,0 +1,59 @@
+--
+-- Copyright (c) 2019, Digital Asset (Switzerland) GmbH and/or its affiliates. All rights reserved.
+-- SPDX-License-Identifier: Apache-2.0
+--
+
+daml 1.2
+module Test.Procedure where
+
+import DA.Map
+import Main.Procedure
+import Main.Types
+
+template Display
+  with
+    owner : Party
+    procedureList : [(ContractId Procedure)]
+
+  where
+    signatory owner
+
+template Display2
+  with
+    owner : Party
+    procedureMap : ProcedureMap
+  where
+    signatory owner
+
+    controller owner can
+      DisclosePM : ContractId Display2
+        with newObservers : [Party]
+        do
+          newProcedureMap <- discloseProcedureMap newObservers procedureMap
+          create this with procedureMap = newProcedureMap
+
+testProcedureList = scenario
+  do
+    owner <- getParty "Owner"
+    let
+      procedureList = [Preventative_Care , Physicals , Sick_Visits]
+    owner `submit` do
+      newProcedureList <- createProcedureList owner Bronze procedureList
+      create Display
+        with
+          procedureList = newProcedureList, ..
+
+test2ProcedureList = scenario
+  do
+    owner <- getParty "Owner"
+    newObserver <- getParty "New One"
+    let newObservers = [newObserver]
+    let
+      procedureList = [Preventative_Care , Physicals , Sick_Visits]
+    display2 <- owner `submit` do
+      newProcedureList <- createProcedureList owner Bronze procedureList
+      let
+        procedureMap = fromList $ zip procedureList newProcedureList
+      create Display2 with ..
+    owner `submit` do
+      exercise display2 DisclosePM with newObservers

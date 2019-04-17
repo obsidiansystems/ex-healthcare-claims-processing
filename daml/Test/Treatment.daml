@@ -1,0 +1,47 @@
+--
+-- Copyright (c) 2019, Digital Asset (Switzerland) GmbH and/or its affiliates. All rights reserved.
+-- SPDX-License-Identifier: Apache-2.0
+--
+
+daml 1.2
+module Test.Treatment where
+
+import DA.Date
+import DA.Either
+import DA.Optional
+import Main.Appointment
+import Test.Appointment
+import Main.Treatment
+import Main.Provider
+import Main.Policy
+
+data TreatmentScenarioOutput =
+  TreatmentScenarioOutput with
+    provider2Role : ContractId Provider
+    treatmentCid : ContractId Treatment
+    paymentReq : TreatmentOutput
+    originalPolicy : ContractId InsurancePolicy
+
+treatmentTest = scenario do
+
+    apptScenario <- appointmentTest
+    operator <- getParty "Operator"
+    payer1 <- getParty "Insurance Company"
+    provider1 <- getParty "PrimaryCareProvider"
+    provider2 <- getParty "Specialist"
+    patient1 <- getParty "John Doe"
+
+    passToDate apptScenario.appointmentDate
+
+    let
+      provider2Role = apptScenario.provider2Role
+      appointmentCid = apptScenario.appointmentCid
+      originalPolicy = apptScenario.originalPolicy
+
+    treatmentCid <- provider2 `submit` do
+      checkInResult <- exercise (fst appointmentCid) CheckInPatient
+      return $ fromSome $ eitherToOptional $ checkInResult
+    paymentReq <- provider2 `submit`
+      exercise treatmentCid CompleteTreatment
+
+    return TreatmentScenarioOutput with ..

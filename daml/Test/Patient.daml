@@ -1,0 +1,74 @@
+--
+-- Copyright (c) 2019, Digital Asset (Switzerland) GmbH and/or its affiliates. All rights reserved.
+-- SPDX-License-Identifier: Apache-2.0
+--
+
+daml 1.2
+module Test.Patient where
+
+import Test.Onboard
+import Main.Patient
+import Test.ReferenceData
+import Main.Procedure
+import Main.Policy
+import DA.Map
+
+
+data PatientScenarioOutput =
+  PatientScenarioOutput with
+    onboardResult : OnboardResult
+    patient1Role : ContractId Patient
+    disclosedPolicyCid : ContractId DisclosedPolicy
+    originalPolicyCid : ContractId InsurancePolicy
+
+onboardPatient = scenario
+  do
+
+    onboard <- onboard
+    operator <- getParty "Operator"
+    payer1 <- getParty "Insurance Company"
+    provider1 <- getParty "PrimaryCareProvider"
+    provider2 <- getParty "Specialist"
+    patient1 <- getParty "John Doe"
+
+    let
+      payerRole = onboard.payerRole
+      patient1Role = onboard.patient1Role
+      _provider1Role = onboard.provider1Role
+
+    policyReq <- patient1 `submit` do
+      exercise patient1Role RequestInsurancePolicy with
+        payer = payer1
+        policyType = patient1_PolicyType
+
+    policyAcceptOutput <- payer1 `submit` do
+      procedures <- createProcedureList payer1 patient1_PolicyType procedureCodeList
+      let procedureMap = fromList $ zip procedureCodeList procedures
+      exercise policyReq AcceptMember with
+        payerCid = payerRole
+        insuranceID = patient1_InsuranceId
+        undisclosedProcedureList = procedureMap
+
+    patient1RoleWithPolicy <- patient1 `submit` do
+      exercise patient1Role SetInsurancePolicy with
+        notifyCid = snd policyAcceptOutput
+
+    pcpReq <- patient1 `submit` do
+      exercise patient1RoleWithPolicy RequestPrimaryCareProvider with
+        primaryCareProvider = provider1
+
+    pcpNotifyCid <- provider1 `submit` do
+      exercise pcpReq AcceptPatient with
+        providerID = provider1_HIN
+
+    patient1Role <- patient1 `submit` do
+      exercise patient1RoleWithPolicy SetPrimaryCareProvider with
+        notifyCid = pcpNotifyCid
+
+    disclosedPolicyCid <- patient1 `submit` do
+      exercise (fst policyAcceptOutput) DisclosePolicy with
+        receivers = [provider1]
+
+    return PatientScenarioOutput with
+      onboardResult = onboard
+      originalPolicyCid = fst policyAcceptOutput, ..
