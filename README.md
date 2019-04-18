@@ -1,3 +1,4 @@
+[![CircleCI](https://circleci.com/gh/digital-asset/ex-healthcare-claims-processing.svg?style=svg)](https://circleci.com/gh/digital-asset/ex-healthcare-claims-processing)
 # Reference Application: Healthcare Claims Processing
 
 ## Introduction
