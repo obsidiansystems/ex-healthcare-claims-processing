@@ -4,37 +4,32 @@
  */
 package com.digitalasset.refapps.healthcareclaims;
 
+import static junit.framework.TestCase.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+
 import com.daml.ledger.javaapi.data.Party;
-import com.daml.ledger.javaapi.data.Record;
 import com.digitalasset.nanobot.healthcare.models.main.appointment.Appointment;
 import com.digitalasset.nanobot.healthcare.models.main.claim.Claim;
 import com.digitalasset.nanobot.healthcare.models.main.claim.PatientObligation;
+import com.digitalasset.nanobot.healthcare.models.main.claim.PaymentReceipt;
 import com.digitalasset.nanobot.healthcare.models.main.policy.DisclosedPolicy;
 import com.digitalasset.nanobot.healthcare.models.main.policy.InsurancePolicy;
 import com.digitalasset.nanobot.healthcare.models.main.provider.Provider;
 import com.digitalasset.nanobot.healthcare.models.main.provider.ReferralDetails;
 import com.digitalasset.nanobot.healthcare.models.main.referral.Referral;
-import com.digitalasset.nanobot.healthcare.models.main.ruletypes.RuleParameters;
 import com.digitalasset.nanobot.healthcare.models.main.treatment.Treatment;
 import com.digitalasset.nanobot.healthcare.models.main.types.DiagnosisCode;
 import com.digitalasset.nanobot.healthcare.models.main.types.ProcedureCode;
 import com.digitalasset.testing.junit4.Sandbox;
 import com.digitalasset.testing.utils.ContractWithId;
 import io.grpc.StatusRuntimeException;
-
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.Optional;
-
 import org.junit.*;
 import org.junit.rules.ExternalResource;
-
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertNotSame;
-import static org.junit.Assert.assertNotEquals;
 
 public class HealthcareClaimsProcessingIT {
   private static final Path RELATIVE_DAR_PATH =
@@ -74,7 +69,7 @@ public class HealthcareClaimsProcessingIT {
         sandbox.getCreatedContractId(
             PROVIDER_PARTY, Provider.TEMPLATE_ID, Provider.ContractId::new);
 
-    // Create a referral for PREVENTATIVE CAR, PAIN IN RIGHT ARM.
+    // Create a referral for PREVENTATIVE CARE, PAIN IN RIGHT ARM.
     sandbox
         .getLedgerAdapter()
         .exerciseChoice(
@@ -90,13 +85,16 @@ public class HealthcareClaimsProcessingIT {
 
     // Observe the Contract ID of it
     Referral.ContractId referral =
-            sandbox.getCreatedContractId(
-                    PROVIDER_PARTY, Referral.TEMPLATE_ID, Referral.ContractId::new);
+        sandbox.getCreatedContractId(
+            PROVIDER_PARTY, Referral.TEMPLATE_ID, Referral.ContractId::new);
 
-    // Get the created referral and then its modified version (with some fields updated by a bot)
-    ReferralDetails.ContractId initialReferral = sandbox.getCreatedContractId(
+    // Get the created referral details contract (First not yet observed referral details contract
+    // Then its updated version (with some fields modified by a bot)
+    ReferralDetails.ContractId initialReferralD =
+        sandbox.getCreatedContractId(
             RADIOLOGIST_PARTY, ReferralDetails.TEMPLATE_ID, ReferralDetails.ContractId::new);
-    ReferralDetails.ContractId updatedReferral = sandbox.getCreatedContractId(
+    ReferralDetails.ContractId updatedReferralD =
+        sandbox.getCreatedContractId(
             RADIOLOGIST_PARTY, ReferralDetails.TEMPLATE_ID, ReferralDetails.ContractId::new);
 
     // The radiologist schedules an appointment for a given date
@@ -104,9 +102,9 @@ public class HealthcareClaimsProcessingIT {
     sandbox
         .getLedgerAdapter()
         .exerciseChoice(
-            RADIOLOGIST_PARTY, updatedReferral.exerciseScheduleAppointment(appointmentDate));
+            RADIOLOGIST_PARTY, updatedReferralD.exerciseScheduleAppointment(appointmentDate));
 
-    // Check-in. It should happen on appointment date
+    // Check-in. It should happen on appointment date (Set time).
     sandbox
         .getLedgerAdapter()
         .setCurrentTime(Instant.ofEpochSecond(appointmentDate.toEpochDay() * 24 * 60 * 60));
@@ -119,7 +117,8 @@ public class HealthcareClaimsProcessingIT {
 
     // We check whether the insurance policy is there. Later, it will be updated with the completed
     // treatment.
-    ContractWithId<InsurancePolicy.ContractId> insurancePolicyWithCid = sandbox.getMatchedContract(
+    ContractWithId<InsurancePolicy.ContractId> insurancePolicyWithCid =
+        sandbox.getMatchedContract(
             INSURANCE_COMPANY_PARTY, InsurancePolicy.TEMPLATE_ID, InsurancePolicy.ContractId::new);
     InsurancePolicy oldInsurancePolicy = InsurancePolicy.fromValue(insurancePolicyWithCid.record);
 
@@ -135,20 +134,25 @@ public class HealthcareClaimsProcessingIT {
     Claim.ContractId claim =
         sandbox.getCreatedContractId(
             INSURANCE_COMPANY_PARTY, Claim.TEMPLATE_ID, Claim.ContractId::new);
-    ContractWithId<InsurancePolicy.ContractId> newInsurancePolicyWithCid = sandbox.getMatchedContract(
+    ContractWithId<InsurancePolicy.ContractId> newInsurancePolicyWithCid =
+        sandbox.getMatchedContract(
             INSURANCE_COMPANY_PARTY, InsurancePolicy.TEMPLATE_ID, InsurancePolicy.ContractId::new);
-    InsurancePolicy newInsurancePolicy = InsurancePolicy.fromValue(newInsurancePolicyWithCid.record);
+    InsurancePolicy newInsurancePolicy =
+        InsurancePolicy.fromValue(newInsurancePolicyWithCid.record);
 
     // Preventative care's Procedure contract changed, Sick visit's did not
-    assertNotEquals(oldInsurancePolicy.procedureList.textMap.get("Preventative_Care"),
-            newInsurancePolicy.procedureList.textMap.get("Preventative_Care"));
-    assertEquals(oldInsurancePolicy.procedureList.textMap.get("Sick_Visits"),
-            newInsurancePolicy.procedureList.textMap.get("Sick_Visits"));
+    assertNotEquals(
+        oldInsurancePolicy.procedureList.textMap.get("Preventative_Care"),
+        newInsurancePolicy.procedureList.textMap.get("Preventative_Care"));
+    assertEquals(
+        oldInsurancePolicy.procedureList.textMap.get("Sick_Visits"),
+        newInsurancePolicy.procedureList.textMap.get("Sick_Visits"));
 
     // Insurance company pays
     sandbox
         .getLedgerAdapter()
-        .exerciseChoice(INSURANCE_COMPANY_PARTY, claim.exercisePayClaim(newInsurancePolicyWithCid.contractId));
+        .exerciseChoice(
+            INSURANCE_COMPANY_PARTY, claim.exercisePayClaim(newInsurancePolicyWithCid.contractId));
 
     // Obligation needs to be there, Patient pays
     PatientObligation.ContractId obligation =
@@ -157,8 +161,15 @@ public class HealthcareClaimsProcessingIT {
     sandbox
         .getLedgerAdapter()
         .exerciseChoice(PATIENT_PARTY, obligation.exercisePayPatientObligation());
+
+    // Receipt, we are done.
+    PaymentReceipt.ContractId receipt =
+        sandbox.getCreatedContractId(
+            PATIENT_PARTY, PaymentReceipt.TEMPLATE_ID, PaymentReceipt.ContractId::new);
   }
 
+  // Negative test case:
+  // Check-in should happen on appointment date!
   @Test(expected = StatusRuntimeException.class)
   public void testHealthcareClaimsProcessingMainWorkflowWrongCheckingDate() {
     DisclosedPolicy.ContractId policy = new DisclosedPolicy.ContractId("#38:11");
