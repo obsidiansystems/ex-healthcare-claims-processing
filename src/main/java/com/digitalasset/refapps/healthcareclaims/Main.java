@@ -18,7 +18,6 @@ import com.digitalasset.refapps.healthcareclaims.util.TimeManager;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.concurrent.TimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -137,13 +136,14 @@ public class Main {
     boolean connected = false;
     while (!connected) {
       try {
-        if (time >= 10) {
-          throw new TimeoutException("Cannot connect to Sandbox.");
+        if (time >= 60) {
+          logger.info("Cannot connect to Sandbox: timeout.");
+          System.exit(1);
         }
         client.connect();
         connected = true;
       } catch (Exception _ignored) {
-        logger.info(String.format("Connecting to sandbox..."));
+        logger.info("Connecting to sandbox...");
         try {
           Thread.sleep(1000);
           time++;
