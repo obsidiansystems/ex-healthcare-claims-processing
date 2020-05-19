@@ -6,7 +6,7 @@
 sdk-version: 1.0.1
 name: healthcare-claims-processing
 source: daml/
-scenario: DemoOnboardScenario.InsurancePolicies:insurancePoliciesSetSingle
+init-script: DemoOnboardScenario.StartScript:insurancePoliciesSetSingle
 parties:
   - InsuranceCompany
   - PrimaryCareProvider
@@ -17,4 +17,5 @@ exposed-modules: []
 dependencies:
   - daml-prim
   - daml-stdlib
+  - daml-trigger
   - daml-script
