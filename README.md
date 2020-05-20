@@ -12,26 +12,18 @@ This application simulates processing a healthcare claim, starting with the refe
 
 #### Prerequisites
 
-Be sure you have the following installed:
-- [DAML SDK](https://docs.daml.com/)
-- Docker
-- Java
+Be sure you have the following installed.
 
-#### Build the App
-
-Type:
-```shell
-daml build -o target/app.dar
-```
-**Note:** If you change the DAML models locally, you need to re-run this command before starting the application.
+There are two options to run the app:
+- Option 1: with Docker. Requires:
+  - Docker
+- Option 2: in standalone mode. Requires:
+  - [DAML SDK](https://docs.daml.com/)
+  - Java 8 or higher
 
 ### Starting the App
 
-**Note:** Make sure you have built the application (see: [Build the App](#build-the-app)).
-
-There are two options:
-
-#### Option 1: Start App with Docker
+#### Start App with Docker
 
 Note: make sure to have at least 8 GBs of memory allocated to Docker.
 
@@ -42,32 +34,32 @@ Note: make sure to have at least 8 GBs of memory allocated to Docker.
 2. Open UI with a browser at http://localhost:7500.
 
 
-#### Option 2: Start App in Standalone
+#### Start App in Standalone
 
-1. Start the DAML Sandbox and Navigator. Type:
+1. Build, then start the DAML Sandbox and Navigator. Type:
     ```shell
     daml start --sandbox-option --address=localhost
     ```
     The navigator will automatically open in new browser tab at http://localhost:7500.
-2. Once the sandbox has started start the automation logic by starting bots. Type:
+2. Once the sandbox has started start the automation logic by starting triggers. Type:
     ```shell
-    scripts/startTriggers.sh localhost 6865 target/app.dar
+    scripts/startTriggers.sh localhost 6865 .daml/dist/*.dar
     ```
 
 ### Stopping the App
 
 #### Stopping Dockerized Run
-1. Stop the Docker containers or bots by pressing **Ctrl+C**. (Alternatively, you can also stop it by typing `docker-compose down`.)
+1. Stop the Docker containers or triggers by pressing **Ctrl+C**. (Alternatively, you can also stop it by typing `docker-compose down`.)
 
 #### Stopping Standalone Run
-1. Stop the bots by pressing **Ctrl+C**.
+1. Stop the triggers by pressing **Ctrl+C**.
 1. Stop the Sandbox and the Navigator by pressing **Ctrl+C** in the DAML assistant.
 
 ### Resetting the Prototype
 
 Reset the application by following these steps:
 1.  Stop the app by following the steps in [Stopping the App](#stopping-the-app) section.
-2.  Start the app in [Docker](#option-1-start-app-with-docker) or [Standalone](#option-2-start-app-in-standalone) by following the steps in the relevant section.
+2.  Start the app in [Docker](#start-app-with-docker) or [Standalone](#start-app-in-standalone) by following the steps in the relevant section.
 
 ## User Guide
 
