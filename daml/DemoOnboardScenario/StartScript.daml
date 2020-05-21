@@ -127,4 +127,4 @@ insurancePoliciesSetSingle = do
             operator = operator
             owner = patient1
             receivers = [provider1, provider2]
-    return ()
+    debug "Ledger initialized."
