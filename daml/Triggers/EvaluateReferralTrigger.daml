@@ -12,8 +12,9 @@ import DA.Next.Map qualified as Maps
 
 import Main.Provider
 import Main.NetworkContract
-import Triggers.ContractUtils (headNote)
+import DA.List.Total (head)
 import DA.Foldable (forA_)
+import DA.Optional
 
 evaluateReferralTrigger : Trigger ()
 evaluateReferralTrigger = Trigger
@@ -29,11 +30,10 @@ evaluateReferralTrigger = Trigger
 
 evaluateReferrals : Party -> ACS -> Time -> Maps.Map CommandId [Command] -> () -> TriggerA ()
 evaluateReferrals party activeContracts _ _ () = do
-  let
-    requests = map fst $ getContracts @ReferralRequest activeContracts
-    (networkContract, _) =
-      headNote
-        "Every provider should have exactly one network contract"
-        (getContracts @ProviderNetworkContract activeContracts)
+  let requests = map fst $ getContracts @ReferralRequest activeContracts
+      networkContractOpt =
+        head $ getContracts @ProviderNetworkContract activeContracts
 
-  forA_ requests (`dedupExercise` EvaluateReferral networkContract)
+  whenSome networkContractOpt $
+    \(networkContract, _) ->
+      forA_ requests (`dedupExercise` EvaluateReferral networkContract)

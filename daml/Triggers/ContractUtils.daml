@@ -16,3 +16,5 @@ filterContractIds p contracts = [id | (id, value) <- contracts, p value]
 
 headNote: Text -> [a] -> a
 headNote message = (fromSomeNote message) . head
+
+headFst

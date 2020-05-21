@@ -37,19 +37,21 @@ acknowledgeAndDiscloseTrigger = Trigger
 
 acknowledgeAndDiscloseRule : Party -> ACS -> Time -> Maps.Map CommandId [Command] -> () -> TriggerA ()
 acknowledgeAndDiscloseRule _party activeContracts _ _ () =
-  forA_ notifyPatientContracts $ \(npCid, notifyPatient) -> do
-    let selectedPolicyOpt =
-          head $ filterContractIds
-            (\p -> p.patient == notifyPatient.patient) insurancePolicies
-    whenSome selectedPolicyOpt $ \selectedPolicy ->
-      dedupExercise npCid $ AcknowledgeAndDisclose with
-        policyCid = selectedPolicy
-        receivers = dRule.receivers
+  whenSome dRuleOpt $
+    \(_, dRule) ->
+      forA_ notifyPatientContracts $ \(npCid, notifyPatient) -> do
+        let selectedPolicyOpt =
+              head $ filterContractIds
+                (\p -> p.patient == notifyPatient.patient)
+                insurancePolicies
+        whenSome selectedPolicyOpt $ \selectedPolicy ->
+          dedupExercise npCid $ AcknowledgeAndDisclose with
+            policyCid = selectedPolicy
+            receivers = dRule.receivers
  where
   insurancePolicies = getContracts @InsurancePolicy activeContracts
   notifyPatientContracts = getContracts @NotifyPatient activeContracts
-  (_, dRule) = headNote "There should be a disclode policy rule specifying the receivers."
-             $ getContracts @DisclosureRule activeContracts
+  dRuleOpt = head $ getContracts @DisclosureRule activeContracts
 
 -- Tests ---------------------------
 
