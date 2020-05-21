@@ -122,4 +122,9 @@ insurancePoliciesSetSingle = do
     patient1 `submit`
         exerciseCmd insurancePolicy DisclosePolicy with receivers = [provider2]
 
+    patient1 `submit`
+        createCmd DisclosureRule with
+            operator = operator
+            owner = patient1
+            receivers = [provider1, provider2]
     return ()

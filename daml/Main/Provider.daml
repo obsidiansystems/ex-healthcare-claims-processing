@@ -165,6 +165,14 @@ template NotifyPayer
           notifyPatient <- create NotifyPatient with ..
           return (policy, notifyPatient)
 
+template DisclosureRule
+  with
+    operator : Party
+    owner : Party
+    receivers : [Party]
+  where
+    signatory owner
+
 template NotifyPatient
   with
     operator : Party
