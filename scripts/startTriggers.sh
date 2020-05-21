@@ -40,7 +40,7 @@ run_trigger Triggers.EvaluateReferralTrigger:evaluateReferralTrigger Radiologist
 run_trigger Triggers.AcknowledgeAppointmentTrigger:acknowledgeAppointmentTrigger InsuranceCompany &
 run_trigger Triggers.UpdateReferralDetailsTrigger:updateReferralDetailsTrigger Radiologist &
 
-run_trigger Triggers.AcknowledgeAndDiscloseTrigger:acknowledgeAndDiscloseTriggerWired Patient1 &
+run_trigger Triggers.AcknowledgeAndDiscloseTrigger:acknowledgeAndDiscloseTrigger Patient1 &
 run_trigger Triggers.AcceptPatientPaymentRequestTrigger:acceptPatientPaymentRequestTrigger Patient1 &
 
 sleep 2
