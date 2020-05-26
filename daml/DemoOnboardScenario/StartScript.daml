@@ -19,6 +19,7 @@ import Daml.Script
 
 insurancePoliciesSetSingle : Script ()
 insurancePoliciesSetSingle = do
+    debug "Starting ledger initialization..."
     let provider1 = fromSome (partyFromText "PrimaryCareProvider")
         provider2 = fromSome (partyFromText "Radiologist")
         patient1 = fromSome (partyFromText "Patient1")
@@ -122,4 +123,9 @@ insurancePoliciesSetSingle = do
     patient1 `submit`
         exerciseCmd insurancePolicy DisclosePolicy with receivers = [provider2]
 
-    return ()
+    patient1 `submit`
+        createCmd DisclosureRule with
+            operator = operator
+            owner = patient1
+            receivers = [provider1, provider2]
+    debug "Ledger initialized."

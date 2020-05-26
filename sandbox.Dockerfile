@@ -7,8 +7,16 @@ ARG sdk_vsn=1.1.1
 
 FROM digitalasset/daml-sdk:${sdk_vsn} AS source
 
+USER root
+
+# TODO: Remove this when upgrading to SDK 1.2
+# That version will have a fix for this problem.
+# See https://github.com/digital-asset/daml/pull/5882
+RUN echo 'hosts: files dns' > /etc/nsswitch.conf
+
 WORKDIR /home/daml/
 
+USER daml
 COPY --chown=daml daml.yaml ./
 COPY --chown=daml daml daml
 COPY --chown=daml ui-backend.conf frontend-config.js /home/daml/
