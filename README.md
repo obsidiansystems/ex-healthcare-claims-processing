@@ -1,5 +1,27 @@
 # Reference Application: Healthcare Claims Processing
 
+- [Introduction](#introduction)
+- [Getting Started](#getting-started)
+  - [Installing](#installing)
+    - [Prerequisites](#prerequisites)
+  - [Starting the App](#starting-the-app)
+    - [Start App with Docker](#start-app-with-docker)
+    - [Start App in Standalone](#start-app-in-standalone)
+  - [Stopping the App](#stopping-the-app)
+    - [Stopping Dockerized Run](#stopping-dockerized-run)
+    - [Stopping Standalone Run](#stopping-standalone-run)
+  - [Resetting the Prototype](#resetting-the-prototype)
+- [Working with DAML Hub](#working-with-daml-hub)
+- [User Guide](#user-guide)
+- [Workflow](#workflow)
+- [Running the Application](#running-the-application)
+  - [Choosing and Changing Roles](#choosing-and-changing-roles)
+- [Referral](#referral)
+- [Scheduling](#scheduling)
+- [Check-In](#check-in)
+- [Check-Out and Claim Creation](#check-out-and-claim-creation)
+- [Payment](#payment)
+
 ## Introduction
 
 This application simulates processing a healthcare claim, starting with the referral from the Primary Care Provider (PCP) and including the creation of an appointment with the radiologist, checking in the patient on the date of the appointment, checking out the patient after service delivery, generation of the claim, and finally, payment for the procedure.
@@ -43,7 +65,8 @@ Note: make sure to have at least 8 GBs of memory allocated to Docker.
     The navigator will automatically open in new browser tab at http://localhost:7500.
 2. Once the sandbox has started, start the automation logic by starting triggers. Type:
     ```shell
-    scripts/startTriggers.sh localhost 6865 .daml/dist/*.dar
+    daml build --project-root=triggers && \
+    scripts/startTriggers.sh localhost 6865 triggers/.daml/dist/*.dar
     ```
 
 ### Stopping the App
@@ -60,6 +83,69 @@ Note: make sure to have at least 8 GBs of memory allocated to Docker.
 Reset the application by following these steps:
 1.  Stop the app by following the steps in [Stopping the App](#stopping-the-app) section.
 2.  Start the app in [Docker](#start-app-with-docker) or [Standalone](#start-app-in-standalone) by following the steps in the relevant section.
+
+## Working with DAML Hub
+
+1. As a first step, build the whole project
+    ```shell
+    daml build --output models.dar
+    daml build --project-root=triggers --output triggers.dar
+    ```
+2. Create a project and a ledger in DAML Hub
+3. Upload the DARs
+4. Add the parties to the ledger
+   - PrimaryCareProvider
+   - Radiologist
+   - Patient1
+   - Operator
+   - InsuranceCompany
+5. Download `participants.json` from the ledger settings
+6. Create the `ledger-setup.json` file manually or by running
+    ```shell
+    node scripts/create-ledger-setup.js participants.json ledger-setup.json
+    ```
+
+    The resulting file should like this:
+    ```json
+    {
+      "parties": {
+        "payer1": "ledger-party-92d3fc64-a589-4a18-9e47-30541fdc7824",
+        "operator": "ledger-party-01328c4d-a7b1-49d4-92cc-400badcb46c2",
+        "patient1": "ledger-party-841214e1-cb38-42fa-88a9-08710592f74d",
+        "provider1": "ledger-party-5292e717-bbd6-43d5-8cdc-67b463427ee9",
+        "provider2": "ledger-party-bd952624-9142-412d-ae39-f6025cd94ac8"
+      }
+    }
+    ```
+
+    The following table contains the necessary name mapping:
+
+    | DAML Hub name (in `participants.json`) | Ledger Setup name |
+    | :------------------------------------: | :---------------: |
+    |          primaryCareProvider           |     provider1     |
+    |              radiologist               |     provider2     |
+    |                patient1                |     patient1      |
+    |                operator                |     operator      |
+    |            insuranceCompany            |      payer1       |
+7. Run the ledger setup
+    ```shell
+    daml script \
+      --participant-config participants.json \
+      --json-api \
+      --dar models.dar \
+      --script-name DemoOnboardScenario.StartScript:setupLedger \
+      --input-file ledger-setup.json
+    ```
+8. Run the triggers from the DAML Hub UI
+
+   | Party            | Trigger                                                                        |
+   | :--------------- | :----------------------------------------------------------------------------- |
+   | InsuranceCompany | Triggers.AcceptClaimTrigger:acceptClaimTrigger                                 |
+   | InsuranceCompany | Triggers.AcknowledgeAppointmentTrigger:acknowledgeAppointmentTrigger           |
+   | Radiologist      | Triggers.EvaluateReferralTrigger:evaluateReferralTrigger                       |
+   | Radiologist      | Triggers.UpdateReferralDetailsTrigger:updateReferralDetailsTrigger             |
+   | Patient1         | Triggers.AcknowledgeAndDiscloseTrigger:acknowledgeAndDiscloseTrigger           |
+   | Patient1         | Triggers.AcceptPatientPaymentRequestTrigger:acceptPatientPaymentRequestTrigger |
 
 ## User Guide
 

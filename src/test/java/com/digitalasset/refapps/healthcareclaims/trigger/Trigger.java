@@ -4,6 +4,8 @@
  */
 package com.digitalasset.refapps.healthcareclaims.trigger;
 
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
@@ -60,7 +62,9 @@ public class Trigger extends ExternalResource {
     logger.debug("Executing: {}", String.join(" ", processBuilder.command()));
     trigger = processBuilder.start();
 
-    waitForTriggerToStart();
+    if (!waitForTriggerToStart()) {
+      fail("Trigger did not start within timeout.");
+    }
 
     logger.info("Started.");
   }
@@ -89,7 +93,7 @@ public class Trigger extends ExternalResource {
             party);
   }
 
-  private void waitForTriggerToStart() throws InterruptedException {
+  private boolean waitForTriggerToStart() throws InterruptedException {
     final CountDownLatch hasStarted = new CountDownLatch(1);
     Tailer tailer =
         new Tailer(
@@ -97,7 +101,8 @@ public class Trigger extends ExternalResource {
             new TailerListenerAdapter() {
               @Override
               public void handle(String line) {
-                if (line != null && line.contains("Trigger is running")) {
+                // FIXME: Trigger is broken, mind the double space.
+                if (line != null && line.contains("Trigger  is running")) {
                   hasStarted.countDown();
                 } else {
                   logger.debug("Waiting for trigger...");
@@ -110,12 +115,13 @@ public class Trigger extends ExternalResource {
     executor.submit(tailer);
 
     try {
-      hasStarted.await(30L, TimeUnit.SECONDS);
+      return hasStarted.await(30L, TimeUnit.SECONDS);
     } catch (InterruptedException e) {
-      throw new IllegalStateException("Trigger did not start within timeout.");
+      return false;
     } finally {
       tailer.stop();
       executor.shutdown();
+      //noinspection ResultOfMethodCallIgnored
       executor.awaitTermination(10L, TimeUnit.SECONDS);
     }
   }
