@@ -11,7 +11,7 @@ clean:
 
 ui/daml.js: build-dars
 	rm -rf ui/daml.js
-	daml codegen js
+	daml codegen js target/healthcare-claims-processing.dar -o ui/daml.js
 
 ### DARS ###
 
