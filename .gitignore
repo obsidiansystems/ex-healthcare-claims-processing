@@ -12,3 +12,4 @@ dist
 .classpath
 .project
 .settings/
+ui/daml.js
