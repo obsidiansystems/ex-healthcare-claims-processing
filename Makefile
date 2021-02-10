@@ -2,12 +2,16 @@ MODELS_DAR=target/healthcare-claims-processing.dar
 TRIGGERS_DAR=target/healthcare-claims-processing-triggers.dar
 
 .PHONY: build
-build: build-dars
+build: build-dars ui/daml.js
 
 .PHONY: clean
 clean:
 	rm -rf .daml triggers/.daml
 	rm -rf target
+
+ui/daml.js: build-dars
+	rm -rf ui/daml.js
+	daml codegen js
 
 ### DARS ###
 
