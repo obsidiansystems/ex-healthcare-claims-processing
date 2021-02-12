@@ -4,6 +4,7 @@
 import React from 'react'
 import { Image, Menu } from 'semantic-ui-react'
 import MainView from './MainView';
+import Modal from './Modal';
 import { useParty } from '@daml/react';
 import { Link } from 'react-router-dom';
 
@@ -19,8 +20,13 @@ const TabLink : React.FC<{}> = ({children}) => {
  * React component for the main screen of the `App`.
  */
 const MainScreen: React.FC<Props> = ({onLogout}) => {
+  const [modalIsOpen,setIsOpen] = React.useState(false);
+
   return (
     <>
+      <button onClick={() => setIsOpen(true)}> Open Modal</button>
+      <Modal isOpen={modalIsOpen} setIsOpen={setIsOpen} hasCloseButton={true} />
+
       <div className="px-20 inset-y-0 bg-blue w-64 object-center">
         <div>Daml Health</div>
         <TabLink>Profile</TabLink>
