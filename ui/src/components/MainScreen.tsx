@@ -3,6 +3,8 @@
 
 import React from 'react'
 import { Image, Menu } from 'semantic-ui-react'
+import dateFormat from 'dateformat';
+import DayPicker from './DayPicker'
 import MainView from './MainView';
 import Modal from './Modal';
 import { useParty } from '@daml/react';
@@ -20,13 +22,15 @@ const TabLink : React.FC<{}> = ({children}) => {
  * React component for the main screen of the `App`.
  */
 const MainScreen: React.FC<Props> = ({onLogout}) => {
-  const [modalIsOpen,setIsOpen] = React.useState(false);
+  const [modalActive,setModalActive] = React.useState(false);
+  const [date, setDate] = React.useState(new Date());
+  const formatDate = (d:Date) => dateFormat(d, "ddd, mmm d, yyyy");
+  const theme = {
+    blue: '#4c6fea',
+  }
 
   return (
     <>
-      <button onClick={() => setIsOpen(true)}> Open Modal</button>
-      <Modal isOpen={modalIsOpen} setIsOpen={setIsOpen} hasCloseButton={true} />
-
       <div className="px-20 inset-y-0 bg-blue w-64 object-center">
         <div>Daml Health</div>
         <TabLink>Profile</TabLink>
@@ -64,6 +68,21 @@ const MainScreen: React.FC<Props> = ({onLogout}) => {
           />
         </Menu.Menu>
       </Menu>
+
+      {formatDate(date)}
+      <br />
+      <button onClick={() => setModalActive(true)}>
+        Set Date
+      </button>
+      <Modal active={modalActive} setActive={setModalActive} hasCloseButton={true} theme={theme} body={
+        <DayPicker
+          setModalActive={setModalActive}
+          date={date}
+          setDate={setDate}
+          theme={theme}
+        />
+      }
+      />
 
       <MainView/>
     </>

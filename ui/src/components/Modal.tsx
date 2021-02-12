@@ -1,16 +1,16 @@
-import React from "react";
+import React, { Dispatch, SetStateAction } from "react";
 import ReactModal from 'react-modal';
 import { X } from "phosphor-react";
 
-type StateSet<V> = React.Dispatch<React.SetStateAction<V>>;
-
 type Props = {
+  body: React.ReactNode;
   hasCloseButton: boolean;
-  isOpen: boolean;
-  setIsOpen: StateSet<boolean>;
+  active: boolean;
+  setActive: Dispatch<SetStateAction<boolean>>;
+  theme: { blue: string };
 }
 
-const Modal: React.FC<Props> = ({isOpen, setIsOpen, hasCloseButton}) => {
+const Modal: React.FC<Props> = ({active, setActive, hasCloseButton, body, theme}) => {
   const styles = {
     overlay: {
       display: 'flex',
@@ -24,18 +24,19 @@ const Modal: React.FC<Props> = ({isOpen, setIsOpen, hasCloseButton}) => {
 
   return (
     <ReactModal
-      isOpen={isOpen}
-      onRequestClose={() => setIsOpen(false)}
+      isOpen={active}
+      onRequestClose={() => setActive(false)}
       contentLabel="Example Modal"
       style={styles}
     >
       {hasCloseButton &&
        <div className="flex flex-auto flex-row-reverse">
-         <button onClick={() => setIsOpen(false)}>
-           <X size="20px" color="#4c6fea" weight="bold" />
+         <button onClick={() => setActive(false)}>
+           <X size="20px" color={theme.blue} weight="bold" />
          </button>
        </div>
       }
+      {body}
     </ReactModal>
   )
 }

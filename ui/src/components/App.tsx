@@ -16,7 +16,7 @@ import { httpBaseUrl } from '../config';
 const App: React.FC = () => {
   // const [user, setUser] = React.useState<String | undefined>();
   const [credentials, setCredentials] = React.useState<Credentials | undefined>();
-  
+
   // return <LoginScreen onLogin={setCredentials} />
   return credentials
     ? <DamlLedger
