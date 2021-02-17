@@ -6,13 +6,14 @@ import { Image, Menu } from 'semantic-ui-react'
 import MainView from './MainView';
 import { useParty } from '@daml/react';
 import { Link } from 'react-router-dom';
+// import * as phos from 'phosphor-react';
 
 type Props = {
   onLogout: () => void;
 }
 
-const TabLink : React.FC<{}> = ({children}) => {
-  return <Link to="/nowhere">{children}</Link>
+const TabLink : React.FC<{to: string, icon: string}> = ({to, children, icon}) => {
+  return <Link to={to} className="flex h-9 items-center"><i className={"ph-"+icon}/>{children}</Link>
 };
 
 /**
@@ -20,47 +21,24 @@ const TabLink : React.FC<{}> = ({children}) => {
  */
 const MainScreen: React.FC<Props> = ({onLogout}) => {
   return (
-    <>
-      <div className="px-20 inset-y-0 bg-blue w-64 object-center">
+    <div className="main-grid">
+      <div className="bg-trueGray-50"> {/*px-20 inset-y-0 bg-blue w-64 object-center">*/}
         <div>Daml Health</div>
-        <TabLink>Profile</TabLink>
-        <TabLink>Referrals</TabLink>
-        <TabLink>Patients</TabLink>
-        <TabLink>Insurance Providers</TabLink>
+        <TabLink icon="user" to="/">Profile</TabLink>
+        <TabLink icon="tray" to="provider/referrals">Referrals</TabLink>
+        <TabLink icon="pedestrian" to="provider/patients">Patients</TabLink>
+        <TabLink icon="handshake" to="provider/payers">Insurance Providers</TabLink>
         <hr/>
         <div>Today's Date:</div>
         <div>Show developer tabs</div>
         <div>Selected Role:</div>
-        <div>Change Role</div>
-        <div>Sign Out</div>
+        <a onClick={onLogout}>Change Role</a>
+        <a onClick={onLogout}>Sign Out</a>
       </div>
-      <Menu icon borderless>
-        <Menu.Item>
-          <Image
-            as='a'
-            href='https://www.daml.com/'
-            target='_blank'
-            src='/daml.svg'
-            alt='DAML Logo'
-            size='mini'
-          />
-        </Menu.Item>
-        <Menu.Menu position='right' className='test-select-main-menu'>
-          <Menu.Item position='right'>
-            You are logged in as {useParty()}.
-          </Menu.Item>
-          <Menu.Item
-            position='right'
-            active={false}
-            className='test-select-log-out'
-            onClick={onLogout}
-            icon='log out'
-          />
-        </Menu.Menu>
-      </Menu>
-
+      <div className="bg-trueGray-100">
       <MainView/>
-    </>
+      </div>
+    </div>
   );
 };
 

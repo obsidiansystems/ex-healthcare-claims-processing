@@ -6,6 +6,50 @@ import { Container, Grid, Header, Icon, Segment, Divider } from 'semantic-ui-rea
 import { Party } from '@daml/types';
 import { Main } from '@daml.js/healthcare-claims-processing';
 import { useParty, useLedger, useStreamFetchByKeys, useStreamQueries } from '@daml/react';
+import { Switch, Route } from 'react-router-dom';
+
+const UserIcon: React.FC = () => {
+  return (
+  <i className="ph-user userIconBlue"/>
+  );
+}
+
+const PCPProfile: React.FC = () => {
+  const username = useParty();
+  const pcpResult = useStreamQueries(Main.Provider.Provider).contracts;
+  return (
+    <Container>
+      <Grid centered columns={2}>
+        <Grid.Row stretched>
+          <Grid.Column>
+            {[...pcpResult].map(({payload: p})=>
+            <Segment>
+              <Header as='h2'>
+                <div>Welcome!</div>
+                <UserIcon/>
+                <Header.Content>
+                  {p.providerName}
+                  <Header.Subheader>Provider</Header.Subheader>
+                </Header.Content>
+              </Header>
+              <Divider />
+              {[p].map(({demographics: d})=>
+                <div>
+              <div> HIN {d.providerHIN}</div>
+              <div> Tax ID {d.providerTaxID}</div>
+              <div> Address 
+              {d.providerAddressFirstLine}
+              {d.providerAddressSecondLine}
+              {d.providerCity}, {d.providerState} {d.providerZipCode} </div>
+               </div>)}
+            </Segment>
+               )}
+          </Grid.Column>
+        </Grid.Row>
+      </Grid>
+    </Container>
+  );
+}
 
 // USERS_BEGIN
 const MainView: React.FC = () => {
@@ -24,41 +68,12 @@ const MainView: React.FC = () => {
       return false;
     }
   }*/
-
   return (
-    <Container>
-      <Grid centered columns={2}>
-        <Grid.Row stretched>
-          <Grid.Column>
-            {[...pcpResult].map(({payload: p})=>
-            <Segment>
-              <Header as='h2'>
-                <div>Welcome!</div>
-                <Icon name='user' />
-                <Header.Content>
-                  {p.providerName}
-                  <Header.Subheader>Provider</Header.Subheader>
-                </Header.Content>
-              </Header>
-              <Divider />
-              {[p].map(({demographics: d})=>
-                <div>
-              <div> HIN {d.providerHIN}</div>
-              <div> Tax ID {d.providerTaxID}</div>
-              <div> Address 
-              {d.providerAddressFirstLine}
-              {d.providerAddressSecondLine}
-              {d.providerCity}, {d.providerState} {d.providerZipCode} </div>
-                <pre>
-                   {JSON.stringify(p, null, ' ')}
-                </pre>
-               </div>)}
-            </Segment>
-               )}
-          </Grid.Column>
-        </Grid.Row>
-      </Grid>
-    </Container>
+  <Switch>
+    <Route exact={true} path="/">
+      <PCPProfile/>
+    </Route>
+  </Switch>
   );
 }
 
