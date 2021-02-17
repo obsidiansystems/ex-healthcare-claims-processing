@@ -6,6 +6,7 @@ import { Container, Grid, Header, Icon, Segment, Divider } from 'semantic-ui-rea
 import { Party } from '@daml/types';
 import { Main } from '@daml.js/healthcare-claims-processing';
 import { useParty, useLedger, useStreamFetchByKeys, useStreamQueries } from '@daml/react';
+import { Switch, Route } from 'react-router-dom';
 
 const UserIcon: React.FC = () => {
   return (
@@ -13,24 +14,9 @@ const UserIcon: React.FC = () => {
   );
 }
 
-// USERS_BEGIN
-const MainView: React.FC = () => {
+const PCPProfile: React.FC = () => {
   const username = useParty();
   const pcpResult = useStreamQueries(Main.Provider.Provider).contracts;
-
-  // kept for the moment as an example of exercising an option
-  /* const ledger = useLedger();
-
-  const follow = async (userToFollow: Party): Promise<boolean> => {
-    try {
-      await ledger.exerciseByKey(User.User.Follow, username, {userToFollow});
-      return true;
-    } catch (error) {
-      alert(`Unknown error:\n${error}`);
-      return false;
-    }
-  }*/
-
   return (
     <Container>
       <Grid centered columns={2}>
@@ -62,6 +48,32 @@ const MainView: React.FC = () => {
         </Grid.Row>
       </Grid>
     </Container>
+  );
+}
+
+// USERS_BEGIN
+const MainView: React.FC = () => {
+  const username = useParty();
+  const pcpResult = useStreamQueries(Main.Provider.Provider).contracts;
+
+  // kept for the moment as an example of exercising an option
+  /* const ledger = useLedger();
+
+  const follow = async (userToFollow: Party): Promise<boolean> => {
+    try {
+      await ledger.exerciseByKey(User.User.Follow, username, {userToFollow});
+      return true;
+    } catch (error) {
+      alert(`Unknown error:\n${error}`);
+      return false;
+    }
+  }*/
+  return (
+  <Switch>
+    <Route exact={true} path="/">
+      <PCPProfile/>
+    </Route>
+  </Switch>
   );
 }
 
