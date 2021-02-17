@@ -25,9 +25,9 @@ const MainScreen: React.FC<Props> = ({onLogout}) => {
       <div className="bg-trueGray-50"> {/*px-20 inset-y-0 bg-blue w-64 object-center">*/}
         <div>Daml Health</div>
         <TabLink icon="user" to="/">Profile</TabLink>
-        <TabLink icon="tray" to="provider/referrals">Referrals</TabLink>
-        <TabLink icon="pedestrian" to="provider/patients">Patients</TabLink>
-        <TabLink icon="handshake" to="provider/payers">Insurance Providers</TabLink>
+        <TabLink icon="tray" to="/provider/referrals">Referrals</TabLink>
+        <TabLink icon="pedestrian" to="/provider/patients">Patients</TabLink>
+        <TabLink icon="handshake" to="/provider/payers">Insurance Providers</TabLink>
         <hr/>
         <div>Today's Date:</div>
         <div>Show developer tabs</div>
