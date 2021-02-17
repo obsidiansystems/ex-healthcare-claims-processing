@@ -7,6 +7,12 @@ import { Party } from '@daml/types';
 import { Main } from '@daml.js/healthcare-claims-processing';
 import { useParty, useLedger, useStreamFetchByKeys, useStreamQueries } from '@daml/react';
 
+const UserIcon: React.FC = () => {
+  return (
+  <i className="ph-user userIconBlue"/>
+  );
+}
+
 // USERS_BEGIN
 const MainView: React.FC = () => {
   const username = useParty();
@@ -34,7 +40,7 @@ const MainView: React.FC = () => {
             <Segment>
               <Header as='h2'>
                 <div>Welcome!</div>
-                <Icon name='user' />
+                <UserIcon/>
                 <Header.Content>
                   {p.providerName}
                   <Header.Subheader>Provider</Header.Subheader>
@@ -49,9 +55,6 @@ const MainView: React.FC = () => {
               {d.providerAddressFirstLine}
               {d.providerAddressSecondLine}
               {d.providerCity}, {d.providerState} {d.providerZipCode} </div>
-                <pre>
-                   {JSON.stringify(p, null, ' ')}
-                </pre>
                </div>)}
             </Segment>
                )}

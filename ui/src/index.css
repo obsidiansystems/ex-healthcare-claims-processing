@@ -5,6 +5,10 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --blue: #4c6fea;
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -17,4 +21,22 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+.main-grid {
+  display: grid;
+  grid-template-columns: 256px 1fr;
+  grid-template-rows: 1fr;
+  min-height: 100vh;
+}
+
+.userIconBlue {
+  width: 89px;
+  height: 85px;
+  font-size: 89px;
+  margin: 0 41px 22px;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  background-image: linear-gradient(to bottom, #83a8f6, var(--blue));
 }
