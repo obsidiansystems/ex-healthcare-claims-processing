@@ -7,6 +7,7 @@ import { Party } from '@daml/types';
 import { Main } from '@daml.js/healthcare-claims-processing';
 import { useParty, useLedger, useStreamFetchByKeys, useStreamQueries } from '@daml/react';
 import { Switch, Route } from 'react-router-dom';
+import Patients from './Patients';
 
 const UserIcon: React.FC = () => {
   return (
@@ -37,7 +38,7 @@ const PCPProfile: React.FC = () => {
                 <div>
               <div> HIN {d.providerHIN}</div>
               <div> Tax ID {d.providerTaxID}</div>
-              <div> Address 
+              <div> Address
               {d.providerAddressFirstLine}
               {d.providerAddressSecondLine}
               {d.providerCity}, {d.providerState} {d.providerZipCode} </div>
@@ -69,11 +70,14 @@ const MainView: React.FC = () => {
     }
   }*/
   return (
-  <Switch>
-    <Route exact={true} path="/">
-      <PCPProfile/>
-    </Route>
-  </Switch>
+    <Switch>
+      <Route exact={true} path="/">
+        <PCPProfile/>
+      </Route>
+      <Route exact={true} path="/provider/patients">
+        <Patients/>
+      </Route>
+    </Switch>
   );
 }
 
