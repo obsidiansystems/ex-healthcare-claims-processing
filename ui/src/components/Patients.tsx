@@ -1,42 +1,64 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom';
+import { Link, NavLink, Redirect, Route, Switch, useRouteMatch, useParams } from 'react-router-dom';
 import { Main } from '@daml.js/healthcare-claims-processing';
 import { useStreamQuery } from '@daml/react';
-import { CaretRight } from "phosphor-react";
+import { CaretRight, Share } from "phosphor-react";
 
 type Map<V> = { [key: string]: V };
+type FieldProps = {label: string, value: string};
 
-type Row =
+type PatientOverview =
   { acceptance: Main.Patient.NotifyPatientOfPCPAcceptance,
     policy: Main.Policy.DisclosedPolicy,
   };
+
+function intercalate<X>(xs: X[], sep: X) {
+  return xs.flatMap(x => [sep,x]).slice(1);
+}
 
 function innerJoin<X,Y>(xs: Map<X>, ys: Map<Y>): Map<[X,Y]> {
   const keys = Object.keys(xs).filter(k => ys[k] != undefined);
   return Object.fromEntries(keys.map(k => [k, [xs[k], ys[k]]]));
 }
 
-const Patients : React.FC = () => {
+const PatientRoutes: React.FC = () => {
+  const match = useRouteMatch();
+  return (
+    <Switch>
+      <Route path={`${match.path}/:patientId`}>
+        <Patient/>
+      </Route>
+      <Route path={match.path}>
+        <Patients/>
+      </Route>
+    </Switch>
+  )
+}
+
+const usePatients = (query: any) => {
+  const acceptances = useStreamQuery(Main.Patient.NotifyPatientOfPCPAcceptance, () => query)
+    .contracts
+    .map(resp => resp.payload)
+  const disclosed = useStreamQuery(Main.Policy.DisclosedPolicy, () => query)
+    .contracts
+    .map(resp => resp.payload)
+
+  const keyedAcceptance = Object.fromEntries(acceptances.map(p => [p.patient, p]));
+  const keyedDisclosed = Object.fromEntries(disclosed.map(p => [p.patient, p]));
+  const overviews = Object.values(innerJoin(keyedAcceptance, keyedDisclosed))
+                         .map(p => ({ acceptance: p[0], policy : p[1]}));
+  return { acceptances, disclosed, overviews };
+}
+
+const Patients: React.FC = () => {
+  const match = useRouteMatch();
   const [search, setSearch] = useState("");
   const searchedFor = (s: string) => s.toLowerCase().indexOf(search.toLowerCase()) != -1;
-
-  const accepted = useStreamQuery(Main.Patient.NotifyPatientOfPCPAcceptance)
-    .contracts
-    .map(resp => resp.payload)
-  const disclosed = useStreamQuery(Main.Policy.DisclosedPolicy)
-    .contracts
-    .map(resp => resp.payload)
-
-  const keyedAccepted = Object.fromEntries(accepted.map(p => [p.patient, p]));
-  const keyedDisclosed = Object.fromEntries(disclosed.map(p => [p.patient, p]));
-  const patients = Object.values(innerJoin(keyedAccepted, keyedDisclosed))
-                         .map(p => ({ acceptance: p[0], policy : p[1]}));
-
-  const visible = patients.filter(p => searchedFor(p.policy.patientName) || searchedFor(p.policy.insuranceID));
+  const visible = usePatients({}).overviews.filter(p => searchedFor(p.policy.patientName) || searchedFor(p.policy.insuranceID));
 
   return (
-    <div className="flex flex-col p-4 space-y-5">
-      <div className="text-3xl text-trueGray-700 "> Patients </div>
+    <>
+    <PageTitle title="Patients" />
       <div className="flex p-2 bg-white">
         <input
           type="text"
@@ -56,22 +78,133 @@ const Patients : React.FC = () => {
           </tr>
         </thead>
         <tbody>
-          {visible.map((p) =>
-            <tr className="bg-white text-trueGray-500 hover:bg-trueGray-100 ">
-              <td className="border-red-600"> { p.policy.patientName } </td>
-              <td> { p.acceptance.providerID } </td>
-              <td> { p.policy.insuranceID } </td>
+          {visible.map((po) =>
+            <tr key={po.policy.patient} className="bg-white text-trueGray-500 hover:bg-trueGray-100 ">
+              <td className="border-red-600"> { po.policy.patientName } </td>
+              <td> </td>
+              <td> { po.policy.insuranceID } </td>
               <td>
-                <div className="flex justify-end">
-                  <CaretRight />
+                <div className="">
+                  <Link to={match.url + "/" + po.policy.patient} className="flex justify-end">
+                    <CaretRight />
+                  </Link>
                 </div>
               </td>
             </tr>
           )}
         </tbody>
       </table>
+    </>
+  )
+}
+
+const Patient: React.FC = () => {
+  const { patientId } = useParams();
+  const { overviews, disclosed } = usePatients({ patient: patientId });
+  const match = useRouteMatch();
+
+  const policyRows = disclosed.map((d) =>
+    <div>
+      <FieldsRow fields={[
+        { label: "Receivers", value: d.receivers.join() },
+        { label: "Insurance ID", value: d.insuranceID },
+      ]} />
+    </div>
+  )
+
+  const content = (po: PatientOverview) => (
+    <div className="flex flex-col p-5 space-y-4 bg-white rounded shadow-lg">
+      <Switch>
+        <Route exact path={match.path + "/policies"}>
+          <div className="flex flex-col space-y-4">
+            { intercalate(policyRows, <hr />) }
+          </div>
+        </Route>
+        <Route exact path={match.path}>
+          <div>
+            <button className="flex justify-center items-center space-x-2 px-4 py-2 rounded-lg border-black border-2 bg-blue text-white">
+              <Share />
+              <div> Refer Patient </div>
+            </button>
+          </div>
+          <hr />
+          <FieldsRow fields={[
+            { label: "Name", value: po.policy.patientName},
+            { label: "Insurance ID", value: po.policy.insuranceID},
+            { label: "Primary Care Provider", value: ""},
+          ]} />
+        </Route>
+        <Route>
+          <Redirect to={match.url} />
+        </Route>
+      </Switch>
+    </div>
+  );
+
+  return (
+    <>
+      <div className="flex items-end space-x-4">
+        <PageTitle title="Patient"/>
+        <div className="text-trueGray-500 text-sm"> { patientId } </div>
+      </div>
+
+      <div className="flex flex-col space-y-2">
+        <div className="flex">
+          <TabLink to={match.url + ""}> Summary </TabLink>
+          <TabLink to={match.url + "/policies"}>  Disclosed Policies </TabLink>
+        </div>
+
+        { overviews.length > 0 && content(overviews[0]) }
+
+      </div>
+    </>
+  )
+}
+
+const TabLink: React.FC<{to:string}> = ({children,to}) => {
+  const match = useRouteMatch();
+  return (
+    <NavLink
+      exact
+      to={to}
+      className="text-sm px-2 py-1 text-blue"
+      activeStyle={{
+        background: "white",
+        color: "black",
+      }}
+    >
+      {children}
+    </NavLink>
+  )
+}
+
+const PageTitle: React.FC<{title:string}> = ({title}) => {
+  return (
+    <div className="text-3xl text-trueGray-700"> {title} </div>
+  )
+}
+
+const FieldsRow: React.FC<{fields: FieldProps[]}> = ({fields}) => {
+  return (
+    <div className="flex space-x-12">
+      { fields.map(f =>
+        <Field label={f.label} value={f.value} />
+      )}
     </div>
   )
 }
 
-export default Patients;
+const Field: React.FC<FieldProps> = ({label, value}) => {
+  return (
+    <div className="flex flex-col">
+      <div className="text-sm text-trueGray-500">
+        {label}
+      </div>
+      <div className="text-base">
+        {value}
+      </div>
+    </div>
+  )
+}
+
+export default PatientRoutes;
