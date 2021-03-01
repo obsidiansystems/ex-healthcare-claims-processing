@@ -90,7 +90,7 @@ const Patients: React.FC = () => {
 }
 
 const Patient: React.FC = () => {
-  const { patientId } = useParams();
+  const { patientId } = useParams< { patientId: string } >();
   const { overviews, disclosed } = usePatients({ patient: patientId });
   const match = useRouteMatch();
 

@@ -55,31 +55,6 @@ const MainScreen: React.FC<Props> = ({onLogout}) => {
         <a onClick={onLogout}>Sign Out</a>
       </div>
 
-      <Menu icon borderless>
-        <Menu.Item>
-          <Image
-            as='a'
-            href='https://www.daml.com/'
-            target='_blank'
-            src='/daml.svg'
-            alt='DAML Logo'
-            size='mini'
-          />
-        </Menu.Item>
-        <Menu.Menu position='right' className='test-select-main-menu'>
-          <Menu.Item position='right'>
-            You are logged in as {useParty()}.
-          </Menu.Item>
-          <Menu.Item
-            position='right'
-            active={false}
-            className='test-select-log-out'
-            onClick={onLogout}
-            icon='log out'
-          />
-        </Menu.Menu>
-      </Menu>
-
       <Modal active={modalActive} setActive={setModalActive} hasCloseButton={true} theme={theme} body={
         <DayPicker
           setModalActive={setModalActive}
@@ -91,6 +66,7 @@ const MainScreen: React.FC<Props> = ({onLogout}) => {
       />
 
       <div className="bg-trueGray-100">
+        <MainView />
       </div>
     </div>
   );
