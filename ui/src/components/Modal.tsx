@@ -3,14 +3,12 @@ import ReactModal from 'react-modal';
 import { X } from "phosphor-react";
 
 type Props = {
-  body: React.ReactNode;
   hasCloseButton: boolean;
   active: boolean;
   setActive: Dispatch<SetStateAction<boolean>>;
-  theme: { blue: string };
 }
 
-const Modal: React.FC<Props> = ({active, setActive, hasCloseButton, body, theme}) => {
+const Modal: React.FC<Props> = ({active, setActive, hasCloseButton, children}) => {
   const styles = {
     overlay: {
       display: 'flex',
@@ -32,11 +30,11 @@ const Modal: React.FC<Props> = ({active, setActive, hasCloseButton, body, theme}
       {hasCloseButton &&
        <div className="flex flex-auto flex-row-reverse">
          <button onClick={() => setActive(false)}>
-           <X size="20px" color={theme.blue} weight="bold" />
+           <X size="20px" color="var(--color-blue)" weight="bold" />
          </button>
        </div>
       }
-      {body}
+      {children}
     </ReactModal>
   )
 }

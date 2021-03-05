@@ -1,9 +1,13 @@
 import React, { useState } from 'react'
 import { Link, NavLink, Redirect, Route, Switch, useRouteMatch, useParams } from 'react-router-dom';
 import { Main } from '@daml.js/healthcare-claims-processing';
+import { CreateEvent } from '@daml/ledger';
 import { useStreamQuery } from '@daml/react';
 import { CaretRight, Share } from "phosphor-react";
 import { innerJoin, intercalate, Field, FieldsRow, PageTitle, TabLink } from "./Common";
+import { Formik, Form, Field as FField, useField } from 'formik';
+import Select from 'react-select';
+import { LField, EField, ChoiceModal, Nothing } from "./ChoiceModal";
 
 
 type PatientOverview =
@@ -30,15 +34,15 @@ const usePatients = (query: any) => {
   const acceptances = useStreamQuery(Main.Patient.NotifyPatientOfPCPAcceptance, () => query)
     .contracts
     .map(resp => resp.payload)
-  const disclosed = useStreamQuery(Main.Policy.DisclosedPolicy, () => query)
+  const disclosedRaw = useStreamQuery(Main.Policy.DisclosedPolicy, () => query)
     .contracts
-    .map(resp => resp.payload)
+  const disclosed = disclosedRaw.map(resp => resp.payload)
 
   const keyedAcceptance = Object.fromEntries(acceptances.map(p => [p.patient, p]));
   const keyedDisclosed = Object.fromEntries(disclosed.map(p => [p.patient, p]));
   const overviews = Object.values(innerJoin(keyedAcceptance, keyedDisclosed))
                          .map(p => ({ acceptance: p[0], policy : p[1]}));
-  return { acceptances, disclosed, overviews };
+  return { acceptances, disclosed, overviews, disclosedRaw };
 }
 
 const Patients: React.FC = () => {
@@ -91,7 +95,7 @@ const Patients: React.FC = () => {
 
 const Patient: React.FC = () => {
   const { patientId } = useParams< { patientId: string } >();
-  const { overviews, disclosed } = usePatients({ patient: patientId });
+  const { overviews, disclosed, disclosedRaw } = usePatients({ patient: patientId });
   const match = useRouteMatch();
 
   const policyRows = disclosed.map((d) =>
@@ -103,6 +107,9 @@ const Patient: React.FC = () => {
     </div>
   )
 
+  const pcpResult = useStreamQuery(Main.Provider.Provider).contracts;
+  const pcpContract = pcpResult[0];
+
   const content = (po: PatientOverview) => (
     <div className="flex flex-col p-5 space-y-4 bg-white rounded shadow-lg">
       <Switch>
@@ -113,10 +120,30 @@ const Patient: React.FC = () => {
         </Route>
         <Route exact path={match.path}>
           <div>
-            <button className="flex justify-center items-center space-x-2 px-4 py-2 rounded-lg border-black border-2 bg-blue text-white">
-              <Share />
-              <div> Refer Patient </div>
-            </button>
+            <ChoiceModal className="flex flex-col"
+                         choice={Main.Provider.Provider.CreateReferral}
+                         contract={pcpContract?.contractId}
+                         submitTitle="Create Referral"
+                         buttonTitle="Refer Patient"
+                         icon={<Share />}
+                         initialValues={ { policy: Nothing,
+                                           receiver: Nothing,
+                                           encounterId: Nothing,
+                                           procedureCode: Nothing,
+                                           diagnosisCode: Nothing,
+                                           siteServiceCode: Nothing,
+                                           appointmentPriority: Nothing } } >
+              <h1 className="text-center">Create Referral</h1>
+              <PolicySelect label="Policy" name="policy" disclosedRaw={disclosedRaw} />
+              <div className="grid grid-cols-2">
+              <LField name="receiver" label="Receiver"/>
+              <EField name="diagnosisCode" e={Main.Types.DiagnosisCode} label="Diagnosis Code"/>
+              <LField name="encounterId" placeholder='eg "1"' label="Encounter ID"/>
+              <LField name="siteServiceCode" placeholder='eg "11"' label="Site Service Code"/>
+              <EField name="procedureCode" e={Main.Types.ProcedureCode} label="Procedure Code"/>
+              <LField name="appointmentPriority" placeholder='eg "Elective"' label="Appointment Priority"/>
+              </div>
+            </ChoiceModal>
           </div>
           <hr />
           <FieldsRow fields={[
@@ -150,6 +177,29 @@ const Patient: React.FC = () => {
       </div>
     </>
   )
+}
+
+const PolicySelect : React.FC< { name: string, label: string, disclosedRaw: readonly CreateEvent<Main.Policy.DisclosedPolicy>[] } > = ({name, label, disclosedRaw}) => {
+  const [ field, meta, helpers ] = useField(name);
+  const { setValue } = helpers;
+  const formatOptionLabel= (a : CreateEvent<Main.Policy.DisclosedPolicy>) =>
+    <div>
+      Policy Provider: <b>{a.payload.payer}</b><br/>
+      Disclosed Parties: <b>{a.payload.receivers}</b><br/>
+      <div style={ {textOverflow: "ellipsis", display: "inline-block", maxWidth: "20em", overflow: "hidden", whiteSpace: "nowrap" } }>
+        Contract ID: <b>{a.contractId}</b></div>
+    </div>
+  return (
+    <div className="flow flow-col"><label htmlFor={name} className="block">{label}</label>
+    <Select
+      options={disclosedRaw}
+      onChange={(option) => setValue(option?.contractId) }
+      formatOptionLabel={formatOptionLabel}
+      getOptionValue={a=>a.contractId}
+      styles={({singleValue: (base) => ({ textOverflow: "ellipsis" }) })}
+ />
+ </div>);
+
 }
 
 export default PatientRoutes;
