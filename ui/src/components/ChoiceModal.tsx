@@ -7,6 +7,7 @@ import { Formik, Form, Field, FieldProps, FormikHelpers, FieldAttributes, useFie
 import { Share } from 'phosphor-react';
 import Select, { Props } from 'react-select';
 import Modal from './Modal';
+import DayPicker from "./DayPicker";
 
 export const Nothing = Symbol('Nothing');
 type Nothing = typeof Nothing;
@@ -42,7 +43,9 @@ export function ChoiceModal<T extends object, C, R, K>({ choice, contract, submi
     console.log(values);
     const arg = complete(values);
     if(arg) {
-        ledger.exercise(choice, contract, arg);
+        const success=() => { setModalActive(false) };
+        const failure=console.log;
+        ledger.exercise(choice, contract, arg).then(success, failure);
     } else {
         console.log("Incomplete Parameters");
     }
@@ -81,5 +84,10 @@ export const EField : React.FC<{name: string, e: any, label?: string}> = ({name,
     <Select multi={false} options={e.keys.map((a:string)=>({value: a, label: a}))} onChange={(option) => setValue(option?.value)} styles={({singleValue: (base) => ({ textOverflow: "ellipsis", maxWidth: "10em" }) })} />
   </div>
   )
+}
+
+export const DayPickerField : React.FC<{name: string}> = ({name}) => {
+    const [ field, meta, { setValue } ] = useField(name);
+    return <DayPicker setModalActive={ () => null } date={new Date()} setDate={(d)=>setValue(d.toISOString().split('T')[0])} theme={({ blue: "var(--color-blue)" })}/>
 }
 

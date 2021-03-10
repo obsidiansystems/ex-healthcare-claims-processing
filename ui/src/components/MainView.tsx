@@ -8,6 +8,7 @@ import { Main } from '@daml.js/healthcare-claims-processing';
 import { useParty, useLedger, useStreamFetchByKeys, useStreamQueries } from '@daml/react';
 import { Switch, Route } from 'react-router-dom';
 import PatientRoutes from './Patients';
+import ReferralRoutes from './Referrals';
 
 const UserIcon: React.FC = () => {
   return (
@@ -77,6 +78,9 @@ const MainView: React.FC = () => {
         </Route>
         <Route path="/provider/patients">
           <PatientRoutes />
+        </Route>
+        <Route path="/provider/referrals">
+          <ReferralRoutes />
         </Route>
       </Switch>
     </div>
