@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@craco/craco": "^6.1.1",
+    "@craco/craco": "6.1.1",
     "@daml.js/healthcare-claims-processing": "file:daml.js/healthcare-claims-processing-2.0.0",
     "@daml/ledger": "1.9.0",
     "@daml/react": "1.9.0",
@@ -56,6 +56,6 @@
     "@types/react-dom": "^16.9.4",
     "http-proxy-middleware": "^1.0.4",
     "react-scripts": "^4.0.2",
-    "typescript": "~3.8.3"
+    "typescript": "4.2.3"
   }
 }
