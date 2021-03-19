@@ -9,6 +9,7 @@ import MainView from './MainView';
 import Modal from './Modal';
 import { useParty } from '@daml/react';
 import { Link } from 'react-router-dom';
+import { TabularScreenRoutes } from './TabularScreen';
 // import * as phos from 'phosphor-react';
 
 type Props = {
@@ -36,8 +37,12 @@ const MainScreen: React.FC<Props> = ({onLogout}) => {
         <div>Daml Health</div>
         <TabLink icon="user" to="/">Profile</TabLink>
         <TabLink icon="tray" to="/provider/referrals">Referrals</TabLink>
+        <TabLink icon="calendar-blank" to="/provider/appointments">Appointments</TabLink>
+        <TabLink icon="first-aid-kit" to="/provider/treatments">Treatments</TabLink>
+        <TabLink icon="currency-circle-dollar" to="/provider/claims">Claims</TabLink>
         <TabLink icon="pedestrian" to="/provider/patients">Patients</TabLink>
         <TabLink icon="handshake" to="/provider/payers">Insurance Providers</TabLink>
+        <TabLink icon="currency-circle-dollar" to="/patient/bills">Bills</TabLink>
         <hr/>
         <div>
           Today's Date:

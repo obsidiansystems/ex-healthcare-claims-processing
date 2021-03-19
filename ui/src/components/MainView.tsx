@@ -9,6 +9,11 @@ import { useParty, useLedger, useStreamFetchByKeys, useStreamQueries } from '@da
 import { Switch, Route } from 'react-router-dom';
 import PatientRoutes from './Patients';
 import ReferralRoutes from './Referrals';
+import AppointmentRoutes from './Appointments';
+import TreatmentRoutes from './Treatments';
+import ClaimsRoutes from './Claims';
+import BillRoutes from './Bills';
+import { TabularScreenRoutes } from './TabularScreen';
 
 const UserIcon: React.FC = () => {
   return (
@@ -16,9 +21,11 @@ const UserIcon: React.FC = () => {
   );
 }
 
-const PCPProfile: React.FC = () => {
+const Profile: React.FC = () => {
   const username = useParty();
   const pcpResult = useStreamQueries(Main.Provider.Provider).contracts;
+  const patientResult = useStreamQueries(Main.Patient.Patient).contracts;
+  const policyResult = useStreamQueries(Main.Policy.InsurancePolicy).contracts;
   return (
     <Container>
       <Grid centered columns={2}>
@@ -44,6 +51,25 @@ const PCPProfile: React.FC = () => {
               {d.providerAddressSecondLine}
               {d.providerCity}, {d.providerState} {d.providerZipCode} </div>
                </div>)}
+            </Segment>
+               )}
+            {[...patientResult].map(({payload: p})=>
+            <Segment>
+              <Header as='h2'>
+                <div>Welcome!</div>
+                <UserIcon/>
+                <Header.Content>
+                  {p.patientName}
+                  <Header.Subheader>Patient</Header.Subheader>
+                </Header.Content>
+              </Header>
+              <Divider />
+              {[p].map(({demographics: d})=>
+                <div>
+              <div> PCP {p.primaryCareProviderID}</div>
+              <div> Insurance ID {p.insuranceID}</div>
+              <div> Plan {policyResult[0]?.payload.policyType}</div>
+              </div>)}
             </Segment>
                )}
           </Grid.Column>
@@ -74,13 +100,28 @@ const MainView: React.FC = () => {
     <div className="flex flex-col p-4 space-y-5">
       <Switch>
         <Route exact={true} path="/">
-          <PCPProfile/>
+          <Profile/>
         </Route>
         <Route path="/provider/patients">
           <PatientRoutes />
         </Route>
         <Route path="/provider/referrals">
           <ReferralRoutes />
+        </Route>
+        <Route path="/provider/appointments">
+          <AppointmentRoutes />
+        </Route>
+        <Route path="/provider/treatments">
+          <TreatmentRoutes />
+        </Route>
+        <Route path="/provider/Claims">
+          <ClaimsRoutes />
+        </Route>
+        <Route path="/patient/bills">
+          <BillRoutes />
+        </Route>
+        <Route path="/test">
+          <TabularScreenRoutes metavar="foo" table={<p>Nothing</p>} detail={<p>Also nothing</p>}/>
         </Route>
       </Switch>
     </div>
