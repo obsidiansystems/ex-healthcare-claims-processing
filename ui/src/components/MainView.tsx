@@ -14,11 +14,23 @@ import TreatmentRoutes from './Treatments';
 import ClaimsRoutes from './Claims';
 import BillRoutes from './Bills';
 import { TabularScreenRoutes } from './TabularScreen';
+import { User } from "phosphor-react";
 
-const UserIcon: React.FC = () => {
+const UserIcon: React.FC<{className: string}> = ({className}) => {
   return (
-  <i className="ph-user userIconBlue"/>
-  );
+    <svg className={className} width="89" height="85" viewBox="0 0 89 85">
+      <defs>
+        <linearGradient id="userIconGradient" gradientTransform="rotate(90)">
+          <stop offset="0%" stop-color="#83a8f6"/>
+          <stop offset="100%" stop-color="#4c6fea"/>
+        </linearGradient>
+      </defs>
+      <mask id="userMask">
+        <User size={89} viewBox="22 22 212 212" color="white"/>
+      </mask>
+      <rect width="89" height="89" fill="url(#userIconGradient)" mask="url(#userMask)"/>
+    </svg>
+  )
 }
 
 const Profile: React.FC = () => {
@@ -26,38 +38,32 @@ const Profile: React.FC = () => {
   const pcpResult = useStreamQueries(Main.Provider.Provider).contracts;
   const patientResult = useStreamQueries(Main.Patient.Patient).contracts;
   const policyResult = useStreamQueries(Main.Policy.InsurancePolicy).contracts;
-  return (
-    <Container>
-      <Grid centered columns={2}>
-        <Grid.Row stretched>
-          <Grid.Column>
-            {[...pcpResult].map(({payload: p})=>
-            <Segment>
-              <Header as='h2'>
-                <div>Welcome!</div>
-                <UserIcon/>
-                <Header.Content>
+  return (<>
+    <div className="shadow-2xl size-card rounded-xl content-center flex flex-col text-center m-auto justify-self-center self-center p-12 z-20 bg-white relative">
+      {[...pcpResult].map(({payload: p})=> <>
+              <div className="label-sm">Welcome!</div>
+              <UserIcon className="mx-auto mt-16 mb-4"/>
+              <div className="text-2xl text-trueGray-800 mt-1.5">
                   {p.providerName}
-                  <Header.Subheader>Provider</Header.Subheader>
-                </Header.Content>
-              </Header>
-              <Divider />
+              </div>
+              <div className="label-sm mt-2 mb-8">Provider</div>
+              <hr/>
               {[p].map(({demographics: d})=>
-                <div>
-              <div> HIN {d.providerHIN}</div>
-              <div> Tax ID {d.providerTaxID}</div>
-              <div> Address
-              {d.providerAddressFirstLine}
-              {d.providerAddressSecondLine}
+              <div className="flex text-left sm-trueGray-500 mt-8">
+              <div > <div className="sm-trueGray-400">HIN</div> {d.providerHIN}</div>
+              <div className="mx-auto"> <div className="sm-trueGray-400">Tax ID</div> {d.providerTaxID}</div>
+              <div > <div className="sm-trueGray-400">Address</div>
+              {d.providerAddressFirstLine}<br/>
+              {d.providerAddressSecondLine}<br/>
               {d.providerCity}, {d.providerState} {d.providerZipCode} </div>
                </div>)}
-            </Segment>
-               )}
+              </>)
+               }
             {[...patientResult].map(({payload: p})=>
             <Segment>
               <Header as='h2'>
                 <div>Welcome!</div>
-                <UserIcon/>
+                <UserIcon className="mx-auto mt-16 mb-4"/>
                 <Header.Content>
                   {p.patientName}
                   <Header.Subheader>Patient</Header.Subheader>
@@ -71,11 +77,11 @@ const Profile: React.FC = () => {
               <div> Plan {policyResult[0]?.payload.policyType}</div>
               </div>)}
             </Segment>
-               )}
-          </Grid.Column>
-        </Grid.Row>
-      </Grid>
-    </Container>
+            )}
+          </div>
+          <div className="card-GraphicalDots card-gdots-pos1 z-10"/>
+          <div className="card-GraphicalDots card-gdots-pos2 z-10"/>
+     </>
   );
 }
 
@@ -97,7 +103,7 @@ const MainView: React.FC = () => {
     }
   }*/
   return (
-    <div className="flex flex-col p-4 space-y-5">
+    <div className="flex flex-col p-4 min-h-full">
       <Switch>
         <Route exact={true} path="/">
           <Profile/>
