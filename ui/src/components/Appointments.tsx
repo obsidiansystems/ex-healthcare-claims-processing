@@ -35,12 +35,12 @@ const Appointments: React.FC = () => {
     title="Appointments"
     useData={useAppointmentsData}
     fields={ [
-            { label: "Appointment Date", getter: o => o?.appointment?.payload?.appointmentDate },
-            { label: "Patient Name", getter: o => o?.policy?.payload?.patientName},
-            { label: "Insurance ID", getter: o => o?.policy?.payload?.insuranceID},
-            { label: "Procedure Code", getter: o => o?.appointment?.payload?.encounterDetails.encounterDetails.procedureCode},
-            { label: "Appointment Pririty", getter: o => o?.appointment?.payload?.encounterDetails.encounterDetails.appointmentPriority},
-            ] }
+      { label: "Appointment Date", getter: o => o?.appointment?.payload?.appointmentDate },
+      { label: "Patient Name", getter: o => o?.policy?.payload?.patientName },
+      { label: "Insurance ID", getter: o => o?.policy?.payload?.insuranceID },
+      { label: "Procedure Code", getter: o => o?.appointment?.payload?.encounterDetails.encounterDetails.procedureCode },
+      { label: "Appointment Pririty", getter: o => o?.appointment?.payload?.encounterDetails.encounterDetails.appointmentPriority },
+    ] }
     tableKey={ o => o.appointment.contractId }
     itemUrl={ o => o.appointment.contractId }
     />
@@ -57,16 +57,16 @@ const Appointment : React.FC = () => {
     title="Appointment"
     useData={useAppointmentData}
     fields={ [
-            { label: "Patient Name", getter: o => o?.overview?.policy?.payload?.patientName},
-            { label: "Appointment Date", getter: o => o?.overview?.appointment?.payload?.appointmentDate },
-            { label: "Appointment Pririty", getter: o => o?.overview?.appointment?.payload?.encounterDetails.encounterDetails.appointmentPriority},
-            { label: "Procedure Code", getter: o => o?.overview?.appointment?.payload?.encounterDetails.encounterDetails.procedureCode},
-            { label: "Diagnosis Code", getter: o => o?.overview?.appointment?.payload?.encounterDetails.encounterDetails.diagnosisCode},
-            { label: "Site Service Code", getter: o => o?.overview?.appointment?.payload?.encounterDetails.encounterDetails.siteServiceCode},
-            { label: "Allowed Amount", getter: o => o?.overview?.appointment?.payload?.encounterDetails.encounterDetails?.allowedAmount || ""},
-            { label: "CoPay", getter: o => o?.overview?.appointment?.payload?.encounterDetails.encounterDetails?.coPay || ""},
-            { label: "Patient Responsibility", getter: o => o?.overview?.appointment?.payload?.encounterDetails.encounterDetails?.patientResponsibility || ""},
-            ] }
+      { label: "Patient Name", getter: o => o?.overview?.policy?.payload?.patientName },
+      { label: "Appointment Date", getter: o => o?.overview?.appointment?.payload?.appointmentDate },
+      { label: "Appointment Pririty", getter: o => o?.overview?.appointment?.payload?.encounterDetails.encounterDetails.appointmentPriority },
+      { label: "Procedure Code", getter: o => o?.overview?.appointment?.payload?.encounterDetails.encounterDetails.procedureCode },
+      { label: "Diagnosis Code", getter: o => o?.overview?.appointment?.payload?.encounterDetails.encounterDetails.diagnosisCode },
+      { label: "Site Service Code", getter: o => o?.overview?.appointment?.payload?.encounterDetails.encounterDetails.siteServiceCode },
+      { label: "Allowed Amount", getter: o => o?.overview?.appointment?.payload?.encounterDetails.encounterDetails?.allowedAmount || "" },
+      { label: "CoPay", getter: o => o?.overview?.appointment?.payload?.encounterDetails.encounterDetails?.coPay || "" },
+      { label: "Patient Responsibility", getter: o => o?.overview?.appointment?.payload?.encounterDetails.encounterDetails?.patientResponsibility || "" },
+    ] }
     tableKey={ o => o.overview?.appointment.contractId }
     itemUrl={ o => "" }
     choices={ d => [
