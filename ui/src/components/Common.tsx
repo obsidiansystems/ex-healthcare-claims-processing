@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useMemo } from 'react'
 import { NavLink, Route, Switch, useRouteMatch, useParams } from 'react-router-dom';
 
 type Map<V> = { [key: string]: V };
@@ -60,4 +60,13 @@ const Field: React.FC<FieldProps> = ({label, value}) => {
   )
 }
 
-export { Field, FieldsRow, PageTitle, TabLink, innerJoin, intercalate };
+function useAsync<T>(f: () => Promise<T>, memoKeys: [any]) : T | null {
+  const [[v, lastMemoKeys], setV] = useState<[T | null, any]>([null, null]);
+  useMemo(
+    // some false positives so we do the extra comparison to avoid extra `setV`
+    () => { if(JSON.stringify(memoKeys) != JSON.stringify(lastMemoKeys)) { f().then(nv => setV([nv, memoKeys])) } },
+    memoKeys);
+  return v;
+}
+
+export { Field, FieldsRow, PageTitle, TabLink, innerJoin, intercalate, useAsync };

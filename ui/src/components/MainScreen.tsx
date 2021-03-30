@@ -55,15 +55,14 @@ const MainScreen: React.FC<Props> = ({onLogout}) => {
         <a onClick={onLogout}>Sign Out</a>
       </div>
 
-      <Modal active={modalActive} setActive={setModalActive} hasCloseButton={true} theme={theme} body={
+      <Modal active={modalActive} setActive={setModalActive} hasCloseButton={true}>
         <DayPicker
           setModalActive={setModalActive}
           date={date}
           setDate={setDate}
           theme={theme}
         />
-      }
-      />
+      </Modal>
 
       <div className="bg-trueGray-100">
         <MainView />
