@@ -35,11 +35,11 @@ const Referrals: React.FC = () => {
     title="Referrals"
     useData={useReferralsData}
     fields={ [
-            { label: "Name", getter: o => o?.policy?.payload?.patientName},
-            { label: "Referring Party", getter: o => o?.referral?.payload?.referringProvider},
-            { label: "Referral Date", getter: o => "unknown" },
-            { label: "Appointment Pririty", getter: o => o?.referral?.payload?.referralDetails?.encounterDetails?.appointmentPriority},
-            ] }
+      { label: "Name", getter: o => o?.policy?.payload?.patientName},
+      { label: "Referring Party", getter: o => o?.referral?.payload?.referringProvider},
+      { label: "Referral Date", getter: o => "unknown" },
+      { label: "Appointment Pririty", getter: o => o?.referral?.payload?.referralDetails?.encounterDetails?.appointmentPriority},
+    ] }
     tableKey={ o => o.referral.contractId }
     itemUrl={ o => o.referral.contractId }
     />
@@ -56,11 +56,11 @@ const Referral: React.FC = () => {
     title="Referral"
     useData={useReferralData}
     fields={ [
-            { label: "Name", getter: o => o?.overview?.policy?.payload?.patientName},
-            { label: "Referring Party", getter: o => o?.overview?.referral?.payload?.referringProvider},
-            { label: "Referral Date", getter: o => "unknown" },
-            { label: "Appointment Pririty", getter: o => o?.overview?.referral?.payload?.referralDetails?.encounterDetails?.appointmentPriority},
-            ] }
+      { label: "Name", getter: o => o?.overview?.policy?.payload?.patientName},
+      { label: "Referring Party", getter: o => o?.overview?.referral?.payload?.referringProvider},
+      { label: "Referral Date", getter: o => "unknown" },
+      { label: "Appointment Pririty", getter: o => o?.overview?.referral?.payload?.referralDetails?.encounterDetails?.appointmentPriority},
+    ] }
     tableKey={ o => o.overview.referral.contractId }
     itemUrl={ o => "" }
     choices={ d => [

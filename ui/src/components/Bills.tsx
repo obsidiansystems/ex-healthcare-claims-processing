@@ -54,18 +54,18 @@ const Bill : React.FC = () => {
     title="Bill"
     useData={useBillData}
     fields={ [
-            { label: "Paid", getter: o => o?.overview?.receipt ? "Yes" : "No" },
-            { label: "Patient Name", getter: o => o?.overview?.bill?.payload?.encounterDetails?.patient},
-            { label: "Appointment Date", getter: o => "" },
-            { label: "Appointment Pririty", getter: o => o?.overview?.bill?.payload?.encounterDetails.appointmentPriority},
-            { label: "Procedure Code", getter: o => o?.overview?.bill?.payload?.encounterDetails.procedureCode},
-            { label: "Diagnosis Code", getter: o => o?.overview?.bill?.payload?.encounterDetails.diagnosisCode},
-            { label: "Site Service Code", getter: o => o?.overview?.bill?.payload?.encounterDetails.siteServiceCode},
-            { label: "Allowed Amount", getter: o => o?.overview?.bill?.payload?.encounterDetails?.allowedAmount || ""},
-            { label: "CoPay", getter: o => o?.overview?.bill?.payload?.encounterDetails?.coPay || ""},
-            { label: "Patient Responsibility", getter: o => o?.overview?.bill?.payload?.encounterDetails?.patientResponsibility || ""},
-            { label: "Bill Amount", getter: o => o?.overview?.bill?.payload?.amount || ""},
-            ] }
+      { label: "Paid", getter: o => o?.overview?.receipt ? "Yes" : "No" },
+      { label: "Patient Name", getter: o => o?.overview?.bill?.payload?.encounterDetails?.patient},
+      { label: "Appointment Date", getter: o => "" },
+      { label: "Appointment Pririty", getter: o => o?.overview?.bill?.payload?.encounterDetails.appointmentPriority},
+      { label: "Procedure Code", getter: o => o?.overview?.bill?.payload?.encounterDetails.procedureCode},
+      { label: "Diagnosis Code", getter: o => o?.overview?.bill?.payload?.encounterDetails.diagnosisCode},
+      { label: "Site Service Code", getter: o => o?.overview?.bill?.payload?.encounterDetails.siteServiceCode},
+      { label: "Allowed Amount", getter: o => o?.overview?.bill?.payload?.encounterDetails?.allowedAmount || ""},
+      { label: "CoPay", getter: o => o?.overview?.bill?.payload?.encounterDetails?.coPay || ""},
+      { label: "Patient Responsibility", getter: o => o?.overview?.bill?.payload?.encounterDetails?.patientResponsibility || ""},
+      { label: "Bill Amount", getter: o => o?.overview?.bill?.payload?.amount || ""},
+    ] }
     tableKey={ o => o.overview?.bill?.contractId }
     itemUrl={ o => "" }
     choices={ d => [
