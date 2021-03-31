@@ -114,3 +114,10 @@ table {
 @for $i from 2 to 10 {
   .table-widths-eq > thead > tr > *:nth-last-child($i) ~ * { width: calc(100% / $i); }
 }
+
+.react-select-modal-enum__value-container {
+  @apply bg-trueGray-100;
+}
+.react-select-modal-enum__indicators {
+  @apply bg-trueGray-100;
+}

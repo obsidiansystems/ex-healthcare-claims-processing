@@ -137,7 +137,7 @@ const Patient: React.FC = () => {
         </Route>
         <Route exact path={match.path}>
           <div>
-            <ChoiceModal className="flex flex-col"
+            <ChoiceModal className="flex flex-col w-170"
                          choice={Main.Provider.Provider.CreateReferral}
                          contract={pcpContract?.contractId}
                          submitTitle="Create Referral"
@@ -154,7 +154,7 @@ const Patient: React.FC = () => {
                          } } >
               <h1 className="heading-2xl mb-7">Create Referral</h1>
               <PolicySelect label="Policy" name="policy" disclosedRaw={disclosedRaw} />
-              <div className="grid grid-cols-2">
+              <div className="grid grid-cols-2 gap-4 gap-x-8 mb-7.5 mt-4">
               <LField name="receiver" label="Receiver"/>
               <EField name="diagnosisCode" e={Main.Types.DiagnosisCode} label="Diagnosis Code"/>
               <LField name="encounterId" placeholder='eg "1"' label="Encounter ID"/>
@@ -211,6 +211,7 @@ const PolicySelect : React.FC< { name: string, label: string, disclosedRaw: read
   return (
     <div className="flow flow-col mb-2 mt-0.5"><label htmlFor={name} className="block label-sm">{label}</label>
     <Select
+      classNamePrefix="react-select-modal-enum"
       options={disclosedRaw}
       onChange={(option) => setValue(option?.contractId) }
       formatOptionLabel={formatOptionLabel}

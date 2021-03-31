@@ -61,9 +61,11 @@ export function ChoiceModal<T extends object, C, R, K>({ choice, contract, submi
     <Formik initialValues={initialValues} onSubmit={ submitF } >
       {({isSubmitting}) => (<Form className={className}>
         {children}
-        <button type="submit" disabled={isSubmitting} 
-         className="flex justify-center items-center space-x-2 px-4 py-2 rounded-lg border-black border-2 bg-blue text-white">
-         {submitTitle}</button>
+        <div className="flex justify-center align-center">
+          <button type="submit" disabled={isSubmitting} 
+           className="flex justify-center items-center space-x-2 px-4 py-2 rounded-lg border-black border-2 bg-blue text-white">
+           {submitTitle}</button>
+        </div>
       </Form>)}
     </Formik>
     </Modal>
@@ -72,8 +74,8 @@ export function ChoiceModal<T extends object, C, R, K>({ choice, contract, submi
 }
 
 export const LField : React.FC<FieldAttributes<any> & { label?: string } > = props => (
-  <div className="m-2"><label htmlFor={props.name} className="block label-sm ">{props.label}</label>
-  <Field {... props} className="bg-trueGray-100 h-11 rounded" />
+  <div className=""><label htmlFor={props.name} className="block label-sm ">{props.label}</label>
+  <Field {... props} className="bg-trueGray-100 h-11 rounded w-full" />
   </div>
 )
 
@@ -81,8 +83,8 @@ export const EField : React.FC<{name: string, e: any, label?: string}> = ({name,
   const [ field, meta, helpers ] = useField(name);
   const { setValue } = helpers;
   return (
-  <div className="flow flow-col m-2"><label htmlFor={name} className="block label-sm">{label}</label>
-    <Select multi={false} options={e.keys.map((a:string)=>({value: a, label: a}))} onChange={(option) => setValue(option?.value)} styles={({singleValue: (base) => ({ textOverflow: "ellipsis", maxWidth: "10em" }) })} />
+  <div className="flow flow-col"><label htmlFor={name} className="block label-sm">{label}</label>
+    <Select classNamePrefix="react-select-modal-enum" multi={false} options={e.keys.map((a:string)=>({value: a, label: a}))} onChange={(option) => setValue(option?.value)} styles={({singleValue: (base) => ({ textOverflow: "ellipsis", maxWidth: "10em" }) })} />
   </div>
   )
 }
