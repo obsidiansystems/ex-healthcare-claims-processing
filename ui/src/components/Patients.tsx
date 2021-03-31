@@ -143,13 +143,15 @@ const Patient: React.FC = () => {
                          submitTitle="Create Referral"
                          buttonTitle="Refer Patient"
                          icon={<Share />}
-                         initialValues={ { policy: Nothing,
-                                           receiver: Nothing,
-                                           encounterId: Nothing,
-                                           procedureCode: Nothing,
-                                           diagnosisCode: Nothing,
-                                           siteServiceCode: Nothing,
-                                           appointmentPriority: Nothing } } >
+                         initialValues={ {
+                           policy: Nothing,
+                           receiver: Nothing,
+                           encounterId: Nothing,
+                           procedureCode: Nothing,
+                           diagnosisCode: Nothing,
+                           siteServiceCode: Nothing,
+                           appointmentPriority: Nothing,
+                         } } >
               <h1 className="heading-2xl mb-7">Create Referral</h1>
               <PolicySelect label="Policy" name="policy" disclosedRaw={disclosedRaw} />
               <div className="grid grid-cols-2">

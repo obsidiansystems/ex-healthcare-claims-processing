@@ -65,9 +65,12 @@ const Field: React.FC<FieldProps> = ({label, value}) => {
   )
 }
 
-function useAsync<T>(f: () => Promise<T>, u: [any]) : T | null {
-  const [[v, vu], setV] = useState<[T | null, any]>([null, null]);
-  useMemo(() => { if(JSON.stringify(u) != JSON.stringify(vu)) { f().then(nv => setV([nv, u])) } }, u);
+function useAsync<T>(f: () => Promise<T>, memoKeys: [any]) : T | null {
+  const [[v, lastMemoKeys], setV] = useState<[T | null, any]>([null, null]);
+  useMemo(
+    // some false positives so we do the extra comparison to avoid extra `setV`
+    () => { if(JSON.stringify(memoKeys) != JSON.stringify(lastMemoKeys)) { f().then(nv => setV([nv, memoKeys])) } },
+    memoKeys);
   return v;
 }
 

@@ -12,6 +12,7 @@ import DayPicker from "./DayPicker";
 export const Nothing = Symbol('Nothing');
 type Nothing = typeof Nothing;
 
+/// Each field is made optional without edge cases, provided nothing else uses `Nothing`.
 type PartialMaybe<T> = {
   [P in keyof T]: T[P] | Nothing;
 };
@@ -90,4 +91,3 @@ export const DayPickerField : React.FC<{name: string}> = ({name}) => {
     const [ field, meta, { setValue } ] = useField(name);
     return <DayPicker setModalActive={ () => null } date={new Date()} setDate={(d)=>setValue(d.toISOString().split('T')[0])} theme={({ blue: "var(--color-blue)" })}/>
 }
-
