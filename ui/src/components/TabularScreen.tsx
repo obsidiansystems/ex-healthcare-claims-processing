@@ -34,16 +34,17 @@ type TabularViewConfig<T> = {
   itemUrl: (a: T) => string,
   fields: TabularViewFields<T>[],
   useData: () => readonly T[],
+  searchFunc?: (a: string) => (b: T) => boolean,
 };
 
-export function TabularView<T, > ( { title, fields, tableKey, itemUrl, useData } : PropsWithChildren< TabularViewConfig<T> > ) {
+export function TabularView<T, > ( { title, fields, tableKey, itemUrl, useData, searchFunc } : PropsWithChildren< TabularViewConfig<T> > ) {
   const match = useRouteMatch();
   const [search, setSearch] = useState("");
   const searchedFor = (s: string) => s.toLowerCase().indexOf(search.toLowerCase()) != -1;
-  const data = useData();
+  const data = useData().filter((searchFunc || (a=>b=>true))(search));
   return (<>
-    <PageTitle title={ title } />
-      <div className="flex p-2 bg-white">
+      <PageTitle title={ title } />
+      <div className="flex p-3 bg-white m-6">
         <input
           type="text"
           value={search}
@@ -52,11 +53,11 @@ export function TabularView<T, > ( { title, fields, tableKey, itemUrl, useData }
           className="w-full px-3 py-2 h-10 bg-trueGray-100"
         />
       </div>
-      <table className="table-fixed">
+      <table className="table-fixed m-6 table-widths-eq">
         <thead>
           <tr className="text-left text-trueGray-500 text-sm">
-            { fields.map(a=> <th className="w-1/6"> { a.label } </th>) }
-            <th> </th>
+            { fields.map(a=> <th className=""> { a.label } </th>) }
+            <th />
           </tr>
         </thead>
         <tbody>

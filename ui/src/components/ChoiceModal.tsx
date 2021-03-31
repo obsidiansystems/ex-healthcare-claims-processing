@@ -71,8 +71,8 @@ export function ChoiceModal<T extends object, C, R, K>({ choice, contract, submi
 }
 
 export const LField : React.FC<FieldAttributes<any> & { label?: string } > = props => (
-  <div><label htmlFor={props.name} className="block">{props.label}</label>
-  <Field {... props} />
+  <div className="m-2"><label htmlFor={props.name} className="block label-sm ">{props.label}</label>
+  <Field {... props} className="bg-trueGray-100 h-11 rounded" />
   </div>
 )
 
@@ -80,7 +80,7 @@ export const EField : React.FC<{name: string, e: any, label?: string}> = ({name,
   const [ field, meta, helpers ] = useField(name);
   const { setValue } = helpers;
   return (
-  <div className="flow flow-col"><label htmlFor={name} className="block">{label}</label>
+  <div className="flow flow-col m-2"><label htmlFor={name} className="block label-sm">{label}</label>
     <Select multi={false} options={e.keys.map((a:string)=>({value: a, label: a}))} onChange={(option) => setValue(option?.value)} styles={({singleValue: (base) => ({ textOverflow: "ellipsis", maxWidth: "10em" }) })} />
   </div>
   )

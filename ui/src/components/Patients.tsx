@@ -8,6 +8,7 @@ import { innerJoin, intercalate, Field, FieldsRow, PageTitle, TabLink } from "./
 import { Formik, Form, Field as FField, useField } from 'formik';
 import Select from 'react-select';
 import { LField, EField, ChoiceModal, Nothing } from "./ChoiceModal";
+import { TabularScreenRoutes, TabularView, SingleItemView } from "./TabularScreen";
 
 
 type PatientOverview =
@@ -45,7 +46,23 @@ const usePatients = (query: any) => {
   return { acceptances, disclosed, overviews, disclosedRaw };
 }
 
+const useAllPatients: (() => PatientOverview[]) = () => usePatients({}).overviews;
 const Patients: React.FC = () => {
+  return <TabularView
+    title="Patients"
+    useData={useAllPatients}
+    fields={ [ 
+         { label: "Name", getter : o => o.policy.patientName },
+         /* { label: "PCP", getter : o => "" }, */
+         { label: "Insurance ID", getter : o => o.policy.insuranceID },
+        ] }
+    tableKey={ o => o.policy.patient }
+    itemUrl={ o => o.policy.patient }
+    />
+  ;
+}
+
+const NotPatients: React.FC = () => {
   const match = useRouteMatch();
   const [search, setSearch] = useState("");
   const searchedFor = (s: string) => s.toLowerCase().indexOf(search.toLowerCase()) != -1;
@@ -133,7 +150,7 @@ const Patient: React.FC = () => {
                                            diagnosisCode: Nothing,
                                            siteServiceCode: Nothing,
                                            appointmentPriority: Nothing } } >
-              <h1 className="text-center">Create Referral</h1>
+              <h1 className="heading-2xl mb-7">Create Referral</h1>
               <PolicySelect label="Policy" name="policy" disclosedRaw={disclosedRaw} />
               <div className="grid grid-cols-2">
               <LField name="receiver" label="Receiver"/>
@@ -183,14 +200,14 @@ const PolicySelect : React.FC< { name: string, label: string, disclosedRaw: read
   const [ field, meta, helpers ] = useField(name);
   const { setValue } = helpers;
   const formatOptionLabel= (a : CreateEvent<Main.Policy.DisclosedPolicy>) =>
-    <div>
+    <div className="">
       Policy Provider: <b>{a.payload.payer}</b><br/>
       Disclosed Parties: <b>{a.payload.receivers}</b><br/>
       <div style={ {textOverflow: "ellipsis", display: "inline-block", maxWidth: "20em", overflow: "hidden", whiteSpace: "nowrap" } }>
         Contract ID: <b>{a.contractId}</b></div>
     </div>
   return (
-    <div className="flow flow-col"><label htmlFor={name} className="block">{label}</label>
+    <div className="flow flow-col mb-2 mt-0.5"><label htmlFor={name} className="block label-sm">{label}</label>
     <Select
       options={disclosedRaw}
       onChange={(option) => setValue(option?.contractId) }
