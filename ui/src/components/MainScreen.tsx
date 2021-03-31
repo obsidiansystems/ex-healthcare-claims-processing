@@ -8,15 +8,19 @@ import DayPicker from './DayPicker'
 import MainView from './MainView';
 import Modal from './Modal';
 import { useParty } from '@daml/react';
-import { Link } from 'react-router-dom';
+import { Link, Route } from 'react-router-dom';
+import { TabularScreenRoutes } from './TabularScreen';
+import '@fontsource/alata';
 // import * as phos from 'phosphor-react';
 
 type Props = {
   onLogout: () => void;
 }
 
-const TabLink : React.FC<{to: string, icon: string}> = ({to, children, icon}) => {
-  return <Link to={to} className="flex h-9 items-center"><i className={"ph-"+icon}/>{children}</Link>
+const TabLink : React.FC<{to: string, exact?: boolean, icon: string}> = ({to, children, icon, exact}) => {
+  return <Route path={to} exact={exact} children={({ match }) => (
+    <Link to={to} className={"flex flex-grow-0 h-9 items-center text-blue text-sm font-alata mr-3 ml-3 mt-1 mb-1 rounded" + (match ? " tab-active" : " tab-hover") }><i className={"ph-"+icon+" text-blueGray-400 text-2xl center m-4"}/>{children}</Link>
+    )} />;
 };
 
 /**
@@ -26,33 +30,43 @@ const MainScreen: React.FC<Props> = ({onLogout}) => {
   const [modalActive,setModalActive] = React.useState(false);
   const [date, setDate] = React.useState(new Date());
   const formatDate = (d:Date) => dateFormat(d, "ddd, mmm d, yyyy");
+  const role = useParty(); // TODO: proper role handling
   const theme = {
     blue: '#4c6fea',
   }
 
   return (
-    <div className="main-grid">
-      <div className="bg-trueGray-50"> {/*px-20 inset-y-0 bg-blue w-64 object-center">*/}
-        <div>Daml Health</div>
-        <TabLink icon="user" to="/">Profile</TabLink>
+    <div className="main-grid font-alata">
+      <div className="bg-trueGray-50 flex flex-col justify-start text-sm text-trueGray-500"> {/*px-20 inset-y-0 bg-blue w-64 object-center">*/}
+        <img src="/logo-with-name.svg" className="inline-block ml-px30 mt-px25 mb-7 self-start"/>
+        <TabLink icon="user" to="/" exact={true}>Profile</TabLink>
         <TabLink icon="tray" to="/provider/referrals">Referrals</TabLink>
+        <TabLink icon="calendar-blank" to="/provider/appointments">Appointments</TabLink>
+        <TabLink icon="first-aid-kit" to="/provider/treatments">Treatments</TabLink>
+        <TabLink icon="currency-circle-dollar" to="/provider/claims">Claims</TabLink>
         <TabLink icon="pedestrian" to="/provider/patients">Patients</TabLink>
         <TabLink icon="handshake" to="/provider/payers">Insurance Providers</TabLink>
-        <hr/>
-        <div>
-          Today's Date:
-          <br />
-          <div className="flex justify-between">
+        <TabLink icon="currency-circle-dollar" to="/patient/bills">Bills</TabLink>
+        <div className="flex-grow"/>
+        <hr className="mx-3"/>
+        <div className="mx-7 py-2">
+        <div className="my-2">
+          <div>Today's Date:</div>
+          <div className="text-sm text-trueGray-400">
             {formatDate(date)}
-            <button onClick={() => setModalActive(true)}>
+            <button className="text-blue ml-2" onClick={() => setModalActive(true)}>
               Set Date
             </button>
           </div>
         </div>
-        <div>Show developer tabs</div>
-        <div>Selected Role:</div>
-        <a onClick={onLogout}>Change Role</a>
-        <a onClick={onLogout}>Sign Out</a>
+        {/*<div className="my-2">Show developer tabs</div>*/}
+        <div className="my-2">
+          Selected Role:
+          <div className="text-sm text-trueGray-400">{role}</div>
+        </div>
+        </div>
+        <a onClick={onLogout} className="flex flex-grow-0 h-9 items-center text-blue text-sm mr-3 ml-3 mt-1 mb-1 rounded tab-hover"><i className={"ph-users text-blueGray-400 text-2xl center m-4"}/>Change Roles</a>
+        <a onClick={onLogout} className="flex flex-grow-0 h-9 items-center text-blue text-sm mr-3 ml-3 mt-1 mb-1 rounded tab-hover"><i className={"ph-sign-out text-blueGray-400 text-2xl center m-4"}/>Sign Out</a>
       </div>
 
       <Modal active={modalActive} setActive={setModalActive} hasCloseButton={true}>
@@ -64,7 +78,7 @@ const MainScreen: React.FC<Props> = ({onLogout}) => {
         />
       </Modal>
 
-      <div className="bg-trueGray-100">
+      <div className="relative bg-trueGray-100 z-0">
         <MainView />
       </div>
     </div>

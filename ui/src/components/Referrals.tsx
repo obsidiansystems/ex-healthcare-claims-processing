@@ -8,21 +8,10 @@ import { innerJoin, intercalate, Field, FieldsRow, PageTitle, TabLink, useAsync 
 import { Formik, Form, Field as FField, useField } from 'formik';
 import Select from 'react-select';
 import { LField, EField, ChoiceModal, DayPickerField, Nothing } from "./ChoiceModal";
+import { TabularScreenRoutes, TabularView, SingleItemView } from "./TabularScreen";
 
-
-const ReferralRoutes: React.FC = () => {
-  const match = useRouteMatch();
-  return (
-    <Switch>
-      <Route path={`${match.path}/:referralId`}>
-        <Referral/>
-      </Route>
-      <Route path={match.path}>
-        <Referrals/>
-      </Route>
-    </Switch>
-  )
-}
+const ReferralRoutes : React.FC = () => 
+  <TabularScreenRoutes metavar=":referralId" table={Referrals} detail={Referral}/>
 
 const useReferrals = (query: any) => {
   const ledger = useLedger();
@@ -36,92 +25,48 @@ const useReferrals = (query: any) => {
   const keyedDisclosed = Object.fromEntries(disclosed.map(p => [p.contractId, p]));
   const overviews = Object.values(innerJoin(keyedReferrals, keyedDisclosed))
                          .map(p => ({ referral: p[0], policy : p[1]}));
-  return { overviews };
+  return overviews;
 }
 
-const Referrals: React.FC = () => {
-  const match = useRouteMatch();
-  const [search, setSearch] = useState("");
-  const searchedFor = (s: string) => s.toLowerCase().indexOf(search.toLowerCase()) != -1;
-  const visible = useReferrals( { } ); // useStreamQuery(Main.Provider.ReferralDetails).contracts; // .filter(p => searchedFor(p.policy.patientName) || searchedFor(p.policy.insuranceID));
+const useReferralsData = () => useReferrals( { } )
 
-  return (
-    <>
-    <PageTitle title="Referrals" />
-      <div className="flex p-2 bg-white">
-        <input
-          type="text"
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          placeholder="Search by name of insurance ID..."
-          className="w-full px-3 py-2 h-10 bg-trueGray-100"
-        />
-      </div>
-      <table className="table-fixed">
-        <thead>
-          <tr className="text-left text-trueGray-500 text-sm">
-            <th className="w-1/6"> Patient Name </th>
-            <th className="w-1/6"> Referring Party </th>
-            <th className="w-1/6"> Insurance ID </th>
-            <th className="w-1/6"> Referral Date </th>
-            <th className="w-1/6"> Priority </th>
-            <th> </th>
-          </tr>
-        </thead>
-        <tbody>
-          {visible.overviews.map((po) =>
-            <tr key={po.policy.payload.patient} className="bg-white text-trueGray-500 hover:bg-trueGray-100 ">
-            <td>{po.policy.payload.patientName}</td>
-            <td>{po.referral.payload.referringProvider}</td>
-            <td>{po.policy.payload.insuranceID}</td>
-            <td> </td>
-            <td>{po.referral.payload.referralDetails.encounterDetails.appointmentPriority}</td>
-              <td>
-                <div className="">
-                  <Link to={match.url + "/" + po.referral.contractId} className="flex justify-end">
-                    <CaretRight />
-                  </Link>
-                </div>
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-    </>
-  )
+const Referrals: React.FC = () => {
+  return <TabularView
+    title="Referrals"
+    useData={useReferralsData}
+    fields={ [
+      { label: "Name", getter: o => o?.policy?.payload?.patientName},
+      { label: "Referring Party", getter: o => o?.referral?.payload?.referringProvider},
+      { label: "Referral Date", getter: o => "unknown" },
+      { label: "Appointment Pririty", getter: o => o?.referral?.payload?.referralDetails?.encounterDetails?.appointmentPriority},
+    ] }
+    tableKey={ o => o.referral.contractId }
+    itemUrl={ o => o.referral.contractId }
+    />
+}
+
+const useReferralData = () => {
+  const { referralId } = useParams< { referralId: string } >();
+  const overviews = useReferrals( { referralId: referralId } ); // { referralId: referralId });
+  return [ { referralId, overview: overviews[0] } ];
 }
 
 const Referral: React.FC = () => {
-  const { referralId } = useParams< { referralId: string } >();
-  const { overviews } = useReferrals( { referralId: referralId } ); // { referralId: referralId });
-  const match = useRouteMatch();
-
-  /*const policyRows = disclosed.map((d) =>
-    <div>
-      <FieldsRow fields={[
-        { label: "Receivers", value: d.receivers.join() },
-        { label: "Insurance ID", value: d.insuranceID },
-      ]} />
-    </div>
-  )*/
-
-  const pcpResult = useStreamQuery(Main.Provider.Provider).contracts;
-  const pcpContract = pcpResult[0];
-
-  
-  const content = (overview : { policy: CreateEvent<Main.Policy.DisclosedPolicy>, referral: CreateEvent<Main.Provider.ReferralDetails> }) => (
-    <div className="flex flex-col p-5 space-y-4 bg-white rounded shadow-lg">
-      <Switch>
-        {/*<Route exact path={match.path + "/policies"}>
-          <div className="flex flex-col space-y-4">
-            { intercalate(policyRows, <hr />) }
-          </div>
-        </Route>*/}
-        <Route exact path={match.path}>
-          <div>
+  return <SingleItemView
+    title="Referral"
+    useData={useReferralData}
+    fields={ [
+      { label: "Name", getter: o => o?.overview?.policy?.payload?.patientName},
+      { label: "Referring Party", getter: o => o?.overview?.referral?.payload?.referringProvider},
+      { label: "Referral Date", getter: o => "unknown" },
+      { label: "Appointment Pririty", getter: o => o?.overview?.referral?.payload?.referralDetails?.encounterDetails?.appointmentPriority},
+    ] }
+    tableKey={ o => o.overview.referral.contractId }
+    itemUrl={ o => "" }
+    choices={ d => [
             <ChoiceModal className="flex flex-col"
                          choice={Main.Provider.ReferralDetails.ScheduleAppointment}
-                         contract={overview.referral?.contractId}
+                         contract={d.overview?.referral?.contractId}
                          submitTitle="Schedule Appointment"
                          buttonTitle="Schedule Appointment"
                          icon={<Share />}
@@ -130,63 +75,10 @@ const Referral: React.FC = () => {
               <p>Select a date for this appointment</p>
               <DayPickerField name="appointmentDate" />
             </ChoiceModal>
-          </div>
-          <hr />
-          <FieldsRow fields={[
-            { label: "Name", value: overview.policy.payload.patientName},
-            { label: "Referring Party", value: overview.referral.payload.referringProvider},
-            { label: "Referral Date", value: "unknown" },
-            { label: "Appointment Pririty", value: overview.referral.payload.referralDetails.encounterDetails.appointmentPriority},
-          ]} />
-        </Route>
-        <Route>
-          <Redirect to={match.url} />
-        </Route>
-      </Switch>
-    </div>
-  );
-
-  return (
-    <>
-      <div className="flex items-end space-x-4">
-        <PageTitle title="Referral"/>
-        <div className="text-trueGray-500 text-sm"> { /*patientId*/ "" } </div>
-      </div>
-
-      <div className="flex flex-col space-y-2">
-        <div className="flex">
-          <TabLink to={match.url + ""}> Summary </TabLink>
-          <TabLink to={match.url + "/policies"}>  Disclosed Policies </TabLink>
-        </div>
-
-        { overviews.length > 0 && content(overviews[0]) }
-
-      </div>
-    </>
-  )
-}
-
-const PolicySelect : React.FC< { name: string, label: string, disclosedRaw: readonly CreateEvent<Main.Policy.DisclosedPolicy>[] } > = ({name, label, disclosedRaw}) => {
-  const [ field, meta, helpers ] = useField(name);
-  const { setValue } = helpers;
-  const formatOptionLabel= (a : CreateEvent<Main.Policy.DisclosedPolicy>) =>
-    <div>
-      Policy Provider: <b>{a.payload.payer}</b><br/>
-      Disclosed Parties: <b>{a.payload.receivers}</b><br/>
-      <div style={ {textOverflow: "ellipsis", display: "inline-block", maxWidth: "20em", overflow: "hidden", whiteSpace: "nowrap" } }>
-        Contract ID: <b>{a.contractId}</b></div>
-    </div>
-  return (
-    <div className="flow flow-col"><label htmlFor={name} className="block">{label}</label>
-    <Select
-      options={disclosedRaw}
-      onChange={(option) => setValue(option?.contractId) }
-      formatOptionLabel={formatOptionLabel}
-      getOptionValue={a=>a.contractId}
-      styles={({singleValue: (base) => ({ textOverflow: "ellipsis" }) })}
- />
- </div>);
-
+    ] }
+    
+    />
+  ;
 }
 
 export default ReferralRoutes;

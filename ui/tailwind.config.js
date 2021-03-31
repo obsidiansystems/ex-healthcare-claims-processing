@@ -8,6 +8,17 @@ module.exports = {
       colors: {
         blue: '#4c6fea',
         trueGray: colors.trueGray,
+        blueGray: colors.blueGray,
+      },
+      fontFamily: {
+        'alata': ['Alata'],
+      },
+      spacing: {
+        "px25": ['25px'],
+        "px30": ['30px'],
+      },
+      zIndex: {
+        '-10': '-10',
       }
     },
   },

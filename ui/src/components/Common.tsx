@@ -9,6 +9,11 @@ function intercalate<X>(xs: X[], sep: X) {
   return xs.flatMap(x => [sep,x]).slice(1);
 }
 
+function leftJoin<X,Y>(xs: Map<X>, ys: Map<Y>): Map<[X,Y]> {
+  const keys = Object.keys(xs);
+  return Object.fromEntries(keys.map(k => [k, [xs[k], ys[k]]]));
+}
+
 function innerJoin<X,Y>(xs: Map<X>, ys: Map<Y>): Map<[X,Y]> {
   const keys = Object.keys(xs).filter(k => ys[k] != undefined);
   return Object.fromEntries(keys.map(k => [k, [xs[k], ys[k]]]));
@@ -69,4 +74,4 @@ function useAsync<T>(f: () => Promise<T>, memoKeys: [any]) : T | null {
   return v;
 }
 
-export { Field, FieldsRow, PageTitle, TabLink, innerJoin, intercalate, useAsync };
+export { Field, FieldsRow, PageTitle, TabLink, innerJoin, leftJoin, intercalate, useAsync };

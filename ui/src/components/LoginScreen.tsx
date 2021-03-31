@@ -17,7 +17,10 @@ type Props = {
  * React component for the login screen of the `App`.
  */
 const LoginScreen: React.FC<Props> = ({onLogin}) => {
-  const [username, setUsername] = React.useState('PrimaryCareProvider');
+  // const [username, setUsername] = React.useState('PrimaryCareProvider');
+  const [username, setUsername] = React.useState('Radiologist');
+  // const [username, setUsername] = React.useState('Patient1');
+  // const [username, setUsername] = React.useState('InsuranceCompany');
 
   const login = useCallback(async (credentials: Credentials) => {
     try {
@@ -43,7 +46,7 @@ const LoginScreen: React.FC<Props> = ({onLogin}) => {
     await login(credentials);
   }
 
-  handleLogin({preventDefault: (() => 1)}); // Hotwiring for dev convenience.
+  // handleLogin({preventDefault: (() => 1)}); // Hotwiring for dev convenience.
 
   const handleDablLogin = () => {
     window.location.assign(`https://login.projectdabl.com/auth/login?ledgerId=${ledgerId}`);
@@ -88,14 +91,15 @@ const LoginScreen: React.FC<Props> = ({onLogin}) => {
             {deploymentMode !== DeploymentMode.PROD_DABL
             ? <>
                 {/* FORM_BEGIN */}
-                <Form.Input
+                <Form.Select
                   fluid
                   icon='user'
                   iconPosition='left'
                   placeholder='Username'
                   value={username}
+                  options={ [ "PrimaryCareProvider", "Radiologist", "Patient1", "InsuranceCompany" ].map(a=>({ key: a, value: a, text: a}))}
                   className='test-select-username-field'
-                  onChange={e => setUsername(e.currentTarget.value)}
+                  onChange={e => {if(e.currentTarget.textContent) { setUsername(e.currentTarget.textContent);} }}
                 />
                 <Button
                   primary
