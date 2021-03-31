@@ -1,5 +1,5 @@
 
-import React from 'react'
+import React, { Dispatch, SetStateAction } from 'react'
 import { Choice, ContractId } from '@daml/types';
 import { useLedger } from '@daml/react';
 
@@ -36,21 +36,67 @@ type ChoiceModalProps<T extends object, C, R, K> =
     className?: string
   };
 
+export const Success = Symbol('Success');
+type Success = typeof Success;
+
+interface Failure {
+  error: any;
+};
+
+type MaybeSuccessOrFailure = Nothing | Success | Failure;
+
 export function ChoiceModal<T extends object, C, R, K>({ choice, contract, submitTitle, buttonTitle, initialValues, icon, className, children }: React.PropsWithChildren<ChoiceModalProps<T,C,R,K> >) {
-  const [modalActive, setModalActive] = React.useState(false);
+  const [modalActive, setModalActiveInner] = React.useState(false);
+  const [successOrFailure, setSuccessOrFailure] = React.useState<MaybeSuccessOrFailure>(Nothing);
+  const setModalActive = (s : SetStateAction<boolean>) => {
+    setModalActiveInner((p : boolean) => {
+      const shown = typeof s == 'function' ? s(p) : s;
+      if(!shown && successOrFailure != Nothing) setSuccessOrFailure(Nothing);
+      return shown;
+    })};
   const ledger = useLedger();
   let submitF = (values : PartialMaybe<C>, { setSubmitting } : FormikHelpers<PartialMaybe<C> >) => {
     console.log("Exercising option: " + choice);
     console.log(values);
     const arg = complete(values);
     if(arg) {
-        const success=() => { setModalActive(false) };
-        const failure=console.log;
+        const success=() => { setSuccessOrFailure(Success); };
+        const failure=(f : any) => { console.log(f); setSuccessOrFailure({error: f})};
         ledger.exercise(choice, contract, arg).then(success, failure);
     } else {
         console.log("Incomplete Parameters");
     }
   };
+  var content;
+  switch(successOrFailure) {
+    case Nothing: {
+      content = (
+          <Formik initialValues={initialValues} onSubmit={ submitF } >
+            {({isSubmitting}) => (<Form className={className}>
+              {children}
+              <div className="flex justify-center align-center">
+              <button type="submit" disabled={isSubmitting} 
+              className="flex justify-center items-center space-x-2 px-4 py-2 rounded-lg border-black border-2 bg-blue text-white">
+              {submitTitle}</button>
+              </div>
+              </Form>)}
+          </Formik>
+      );
+      break;
+    }
+    case Success: {
+      content = (
+        <>Success</>
+      );
+      break;
+    }
+    default: { // Failure case
+      content = (
+        <>Failure</>
+      );
+      break;
+    }
+  }
   return (
     <>
     <button onClick={() => setModalActive(true)} className="flex justify-center items-center space-x-2 px-4 py-2 rounded-lg border-black border-2 bg-blue text-white">
@@ -58,16 +104,7 @@ export function ChoiceModal<T extends object, C, R, K>({ choice, contract, submi
     <div> {buttonTitle} </div>
     </button>
     <Modal active={modalActive} setActive={setModalActive} hasCloseButton={true}>
-    <Formik initialValues={initialValues} onSubmit={ submitF } >
-      {({isSubmitting}) => (<Form className={className}>
-        {children}
-        <div className="flex justify-center align-center">
-          <button type="submit" disabled={isSubmitting} 
-           className="flex justify-center items-center space-x-2 px-4 py-2 rounded-lg border-black border-2 bg-blue text-white">
-           {submitTitle}</button>
-        </div>
-      </Form>)}
-    </Formik>
+      {content}
     </Modal>
     </>
   );
