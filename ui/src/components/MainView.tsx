@@ -103,7 +103,7 @@ const MainView: React.FC = () => {
     }
   }*/
   return (
-    <div className="flex flex-col p-4 min-h-full">
+    <div className="min-h-full flex flex-col">
       <Switch>
         <Route exact={true} path="/">
           <Profile/>

@@ -61,6 +61,7 @@
     "@types/react-router-dom": "^5.1.7",
     "@types/react-select": "^4.0.13",
     "http-proxy-middleware": "^1.0.4",
+    "postcss-for": "^2.1.1",
     "react-scripts": "^4.0.2",
     "typescript": "4.2.3"
   }

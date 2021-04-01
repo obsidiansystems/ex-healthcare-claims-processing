@@ -38,7 +38,7 @@ const TabLink: React.FC<{to:string}> = ({children,to}) => {
 
 const PageTitle: React.FC<{title:string}> = ({title}) => {
   return (
-    <div className="text-3xl text-trueGray-700"> {title} </div>
+    <div className="text-3xl text-trueGray-700 m-6"> {title} </div>
   )
 }
 

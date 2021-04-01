@@ -30,7 +30,7 @@ const Modal: React.FC<Props> = ({active, setActive, hasCloseButton, children}) =
       {hasCloseButton &&
        <div className="flex flex-auto flex-row-reverse">
          <button onClick={() => setActive(false)}>
-           <X size="20px" color="var(--color-blue)" weight="bold" />
+           <X size="20px" color="var(--blue)" weight="bold" />
          </button>
        </div>
       }
