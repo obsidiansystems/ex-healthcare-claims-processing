@@ -10,7 +10,7 @@ import Select from 'react-select';
 import { LField, EField, ChoiceModal, DayPickerField, Nothing } from "./ChoiceModal";
 import { TabularScreenRoutes, TabularView, SingleItemView } from "./TabularScreen";
 
-const AppointmentRoutes : React.FC = () => 
+const AppointmentRoutes : React.FC = () =>
   <TabularScreenRoutes metavar=":appointmentId" table={Appointments} detail={Appointment}/>
 
 const useAppointments = (query: any) => {
@@ -18,7 +18,7 @@ const useAppointments = (query: any) => {
   const appointment = useAsync(async () => query.appointmentId ? await ledger.fetch(Main.Appointment.Appointment, query.appointmentId) : null, [query]);
   const appointmentsStream = useStreamQuery(Main.Appointment.Appointment, () => query).contracts;
   const appointments : readonly CreateEvent<Main.Appointment.Appointment>[] = query.appointmentId && appointment ? [appointment] : appointmentsStream;
-  
+
   const disclosed = useStreamQuery(Main.Policy.DisclosedPolicy).contracts;
 
   const keyedAppointments = Object.fromEntries(appointments.map(p => [p.payload.policy, p]));
@@ -81,7 +81,7 @@ const Appointment : React.FC = () => {
               <p>{d.overview?.policy?.payload?.patientName} is present and ready for treatment?</p>
             </ChoiceModal>
     ] }
-    
+
     />
   ;
 }
