@@ -15,6 +15,7 @@ This application simulates processing a healthcare claim, starting with the refe
 Be sure you have the following installed.
 - [DAML SDK](https://docs.daml.com/)
 - Java 8 or higher
+- Node.js 15 or higher
 
 #### Build the App
 
