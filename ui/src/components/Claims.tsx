@@ -26,8 +26,6 @@ const useClaims = (query: any) => {
   const disclosed = useStreamQuery(Main.Policy.DisclosedPolicy).contracts;
 
   const keyedDisclosed = new Map(disclosed.map(p => [p.payload.patient, p]));
-  //const overviews = Object.values(innerJoin(keyedReferrals, keyedDisclosed))
-  //                        .map(p => ({ referral: p[0], policy : p[1]}));
 
   return Array.from(mapIter(
     ([claim, receipt]) => ({

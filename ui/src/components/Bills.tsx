@@ -24,7 +24,7 @@ const useBills = (query: any) => {
   const keyedReceipts = new Map(receipts.map(receipt => [receipt.payload.paymentId, receipt]));
 
 
-  return Object.values(mapIter(
+  return Array.from(mapIter(
     ([bill, receipt]) => ({ bill, receipt }),
     leftJoin(keyedBills, keyedReceipts).values(),
   ));
@@ -34,16 +34,18 @@ const useBillsData = () => useBills( { } )
 
 const Bills: React.FC = () => {
   return <TabularView
-    title="Bills"
-    useData={useBillsData}
-    fields={ [
-/*            { label: "Patient Name", getter: o => o?.policy?.payload?.patientName},
-            { label: "Procedure Code", getter: o => o?.bill?.payload?.encounterDetails.procedureCode},
-            { label: "Diagnosis Code", getter: o => o?.bill?.payload?.encounterDetails.diagnosisCode}, */
+           title="Bills"
+           useData={useBillsData}
+           fields={ [
+             { label: "Provider", getter: o => "Provider name hidden" },
+             { label: "Amount", getter: o => o?.bill?.payload?.amount },
+             { label: "Appointment Date", getter: o => o?.bill?.payload?.encounterDetails.diagnosisCode },
+             { label: "Procedure Code", getter: o => o?.bill?.payload?.encounterDetails.procedureCode },
+             { label: "Paid", getter: o => (o?.receipt?.payload) ? "YES" : "NO" },
            ] }
-    tableKey={ o => o.bill.contractId }
-    itemUrl={ o => o.bill.contractId }
-    />
+           tableKey={ o => o.bill.contractId }
+           itemUrl={ o => o.bill.contractId }
+  />
 }
 
 const useBillData = () => {
