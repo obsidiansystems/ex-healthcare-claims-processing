@@ -29,14 +29,13 @@ const useClaims = (query: any) => {
   //const overviews = Object.values(innerJoin(keyedReferrals, keyedDisclosed))
   //                        .map(p => ({ referral: p[0], policy : p[1]}));
 
-  return Object.values(mapIter(
-    ([k, [claim, receipt]]) => ({
+  return Array.from(mapIter(
+    ([claim, receipt]) => ({
       claim,
       receipt,
       disclosed: keyedDisclosed.get(claim.payload.encounterDetails.patient),
     }),
-    leftJoin(keyedClaims, keyedReceipts)
-      .entries(),
+    leftJoin(keyedClaims, keyedReceipts).values(),
   ));
 }
 
@@ -47,7 +46,7 @@ const Claims: React.FC = () => {
   title="Claims"
   useData={useClaimsData}
   fields={ [
-    { label: "Patient Name", getter: o => o?.disclosed?.payload?.patientName },
+    { label: "Patient Name", getter: o => o?.disclosed?.payload?.patientName || "unknown patient" },
     { label: "Payer", getter: o => o?.claim?.payload?.payer },
     { label: "Procedure Code", getter: o => o?.claim?.payload?.encounterDetails.procedureCode },
     { label: "Amount", getter: o => o?.claim?.payload?.amount },
