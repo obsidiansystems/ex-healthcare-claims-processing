@@ -33,7 +33,7 @@ make build
     The navigator will automatically open in new browser tab at http://localhost:7500.
 2. Once the sandbox has started, start the automation logic by starting triggers. Type:
     ```shell
-    scripts/startTriggers.sh localhost 6865 triggers/.daml/dist/*.dar
+    scripts/startTriggers.sh localhost 6865 target/healthcare-claims-processing-triggers.dar
     ```
 
 ### Stopping the App
