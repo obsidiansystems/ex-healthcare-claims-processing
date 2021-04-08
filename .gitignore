@@ -13,3 +13,6 @@ dist
 .project
 .settings/
 ui/daml.js
+
+# Nix
+result*
