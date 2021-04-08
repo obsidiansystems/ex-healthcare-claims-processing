@@ -57,24 +57,6 @@ rec {
     inherit pkgs nodejs daml-js;
   };
 
-  # didn't seem to help
-  uiPackage = pkgs.lib.overrideDerivation ui.package (_: {
-    patches = [
-      (pkgs.writeText "fix-dep.patch" ''
-        --- a/package.json
-        +++ b/package.json
-        @@ -4,7 +4,7 @@
-           "private": true,
-           "dependencies": {
-             "@craco/craco": "6.1.1",
-        -    "@daml.js/healthcare-claims-processing": "file:daml.js/healthcare-claims-processing-2.0.0",
-        +    "@daml.js/healthcare-claims-processing": "file:${daml-js}/healthcare-claims-processing-2.0.0",
-             "@daml/ledger": "1.9.0",
-             "@daml/react": "1.9.0",
-      '')
-    ];
-  });
-
   shell = pkgs.mkShell {
     name = "daml-shell";
     nativeBuildInputs = [ daml pkgs.openjdk nodejs ];

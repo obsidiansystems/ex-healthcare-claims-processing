@@ -14,6 +14,6 @@ let
   };
 in
 import ./node-packages.nix {
-  inherit (pkgs) fetchurl nix-gitignore stdenv lib fetchgit;
+  inherit (pkgs) fetchurl nix-gitignore writeText runCommand stdenv lib fetchgit;
   inherit nodeEnv daml-js;
 }
