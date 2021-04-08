@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react'
 import { NavLink, Route, Switch, useRouteMatch, useParams } from 'react-router-dom';
 
-type Map<V> = { [key: string]: V };
+type OMap<V> = { [key: string]: V };
 
 type FieldProps = {label: string, value: string};
 
@@ -9,12 +9,27 @@ function intercalate<X>(xs: X[], sep: X) {
   return xs.flatMap(x => [sep,x]).slice(1);
 }
 
-function leftJoin<X,Y>(xs: Map<X>, ys: Map<Y>): Map<[X,Y]> {
-  const keys = Object.keys(xs);
-  return Object.fromEntries(keys.map(k => [k, [xs[k], ys[k]]]));
+export function* mapIter<A,B>(
+  f: (_: A) => B,
+  i: Iterator<A>
+): IterableIterator<B>
+{
+  let ib: Iterable<A> = {
+    [Symbol.iterator]: () => i,
+  };
+  for (const x of ib) {
+    yield f(x);
+  }
 }
 
-function innerJoin<X,Y>(xs: Map<X>, ys: Map<Y>): Map<[X,Y]> {
+function leftJoin<K,X,Y>(xs: Map<K, X>, ys: Map<K, Y>): Map<K, [X, Y | undefined]> {
+  return new Map(mapIter(
+    (([k, x]) => [k, [x, ys.get(k)]]),
+    xs.entries(),
+  ));
+}
+
+function innerJoin<X,Y>(xs: OMap<X>, ys: OMap<Y>): OMap<[X,Y]> {
   const keys = Object.keys(xs).filter(k => ys[k] != undefined);
   return Object.fromEntries(keys.map(k => [k, [xs[k], ys[k]]]));
 }

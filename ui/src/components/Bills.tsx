@@ -4,13 +4,13 @@ import { Main } from '@daml.js/healthcare-claims-processing';
 import { CreateEvent } from '@daml/ledger';
 import { useStreamQuery, useLedger } from '@daml/react';
 import { CaretRight, Share } from "phosphor-react";
-import { leftJoin, intercalate, Field, FieldsRow, PageTitle, TabLink, useAsync } from "./Common";
+import { mapIter, leftJoin, intercalate, Field, FieldsRow, PageTitle, TabLink, useAsync } from "./Common";
 import { Formik, Form, Field as FField, useField } from 'formik';
 import Select from 'react-select';
 import { LField, EField, ChoiceModal, DayPickerField, Nothing } from "./ChoiceModal";
 import { TabularScreenRoutes, TabularView, SingleItemView } from "./TabularScreen";
 
-const BillRoutes : React.FC = () => 
+const BillRoutes : React.FC = () =>
   <TabularScreenRoutes metavar=":billId" table={Bills} detail={Bill}/>
 
 const useBills = (query: any) => {
@@ -20,11 +20,14 @@ const useBills = (query: any) => {
   const bills : readonly CreateEvent<Main.Claim.PatientObligation>[] = query.billId && bill ? [bill] : billsStream;
   const receipts = useStreamQuery(Main.Claim.PaymentReceipt, () => ({ })).contracts;
 
-  const keyedBills = Object.fromEntries(bills.map(bill => [bill.payload.paymentId, bill]));
-  const keyedReceipts = Object.fromEntries(receipts.map(receipt => [receipt.payload.paymentId, receipt]));
-  
+  const keyedBills = new Map(bills.map(bill => [bill.payload.paymentId, bill]));
+  const keyedReceipts = new Map(receipts.map(receipt => [receipt.payload.paymentId, receipt]));
 
-  return Object.values(leftJoin(keyedBills, keyedReceipts)).map(p=> ({ bill: p[0], receipt: p[1] }));
+
+  return Object.values(mapIter(
+    ([bill, receipt]) => ({ bill, receipt }),
+    leftJoin(keyedBills, keyedReceipts).values(),
+  ));
 }
 
 const useBillsData = () => useBills( { } )
