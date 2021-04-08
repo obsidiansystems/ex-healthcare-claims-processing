@@ -29,10 +29,12 @@ make build
 
 1. Build, then start the DAML Sandbox and Navigator. Type:
     ```shell
+    cd model
     daml start --sandbox-option --address=localhost
     ```
     The navigator will automatically open in new browser tab at http://localhost:7500.
-2. Once the sandbox has started, start the automation logic by starting triggers. Type:
+2. Once the sandbox has started, start the automation logic by starting triggers.
+   In a new terminal back in the repo root, type:
     ```shell
     scripts/startTriggers.sh localhost 6865 target/healthcare-claims-processing-triggers.dar
     ```
