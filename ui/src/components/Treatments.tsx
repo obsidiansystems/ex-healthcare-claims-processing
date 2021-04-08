@@ -4,13 +4,13 @@ import { Main } from '@daml.js/healthcare-claims-processing';
 import { CreateEvent } from '@daml/ledger';
 import { useStreamQuery, useLedger } from '@daml/react';
 import { CaretRight, Share } from "phosphor-react";
-import { innerJoin, intercalate, Field, FieldsRow, PageTitle, TabLink, useAsync } from "./Common";
+import { mapIter, innerJoin, intercalate, Field, FieldsRow, PageTitle, TabLink, useAsync } from "./Common";
 import { Formik, Form, Field as FField, useField } from 'formik';
 import Select from 'react-select';
 import { LField, EField, ChoiceModal, DayPickerField, Nothing } from "./ChoiceModal";
 import { TabularScreenRoutes, TabularView, SingleItemView } from "./TabularScreen";
 
-const TreatmentRoutes : React.FC = () => 
+const TreatmentRoutes : React.FC = () =>
   <TabularScreenRoutes metavar=":treatmentId" table={Treatments} detail={Treatment}/>
 
 const useTreatments = (query: any) => {
@@ -18,13 +18,15 @@ const useTreatments = (query: any) => {
   const treatment = useAsync(async () => query.treatmentId ? await ledger.fetch(Main.Treatment.Treatment, query.treatmentId) : null, [query]);
   const treatmentsStream = useStreamQuery(Main.Treatment.Treatment, () => query).contracts;
   const treatments : readonly CreateEvent<Main.Treatment.Treatment>[] = query.treatmentId && treatment ? [treatment] : treatmentsStream;
-  
+
   const disclosed = useStreamQuery(Main.Policy.DisclosedPolicy).contracts;
 
-  const keyedTreatments = Object.fromEntries(treatments.map(p => [p.payload.policy, p]));
-  const keyedDisclosed = Object.fromEntries(disclosed.map(p => [p.contractId, p]));
-  const overviews = Object.values(innerJoin(keyedTreatments, keyedDisclosed))
-                         .map(p => ({ treatment: p[0], policy : p[1]}));
+  const keyedTreatments = new Map(treatments.map(p => [p.payload.policy, p]));
+  const keyedDisclosed = new Map(disclosed.map(p => [p.contractId, p]));
+  const overviews = Array.from(mapIter(
+    ([treatment, policy]) => ({ treatment, policy }),
+    innerJoin(keyedTreatments, keyedDisclosed).values(),
+  ));
   return overviews;
 }
 
@@ -79,7 +81,7 @@ const Treatment : React.FC = () => {
               <p>{d.overview?.policy?.payload?.patientName} is present and ready for treatment?</p>
             </ChoiceModal>
     ] }
-    
+
     />
   ;
 }

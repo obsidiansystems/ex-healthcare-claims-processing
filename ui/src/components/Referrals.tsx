@@ -4,13 +4,13 @@ import { Main } from '@daml.js/healthcare-claims-processing';
 import { CreateEvent } from '@daml/ledger';
 import { useStreamQuery, useLedger } from '@daml/react';
 import { CaretRight, Share } from "phosphor-react";
-import { innerJoin, intercalate, Field, FieldsRow, PageTitle, TabLink, useAsync } from "./Common";
+import { mapIter, innerJoin, intercalate, Field, FieldsRow, PageTitle, TabLink, useAsync } from "./Common";
 import { Formik, Form, Field as FField, useField } from 'formik';
 import Select from 'react-select';
 import { LField, EField, ChoiceModal, DayPickerField, Nothing } from "./ChoiceModal";
 import { TabularScreenRoutes, TabularView, SingleItemView } from "./TabularScreen";
 
-const ReferralRoutes : React.FC = () => 
+const ReferralRoutes : React.FC = () =>
   <TabularScreenRoutes metavar=":referralId" table={Referrals} detail={Referral}/>
 
 const useReferrals = (query: any) => {
@@ -18,14 +18,15 @@ const useReferrals = (query: any) => {
   const referral = useAsync(async () => query.referralId ? await ledger.fetch(Main.Provider.ReferralDetails, query.referralId) : null, [query]);
   const referralsStream = useStreamQuery(Main.Provider.ReferralDetails, () => query).contracts;
   const referrals : readonly CreateEvent<Main.Provider.ReferralDetails>[] = query.referralId && referral ? [referral] : referralsStream;
-  
+
   const disclosed = useStreamQuery(Main.Policy.DisclosedPolicy).contracts;
 
-  const keyedReferrals = Object.fromEntries(referrals.map(p => [p.payload.referralDetails.policy, p]));
-  const keyedDisclosed = Object.fromEntries(disclosed.map(p => [p.contractId, p]));
-  const overviews = Object.values(innerJoin(keyedReferrals, keyedDisclosed))
-                         .map(p => ({ referral: p[0], policy : p[1]}));
-  return overviews;
+  const keyedReferrals = new Map(referrals.map(p => [p.payload.referralDetails.policy, p]));
+  const keyedDisclosed = new Map(disclosed.map(p => [p.contractId, p]));
+  return Array.from(mapIter(
+    ([referral, policy]) => ({ referral, policy }),
+    innerJoin(keyedReferrals, keyedDisclosed).values(),
+  ));
 }
 
 const useReferralsData = () => useReferrals( { } )
@@ -76,7 +77,7 @@ const Referral: React.FC = () => {
               <DayPickerField name="appointmentDate" />
             </ChoiceModal>
     ] }
-    
+
     />
   ;
 }

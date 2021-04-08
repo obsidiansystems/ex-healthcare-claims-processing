@@ -4,7 +4,7 @@ import { Main } from '@daml.js/healthcare-claims-processing';
 import { CreateEvent } from '@daml/ledger';
 import { useStreamQuery, useLedger } from '@daml/react';
 import { CaretRight, Share } from "phosphor-react";
-import { innerJoin, intercalate, Field, FieldsRow, PageTitle, TabLink, useAsync } from "./Common";
+import { mapIter, innerJoin, intercalate, Field, FieldsRow, PageTitle, TabLink, useAsync } from "./Common";
 import { Formik, Form, Field as FField, useField } from 'formik';
 import Select from 'react-select';
 import { LField, EField, ChoiceModal, DayPickerField, Nothing } from "./ChoiceModal";
@@ -21,11 +21,12 @@ const useAppointments = (query: any) => {
 
   const disclosed = useStreamQuery(Main.Policy.DisclosedPolicy).contracts;
 
-  const keyedAppointments = Object.fromEntries(appointments.map(p => [p.payload.policy, p]));
-  const keyedDisclosed = Object.fromEntries(disclosed.map(p => [p.contractId, p]));
-  const overviews = Object.values(innerJoin(keyedAppointments, keyedDisclosed))
-                         .map(p => ({ appointment: p[0], policy : p[1]}));
-  return overviews;
+  const keyedAppointments = new Map(appointments.map(p => [p.payload.policy, p]));
+  const keyedDisclosed = new Map(disclosed.map(p => [p.contractId, p]));
+  return Array.from(mapIter(
+    ([appointment, policy]) => ({ appointment, policy}),
+    innerJoin(keyedAppointments, keyedDisclosed).values(),
+  ));
 }
 
 const useAppointmentsData = () => useAppointments( { } )

@@ -4,7 +4,7 @@ import { Main } from '@daml.js/healthcare-claims-processing';
 import { CreateEvent } from '@daml/ledger';
 import { useStreamQuery } from '@daml/react';
 import { CaretRight, Share } from "phosphor-react";
-import { innerJoin, intercalate, Field, FieldsRow, PageTitle, TabLink } from "./Common";
+import { mapIter, innerJoin, intercalate, Field, FieldsRow, PageTitle, TabLink } from "./Common";
 import { Formik, Form, Field as FField, useField } from 'formik';
 import Select from 'react-select';
 import { LField, EField, ChoiceModal, ChoiceErrorsType, Nothing, validateNonEmpty, RenderError } from "./ChoiceModal";
@@ -39,10 +39,12 @@ const usePatients = (query: any) => {
     .contracts
   const disclosed = disclosedRaw.map(resp => resp.payload)
 
-  const keyedAcceptance = Object.fromEntries(acceptances.map(p => [p.patient, p]));
-  const keyedDisclosed = Object.fromEntries(disclosed.map(p => [p.patient, p]));
-  const overviews = Object.values(innerJoin(keyedAcceptance, keyedDisclosed))
-                         .map(p => ({ acceptance: p[0], policy : p[1]}));
+  const keyedAcceptance = new Map(acceptances.map(p => [p.patient, p]));
+  const keyedDisclosed = new Map(disclosed.map(p => [p.patient, p]));
+  const overviews = Array.from(mapIter(
+    ([acceptance, policy]) => ({ acceptance, policy }),
+    innerJoin(keyedAcceptance, keyedDisclosed).values(),
+  ));
   return { acceptances, disclosed, overviews, disclosedRaw };
 }
 
