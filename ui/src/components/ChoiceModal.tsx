@@ -50,6 +50,14 @@ interface Failure {
 
 type MaybeSuccessOrFailure = Nothing | Success | Failure;
 
+export const SubmitButton: React.FC<{ submitTitle: string, isSubmitting: boolean }> = ({ submitTitle, isSubmitting }) => (
+  <button type="submit"
+  disabled={isSubmitting}
+  className={"flex justify-center items-center space-x-2 px-4 py-2 rounded-lg border-black border-2 bg-blue text-white"}>
+  {submitTitle}
+  </button>
+);
+
 export function ChoiceModal<T extends object, C, R, K>({ choice, contract, submitTitle, buttonTitle, initialValues, icon, className, children }: ChoiceModalProps<T,C,R,K>) {
   const [modalActive, setModalActiveInner] = React.useState(false);
   const [successOrFailure, setSuccessOrFailure] = React.useState<MaybeSuccessOrFailure>(Nothing);
@@ -80,9 +88,7 @@ export function ChoiceModal<T extends object, C, R, K>({ choice, contract, submi
           {({ errors, touched, isValidating, isSubmitting}) => (<Form className={className}>
             {typeof children == "function" ? children({ errors, touched }) : children}
             <div className="flex justify-center align-center">
-              <button type="submit" disabled={isSubmitting}
-                      className="flex justify-center items-center space-x-2 px-4 py-2 rounded-lg border-black border-2 bg-blue text-white">
-                {submitTitle}</button>
+              <SubmitButton submitTitle={submitTitle} isSubmitting={isSubmitting} />
             </div>
             {/* <Field name="email" validate={validateEmail} />
                 {errors.email && touched.email && <div>{errors.email}</div>}
@@ -187,17 +193,19 @@ export const DayPickerField : React.FC<{
   name: string
   errors?: ChoiceErrorsType,
 }> = ({ name, errors }) => {
-  const [ field, meta, { setValue } ] = useField(name);
+  const [ field, meta, { setValue } ] = useField<string | Nothing>(name);
   const error = errors?.[name];
   return (
     <>
-    <DayPicker
-      setModalActive={ () => null }
-      date={new Date()}
-      setDate={(d)=>setValue(d.toISOString().split('T')[0])}
-      theme={({ blue: "var(--color-blue)" })}
-    />
-    <RenderError error={error} />
+      <DayPicker
+        date={field.value == Nothing
+            ? new Date()
+            : new Date(field.value + "T00:10:00")
+        }
+        setDate={(d)=>setValue(d.toISOString().split('T')[0])}
+        theme={({ blue: "var(--color-blue)" })}
+      />
+      <RenderError error={error} />
     </>
-  );
+        );
 }

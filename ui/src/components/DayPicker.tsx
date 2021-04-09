@@ -4,13 +4,12 @@ import ReactDayPicker from 'react-day-picker';
 import 'react-day-picker/lib/style.css';
 
 type Props = {
-  setModalActive: Dispatch<SetStateAction<boolean>>;
   date: Date;
   setDate: (date:Date) => void;
   theme: { blue: string };
 }
 
-const DayPicker: React.FC<Props> = ({setModalActive, date, setDate, theme}) => {
+const DayPicker: React.FC<Props> = ({date, setDate, theme}) => {
   const month = date;
   let hovered = null;
 
@@ -35,7 +34,6 @@ const DayPicker: React.FC<Props> = ({setModalActive, date, setDate, theme}) => {
 
   const onClick = (date: Date) => {
     setDate(date);
-    setModalActive(false);
   }
 
   return (
