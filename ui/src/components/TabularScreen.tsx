@@ -7,7 +7,7 @@ import { CaretRight, Share } from "phosphor-react";
 import { intercalate, Field, FieldsRow, PageTitle, TabLink, useAsync } from "./Common";
 import { Formik, Form, Field as FField, useField } from 'formik';
 import Select from 'react-select';
-import { LField, EField, ChoiceModal, DayPickerField, Nothing } from "./ChoiceModal";
+import { LField, EField, ChoiceModal, Nothing } from "./ChoiceModal";
 
 export const TabularScreenRoutes : React.FC<{metavar: string, table: ReactNode, detail: ReactNode }> = ( { metavar, table, detail } ) => {
   const match = useRouteMatch();

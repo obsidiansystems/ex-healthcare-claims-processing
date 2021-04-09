@@ -7,7 +7,7 @@ import { CaretRight, Share } from "phosphor-react";
 import { mapIter, innerJoin, intercalate, Field, FieldsRow, PageTitle, TabLink, useAsync } from "./Common";
 import { Formik, Form, Field as FField, useField } from 'formik';
 import Select from 'react-select';
-import { LField, EField, ChoiceModal, DayPickerField, Nothing } from "./ChoiceModal";
+import { LField, EField, ChoiceModal, Nothing } from "./ChoiceModal";
 import { TabularScreenRoutes, TabularView, SingleItemView } from "./TabularScreen";
 
 const AppointmentRoutes : React.FC = () =>
