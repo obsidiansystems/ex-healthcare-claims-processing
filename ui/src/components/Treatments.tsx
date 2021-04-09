@@ -34,7 +34,7 @@ const useTreatmentsData = () => useTreatments( { } )
 
 const Treatments: React.FC = () => {
   return <TabularView
-    title="Referrals"
+    title="Treatments"
     useData={useTreatmentsData}
     fields={ [
       { label: "Patient Name", getter: o => o?.policy?.payload?.patientName},
