@@ -69,7 +69,7 @@ const Claim : React.FC = () => {
       { label: "Paid", getter: o => o?.overview?.receipt ? "Yes" : "No" },
       { label: "Patient Name", getter: o => o?.overview?.claim?.payload?.encounterDetails?.patient},
       { label: "Appointment Date", getter: o => "" },
-      { label: "Appointment Pririty", getter: o => o?.overview?.claim?.payload?.encounterDetails.appointmentPriority},
+      { label: "Appointment Priority", getter: o => o?.overview?.claim?.payload?.encounterDetails.appointmentPriority},
       { label: "Procedure Code", getter: o => o?.overview?.claim?.payload?.encounterDetails.procedureCode},
       { label: "Diagnosis Code", getter: o => o?.overview?.claim?.payload?.encounterDetails.diagnosisCode},
       { label: "Site Service Code", getter: o => o?.overview?.claim?.payload?.encounterDetails.siteServiceCode},

@@ -62,7 +62,7 @@ const Bill : React.FC = () => {
       { label: "Paid", getter: o => o?.overview?.receipt ? "Yes" : "No" },
       { label: "Patient Name", getter: o => o?.overview?.bill?.payload?.encounterDetails?.patient},
       { label: "Appointment Date", getter: o => "" },
-      { label: "Appointment Pririty", getter: o => o?.overview?.bill?.payload?.encounterDetails.appointmentPriority},
+      { label: "Appointment Priority", getter: o => o?.overview?.bill?.payload?.encounterDetails.appointmentPriority},
       { label: "Procedure Code", getter: o => o?.overview?.bill?.payload?.encounterDetails.procedureCode},
       { label: "Diagnosis Code", getter: o => o?.overview?.bill?.payload?.encounterDetails.diagnosisCode},
       { label: "Site Service Code", getter: o => o?.overview?.bill?.payload?.encounterDetails.siteServiceCode},
