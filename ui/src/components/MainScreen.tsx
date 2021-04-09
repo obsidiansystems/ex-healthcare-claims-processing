@@ -45,7 +45,7 @@ const MainScreen: React.FC<Props> = ({onLogout}) => {
         <TabLink icon="first-aid-kit" to="/provider/treatments">Treatments</TabLink>
         <TabLink icon="currency-circle-dollar" to="/provider/claims">Claims</TabLink>
         <TabLink icon="pedestrian" to="/provider/patients">Patients</TabLink>
-        <TabLink icon="handshake" to="/provider/payers">Insurance Providers</TabLink>
+        {/*<TabLink icon="handshake" to="/provider/payers">Insurance Providers</TabLink>*/}
         <TabLink icon="currency-circle-dollar" to="/patient/bills">Bills</TabLink>
         <div className="flex-grow"/>
         <hr className="mx-3"/>
