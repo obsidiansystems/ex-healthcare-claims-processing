@@ -77,8 +77,8 @@ const Bill : React.FC = () => {
             <ChoiceModal className="flex flex-col"
                          choice={Main.Claim.PatientObligation.PayPatientObligation}
                          contract={d.overview?.bill?.contractId}
-                         submitTitle="Complete Treatment"
-                         buttonTitle="Complete Treatment"
+                         submitTitle="Bill Pay"
+                         buttonTitle="Bill Pay"
                          icon={<Share />}
                          initialValues={ { } } >
               <h1 className="text-center">Pay Bill</h1>
