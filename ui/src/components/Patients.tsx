@@ -3,11 +3,11 @@ import { Link, NavLink, Redirect, Route, Switch, useRouteMatch, useParams } from
 import { Main } from '@daml.js/healthcare-claims-processing';
 import { CreateEvent } from '@daml/ledger';
 import { useStreamQuery } from '@daml/react';
-import { CaretRight, Share } from "phosphor-react";
+import { CaretRight, Share, ArrowRight } from "phosphor-react";
 import { innerJoin, intercalate, Field, FieldsRow, PageTitle, TabLink } from "./Common";
 import { Formik, Form, Field as FField, useField } from 'formik';
 import Select from 'react-select';
-import { LField, EField, ChoiceModal, Nothing } from "./ChoiceModal";
+import { LField, EField, ChoiceModal, Nothing, creations } from "./ChoiceModal";
 import { TabularScreenRoutes, TabularView, SingleItemView } from "./TabularScreen";
 
 
@@ -143,6 +143,11 @@ const Patient: React.FC = () => {
                          submitTitle="Create Referral"
                          buttonTitle="Refer Patient"
                          icon={<Share />}
+                         successWidget={({ rv: [v, evts] }, close)=><>
+                           <h2 className="2xl">Referral Created!</h2>
+                             Referral has been checked in and is ready for treatment.
+                             <Link to={"/treatments/"+(creations(evts)[0]?.contractId)}>View Treatment <ArrowRight/></Link>
+                           </>}
                          initialValues={ {
                            policy: Nothing,
                            receiver: Nothing,

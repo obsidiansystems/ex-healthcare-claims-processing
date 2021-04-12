@@ -3,11 +3,11 @@ import { Link, NavLink, Redirect, Route, Switch, useRouteMatch, useParams } from
 import { Main } from '@daml.js/healthcare-claims-processing';
 import { CreateEvent } from '@daml/ledger';
 import { useStreamQuery, useLedger } from '@daml/react';
-import { CaretRight, Share } from "phosphor-react";
+import { CaretRight, Share, ArrowRight } from "phosphor-react";
 import { innerJoin, intercalate, Field, FieldsRow, PageTitle, TabLink, useAsync } from "./Common";
 import { Formik, Form, Field as FField, useField } from 'formik';
 import Select from 'react-select';
-import { LField, EField, ChoiceModal, DayPickerField, Nothing } from "./ChoiceModal";
+import { LField, EField, ChoiceModal, DayPickerField, Nothing, creations } from "./ChoiceModal";
 import { TabularScreenRoutes, TabularView, SingleItemView } from "./TabularScreen";
 
 const AppointmentRoutes : React.FC = () => 
@@ -76,7 +76,14 @@ const Appointment : React.FC = () => {
                          submitTitle="Check In Patient Now"
                          buttonTitle="Check In Patient"
                          icon={<Share />}
-                         initialValues={ { } } >
+                         initialValues={ { } } 
+                         successWidget={({ rv: [v, evts] }, close)=><>
+                           <h2 className="2xl">Patient has been Checked In!</h2>
+                             {d.overview?.policy?.payload?.patientName} has been checked in and is ready for treatment.
+                             <Link to={"/treatments/"+(creations(evts)[0]?.contractId)}>View Treatment <ArrowRight/></Link>
+                           </>}
+                         failureWidget={()=><>Failure</>}
+                         >
               <h1 className="text-center">Check In Patient</h1>
               <p>{d.overview?.policy?.payload?.patientName} is present and ready for treatment?</p>
             </ChoiceModal>

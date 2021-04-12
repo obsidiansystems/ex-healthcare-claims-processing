@@ -3,7 +3,7 @@ import { Link, NavLink, Redirect, Route, Switch, useRouteMatch, useParams } from
 import { Main } from '@daml.js/healthcare-claims-processing';
 import { CreateEvent } from '@daml/ledger';
 import { useStreamQuery, useLedger } from '@daml/react';
-import { CaretRight, Share } from "phosphor-react";
+import { CaretRight, Share, ArrowRight } from "phosphor-react";
 import { leftJoin, intercalate, Field, FieldsRow, PageTitle, TabLink, useAsync } from "./Common";
 import { Formik, Form, Field as FField, useField } from 'formik';
 import Select from 'react-select';
@@ -75,6 +75,12 @@ const Bill : React.FC = () => {
                          submitTitle="Complete Treatment"
                          buttonTitle="Complete Treatment"
                          icon={<Share />}
+                         successWidget={({ rv: [v, evts] }, close)=><>
+                           <h2 className="2xl">Bill has been paid!</h2>
+                             The bill for this procedure has been paid.
+                             <a onClick={(e)=>close()}>close</a>
+                           </>}
+                         failureWidget={()=><>Failure</>}
                          initialValues={ { } } >
               <h1 className="text-center">Pay Bill</h1>
             </ChoiceModal>
