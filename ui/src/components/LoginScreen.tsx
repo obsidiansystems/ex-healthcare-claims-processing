@@ -7,6 +7,7 @@ import Credentials, { computeCredentials } from '../Credentials';
 import Ledger from '@daml/ledger';
 // import { User } from '@daml.js/example-create-daml-app';
 import { DeploymentMode, deploymentMode, ledgerId, httpBaseUrl} from '../config';
+import { Landing } from './Landing';
 import { useEffect } from 'react';
 
 type Props = {
@@ -68,6 +69,8 @@ const LoginScreen: React.FC<Props> = ({onLogin}) => {
   }, [login]);
 
   return (
+    <div className="flex">
+      <Landing/>
     <Grid textAlign='center' style={{ height: '100vh' }} verticalAlign='middle'>
       <Grid.Column style={{ maxWidth: 450 }}>
         <Header as='h1' textAlign='center' size='huge' style={{color: '#223668'}}>
@@ -118,6 +121,7 @@ const LoginScreen: React.FC<Props> = ({onLogin}) => {
         </Form>
       </Grid.Column>
     </Grid>
+    </div>
   );
 };
 
