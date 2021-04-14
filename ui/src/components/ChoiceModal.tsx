@@ -203,7 +203,7 @@ export const DayPickerField : React.FC<{
             : new Date(field.value + "T00:10:00")
         }
         setDate={(d)=>setValue(d.toISOString().split('T')[0])}
-        theme={({ blue: "var(--color-blue)" })}
+        theme={({ blue: "var(--blue)" })}
       />
       <RenderError error={error} />
     </>
