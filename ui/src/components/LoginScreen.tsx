@@ -105,7 +105,7 @@ const LoginScreen: React.FC<Props> = ({onLogin}) => {
   );
 
   return (
-    <div className="flex">
+    <div className="main-grid font-alata">
         <Landing/>
         <div className="relative flex flex-col flex-grow justify-center items-center">
           <img src="/logo-with-name.svg" className="absolute top-7 left-11"/>
