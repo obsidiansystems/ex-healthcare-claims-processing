@@ -106,21 +106,21 @@ const LoginScreen: React.FC<Props> = ({onLogin}) => {
 
   return (
     <div className="main-grid font-alata">
-        <Landing/>
-        <div className="relative flex flex-col flex-grow justify-center items-center">
-          <img src="/logo-with-name.svg" className="absolute top-7 left-11"/>
-          <div className="flex flex-col justify-center items-stretch space-y-4 w-80">
-            {deploymentMode === DeploymentMode.PROD_DABL
-            ?
-             <Button primary fluid onClick={handleDablLogin}>
-               Log in with DABL
-             </Button>
-            : <SelectRole />
-            }
-          </div>
+      <Landing/>
+      <div className="relative flex flex-col flex-grow justify-center items-center">
+        <img src="/logo-with-name.svg" className="absolute top-7 left-11"/>
+        <div className="flex flex-col justify-center items-stretch space-y-4 w-80">
+          {deploymentMode === DeploymentMode.PROD_DABL
+          ?
+           <Button primary fluid onClick={handleDablLogin}>
+             Log in with DABL
+           </Button>
+          : <SelectRole />
+          }
         </div>
       </div>
-    );
+    </div>
+  );
 };
 
 export default LoginScreen;
