@@ -4,13 +4,13 @@ import { Main } from '@daml.js/healthcare-claims-processing';
 import { CreateEvent } from '@daml/ledger';
 import { useStreamQuery, useLedger } from '@daml/react';
 import { CaretRight, Share, ArrowRight } from "phosphor-react";
-import { innerJoin, intercalate, Field, FieldsRow, PageTitle, TabLink, useAsync } from "./Common";
+import { mapIter, innerJoin, intercalate, Field, FieldsRow, PageTitle, TabLink, useAsync } from "./Common";
 import { Formik, Form, Field as FField, useField } from 'formik';
 import Select from 'react-select';
-import { LField, EField, ChoiceModal, DayPickerField, Nothing, creations } from "./ChoiceModal";
+import { LField, EField, ChoiceModal, Nothing, creations } from "./ChoiceModal";
 import { TabularScreenRoutes, TabularView, SingleItemView } from "./TabularScreen";
 
-const AppointmentRoutes : React.FC = () => 
+const AppointmentRoutes : React.FC = () =>
   <TabularScreenRoutes metavar=":appointmentId" table={Appointments} detail={Appointment}/>
 
 const useAppointments = (query: any) => {
@@ -18,14 +18,15 @@ const useAppointments = (query: any) => {
   const appointment = useAsync(async () => query.appointmentId ? await ledger.fetch(Main.Appointment.Appointment, query.appointmentId) : null, [query]);
   const appointmentsStream = useStreamQuery(Main.Appointment.Appointment, () => query).contracts;
   const appointments : readonly CreateEvent<Main.Appointment.Appointment>[] = query.appointmentId && appointment ? [appointment] : appointmentsStream;
-  
+
   const disclosed = useStreamQuery(Main.Policy.DisclosedPolicy).contracts;
 
-  const keyedAppointments = Object.fromEntries(appointments.map(p => [p.payload.policy, p]));
-  const keyedDisclosed = Object.fromEntries(disclosed.map(p => [p.contractId, p]));
-  const overviews = Object.values(innerJoin(keyedAppointments, keyedDisclosed))
-                         .map(p => ({ appointment: p[0], policy : p[1]}));
-  return overviews;
+  const keyedAppointments = new Map(appointments.map(p => [p.payload.policy, p]));
+  const keyedDisclosed = new Map(disclosed.map(p => [p.contractId, p]));
+  return Array.from(mapIter(
+    ([appointment, policy]) => ({ appointment, policy}),
+    innerJoin(keyedAppointments, keyedDisclosed).values(),
+  ));
 }
 
 const useAppointmentsData = () => useAppointments( { } )
@@ -39,7 +40,7 @@ const Appointments: React.FC = () => {
       { label: "Patient Name", getter: o => o?.policy?.payload?.patientName },
       { label: "Insurance ID", getter: o => o?.policy?.payload?.insuranceID },
       { label: "Procedure Code", getter: o => o?.appointment?.payload?.encounterDetails.encounterDetails.procedureCode },
-      { label: "Appointment Pririty", getter: o => o?.appointment?.payload?.encounterDetails.encounterDetails.appointmentPriority },
+      { label: "Appointment Priority", getter: o => o?.appointment?.payload?.encounterDetails.encounterDetails.appointmentPriority },
     ] }
     tableKey={ o => o.appointment.contractId }
     itemUrl={ o => o.appointment.contractId }
@@ -59,7 +60,7 @@ const Appointment : React.FC = () => {
     fields={ [
       { label: "Patient Name", getter: o => o?.overview?.policy?.payload?.patientName },
       { label: "Appointment Date", getter: o => o?.overview?.appointment?.payload?.appointmentDate },
-      { label: "Appointment Pririty", getter: o => o?.overview?.appointment?.payload?.encounterDetails.encounterDetails.appointmentPriority },
+      { label: "Appointment Priority", getter: o => o?.overview?.appointment?.payload?.encounterDetails.encounterDetails.appointmentPriority },
       { label: "Procedure Code", getter: o => o?.overview?.appointment?.payload?.encounterDetails.encounterDetails.procedureCode },
       { label: "Diagnosis Code", getter: o => o?.overview?.appointment?.payload?.encounterDetails.encounterDetails.diagnosisCode },
       { label: "Site Service Code", getter: o => o?.overview?.appointment?.payload?.encounterDetails.encounterDetails.siteServiceCode },
@@ -88,7 +89,7 @@ const Appointment : React.FC = () => {
               <p>{d.overview?.policy?.payload?.patientName} is present and ready for treatment?</p>
             </ChoiceModal>
     ] }
-    
+
     />
   ;
 }

@@ -2,11 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import React, { useCallback } from 'react'
+import { ArrowRight } from "phosphor-react";
 import { Button, Form, Grid, Header, Image, Segment } from 'semantic-ui-react'
 import Credentials, { computeCredentials } from '../Credentials';
 import Ledger from '@daml/ledger';
 // import { User } from '@daml.js/example-create-daml-app';
 import { DeploymentMode, deploymentMode, ledgerId, httpBaseUrl} from '../config';
+import { Landing } from './Landing';
 import { useEffect } from 'react';
 
 type Props = {
@@ -17,11 +19,6 @@ type Props = {
  * React component for the login screen of the `App`.
  */
 const LoginScreen: React.FC<Props> = ({onLogin}) => {
-  // const [username, setUsername] = React.useState('PrimaryCareProvider');
-  const [username, setUsername] = React.useState('Radiologist');
-  // const [username, setUsername] = React.useState('Patient1');
-  // const [username, setUsername] = React.useState('InsuranceCompany');
-
   const login = useCallback(async (credentials: Credentials) => {
     try {
       console.log("Attempting ogin");
@@ -40,10 +37,9 @@ const LoginScreen: React.FC<Props> = ({onLogin}) => {
     }
   }, [onLogin]);
 
-  const handleLogin = async (event : any) => { //: React.FormEvent) => {
+  const handleLogin = (username: string) => async (event : any) => {
     event.preventDefault();
-    const credentials = computeCredentials(username);
-    await login(credentials);
+    await login(computeCredentials(username));
   }
 
   // handleLogin({preventDefault: (() => 1)}); // Hotwiring for dev convenience.
@@ -67,58 +63,64 @@ const LoginScreen: React.FC<Props> = ({onLogin}) => {
     login({token, party, ledgerId});
   }, [login]);
 
-  return (
-    <Grid textAlign='center' style={{ height: '100vh' }} verticalAlign='middle'>
-      <Grid.Column style={{ maxWidth: 450 }}>
-        <Header as='h1' textAlign='center' size='huge' style={{color: '#223668'}}>
-          <Header.Content>
-            Create
-            <Image
-              as='a'
-              href='https://www.daml.com/'
-              target='_blank'
-              src='/daml.svg'
-              alt='Daml Logo'
-              spaced
-              size='small'
-              verticalAlign='middle'
-            />
-            App
-          </Header.Content>
-        </Header>
-        <Form size='large' className='test-select-login-screen'>
-          <Segment>
-            {deploymentMode !== DeploymentMode.PROD_DABL
-            ? <>
-                {/* FORM_BEGIN */}
-                <Form.Select
-                  fluid
-                  icon='user'
-                  iconPosition='left'
-                  placeholder='Username'
-                  value={username}
-                  options={ [ "PrimaryCareProvider", "Radiologist", "Patient1", "InsuranceCompany" ].map(a=>({ key: a, value: a, text: a}))}
-                  className='test-select-username-field'
-                  onChange={e => {if(e.currentTarget.textContent) { setUsername(e.currentTarget.textContent);} }}
-                />
-                <Button
-                  primary
-                  fluid
-                  className='test-select-login-button'
-                  onClick={handleLogin}>
-                  Log in
-                </Button>
-                {/* FORM_END */}
-              </>
-            : <Button primary fluid onClick={handleDablLogin}>
-                Log in with DABL
-              </Button>
-            }
-          </Segment>
-        </Form>
-      </Grid.Column>
-    </Grid>
+  const roles = [
+    {
+      label: "Primary Care Provider",
+      username: "PrimaryCareProvider",
+    },
+    {
+      label: "Radiologist",
+      username: "Radiologist",
+    },
+    {
+      label: "Patient",
+      username: "Patient 1",
+    },
+    {
+      label: "Insurance Company",
+      username: "Insurance Company",
+    },
+  ];
+
+  const SelectRole = () => (
+    <>
+      <div className="text-2xl text-center text-gray-600">
+        Select a User Role
+      </div>
+      <div className="text-sm text-center text-trueGray-500">
+        User roles allow you to access features unique to each party in a health care system.
+      </div>
+      <div className="flex flex-col space-y-4">
+        { roles.map(({label, username}) => (
+          <button
+            className="flex flex-row justify-between items-center rounded h-10 p-4 bg-trueGray-100 border-trueGray-100 focus:bg-blue focus:text-white hover:bg-white hover:border-blue border-2 text-sm text-gray-600"
+            onClick={handleLogin(username)}
+          >
+            {label}
+            <ArrowRight size={21} />
+          </button>
+          ))}
+      </div>
+    </>
   );
+
+  return (
+    <div className="flex">
+        <Landing/>
+        <div className="relative flex flex-col flex-grow justify-center items-center">
+          <img src="/logo-with-name.svg" className="absolute top-7 left-11"/>
+          <div className="flex flex-col justify-center items-stretch space-y-4 w-80">
+            {deploymentMode === DeploymentMode.PROD_DABL
+            ?
+             <Button primary fluid onClick={handleDablLogin}>
+               Log in with DABL
+             </Button>
+            : <SelectRole />
+            }
+          </div>
+        </div>
+      </div>
+    );
 };
 
 export default LoginScreen;

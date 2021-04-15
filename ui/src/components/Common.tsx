@@ -1,22 +1,37 @@
 import React, { useState, useMemo } from 'react'
 import { NavLink, Route, Switch, useRouteMatch, useParams } from 'react-router-dom';
 
-type Map<V> = { [key: string]: V };
-
 type FieldProps = {label: string, value: string};
 
 function intercalate<X>(xs: X[], sep: X) {
   return xs.flatMap(x => [sep,x]).slice(1);
 }
 
-function leftJoin<X,Y>(xs: Map<X>, ys: Map<Y>): Map<[X,Y]> {
-  const keys = Object.keys(xs);
-  return Object.fromEntries(keys.map(k => [k, [xs[k], ys[k]]]));
+export function* mapIter<A,B>(
+  f: (_: A) => B,
+  i: IterableIterator<A>
+): IterableIterator<B>
+{
+  for (const x of i) {
+    yield f(x);
+  }
 }
 
-function innerJoin<X,Y>(xs: Map<X>, ys: Map<Y>): Map<[X,Y]> {
-  const keys = Object.keys(xs).filter(k => ys[k] != undefined);
-  return Object.fromEntries(keys.map(k => [k, [xs[k], ys[k]]]));
+function leftJoin<K, X, Y>(xs: Map<K, X>, ys: Map<K, Y>): Map<K, [X, Y | undefined]> {
+  return new Map(mapIter(
+    (([k, x]) => [k, [x, ys.get(k)]]),
+    xs.entries(),
+  ));
+}
+
+function innerJoin<K, X, Y>(xs: Map<K, X>, ys: Map<K, Y>): Map<K, [X, Y]> {
+  let ret = new Map();
+  for (const [k, x] of xs.entries()) {
+    const y = ys.get(k);
+    if (y)
+      ret.set(k, [x, y]);
+  }
+  return ret;
 }
 
 const TabLink: React.FC<{to:string}> = ({children,to}) => {

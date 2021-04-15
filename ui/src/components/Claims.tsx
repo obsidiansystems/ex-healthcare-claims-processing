@@ -4,13 +4,13 @@ import { Main } from '@daml.js/healthcare-claims-processing';
 import { CreateEvent } from '@daml/ledger';
 import { useStreamQuery, useLedger } from '@daml/react';
 import { CaretRight, Share } from "phosphor-react";
-import { leftJoin, intercalate, Field, FieldsRow, PageTitle, TabLink, useAsync } from "./Common";
+import { mapIter, leftJoin, intercalate, Field, FieldsRow, PageTitle, TabLink, useAsync } from "./Common";
 import { Formik, Form, Field as FField, useField } from 'formik';
 import Select from 'react-select';
-import { LField, EField, ChoiceModal, DayPickerField, Nothing } from "./ChoiceModal";
+import { LField, EField, ChoiceModal, Nothing } from "./ChoiceModal";
 import { TabularScreenRoutes, TabularView, SingleItemView } from "./TabularScreen";
 
-const ClaimRoutes : React.FC = () => 
+const ClaimRoutes : React.FC = () =>
   <TabularScreenRoutes metavar=":claimId" table={Claims} detail={Claim}/>
 
 const useClaims = (query: any) => {
@@ -20,27 +20,39 @@ const useClaims = (query: any) => {
   const claims : readonly CreateEvent<Main.Claim.Claim>[] = query.claimId && claim ? [claim] : claimsStream;
   const receipts = useStreamQuery(Main.Claim.PaymentReceipt, () => ({ })).contracts;
 
-  const keyedClaims = Object.fromEntries(claims.map(claim => [claim.payload.claimId, claim]));
-  const keyedReceipts = Object.fromEntries(receipts.map(receipt => [receipt.payload.paymentId, receipt]));
-  
+  const keyedClaims = new Map(claims.map(claim => [claim.payload.claimId, claim]));
+  const keyedReceipts = new Map(receipts.map(receipt => [receipt.payload.paymentId, receipt]));
 
-  return Object.values(leftJoin(keyedClaims, keyedReceipts)).map(p=> ({ claim: p[0], receipt: p[1] }));
+  const disclosed = useStreamQuery(Main.Policy.DisclosedPolicy).contracts;
+
+  const keyedDisclosed = new Map(disclosed.map(p => [p.payload.patient, p]));
+
+  return Array.from(mapIter(
+    ([claim, receipt]) => ({
+      claim,
+      receipt,
+      disclosed: keyedDisclosed.get(claim.payload.encounterDetails.patient),
+    }),
+    leftJoin(keyedClaims, keyedReceipts).values(),
+  ));
 }
 
 const useClaimsData = () => useClaims( { } )
 
 const Claims: React.FC = () => {
   return <TabularView
-    title="Claims"
-    useData={useClaimsData}
-    fields={ [
-/*            { label: "Patient Name", getter: o => o?.policy?.payload?.patientName},
-            { label: "Procedure Code", getter: o => o?.claim?.payload?.encounterDetails.procedureCode},
-            { label: "Diagnosis Code", getter: o => o?.claim?.payload?.encounterDetails.diagnosisCode}, */
-           ] }
-    tableKey={ o => o.claim.contractId }
-    itemUrl={ o => o.claim.contractId }
-    />
+  title="Claims"
+  useData={useClaimsData}
+  fields={ [
+    { label: "Patient Name", getter: o => o?.disclosed?.payload?.patientName || "unknown patient" },
+    { label: "Payer", getter: o => o?.claim?.payload?.payer },
+    { label: "Procedure Code", getter: o => o?.claim?.payload?.encounterDetails.procedureCode },
+    { label: "Amount", getter: o => o?.claim?.payload?.amount },
+    { label: "Complete", getter: o => o?.receipt ? "Yes" : "No" },
+  ] }
+  tableKey={ o => o.claim.contractId }
+  itemUrl={ o => o.claim.contractId }
+  />
 }
 
 const useClaimData = () => {
@@ -57,7 +69,7 @@ const Claim : React.FC = () => {
       { label: "Paid", getter: o => o?.overview?.receipt ? "Yes" : "No" },
       { label: "Patient Name", getter: o => o?.overview?.claim?.payload?.encounterDetails?.patient},
       { label: "Appointment Date", getter: o => "" },
-      { label: "Appointment Pririty", getter: o => o?.overview?.claim?.payload?.encounterDetails.appointmentPriority},
+      { label: "Appointment Priority", getter: o => o?.overview?.claim?.payload?.encounterDetails.appointmentPriority},
       { label: "Procedure Code", getter: o => o?.overview?.claim?.payload?.encounterDetails.procedureCode},
       { label: "Diagnosis Code", getter: o => o?.overview?.claim?.payload?.encounterDetails.diagnosisCode},
       { label: "Site Service Code", getter: o => o?.overview?.claim?.payload?.encounterDetails.siteServiceCode},

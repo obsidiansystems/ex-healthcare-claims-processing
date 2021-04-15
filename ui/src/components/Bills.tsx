@@ -4,13 +4,13 @@ import { Main } from '@daml.js/healthcare-claims-processing';
 import { CreateEvent } from '@daml/ledger';
 import { useStreamQuery, useLedger } from '@daml/react';
 import { CaretRight, Share, ArrowRight } from "phosphor-react";
-import { leftJoin, intercalate, Field, FieldsRow, PageTitle, TabLink, useAsync } from "./Common";
+import { mapIter, leftJoin, intercalate, Field, FieldsRow, PageTitle, TabLink, useAsync } from "./Common";
 import { Formik, Form, Field as FField, useField } from 'formik';
 import Select from 'react-select';
-import { LField, EField, ChoiceModal, DayPickerField, Nothing } from "./ChoiceModal";
+import { LField, EField, ChoiceModal, Nothing } from "./ChoiceModal";
 import { TabularScreenRoutes, TabularView, SingleItemView } from "./TabularScreen";
 
-const BillRoutes : React.FC = () => 
+const BillRoutes : React.FC = () =>
   <TabularScreenRoutes metavar=":billId" table={Bills} detail={Bill}/>
 
 const useBills = (query: any) => {
@@ -20,27 +20,32 @@ const useBills = (query: any) => {
   const bills : readonly CreateEvent<Main.Claim.PatientObligation>[] = query.billId && bill ? [bill] : billsStream;
   const receipts = useStreamQuery(Main.Claim.PaymentReceipt, () => ({ })).contracts;
 
-  const keyedBills = Object.fromEntries(bills.map(bill => [bill.payload.paymentId, bill]));
-  const keyedReceipts = Object.fromEntries(receipts.map(receipt => [receipt.payload.paymentId, receipt]));
-  
+  const keyedBills = new Map(bills.map(bill => [bill.payload.paymentId, bill]));
+  const keyedReceipts = new Map(receipts.map(receipt => [receipt.payload.paymentId, receipt]));
 
-  return Object.values(leftJoin(keyedBills, keyedReceipts)).map(p=> ({ bill: p[0], receipt: p[1] }));
+
+  return Array.from(mapIter(
+    ([bill, receipt]) => ({ bill, receipt }),
+    leftJoin(keyedBills, keyedReceipts).values(),
+  ));
 }
 
 const useBillsData = () => useBills( { } )
 
 const Bills: React.FC = () => {
   return <TabularView
-    title="Bills"
-    useData={useBillsData}
-    fields={ [
-/*            { label: "Patient Name", getter: o => o?.policy?.payload?.patientName},
-            { label: "Procedure Code", getter: o => o?.bill?.payload?.encounterDetails.procedureCode},
-            { label: "Diagnosis Code", getter: o => o?.bill?.payload?.encounterDetails.diagnosisCode}, */
+           title="Bills"
+           useData={useBillsData}
+           fields={ [
+             { label: "Provider", getter: o => "Provider name hidden" },
+             { label: "Amount", getter: o => o?.bill?.payload?.amount },
+             { label: "Appointment Date", getter: o => o?.bill?.payload?.encounterDetails.diagnosisCode },
+             { label: "Procedure Code", getter: o => o?.bill?.payload?.encounterDetails.procedureCode },
+             { label: "Paid", getter: o => (o?.receipt?.payload) ? "YES" : "NO" },
            ] }
-    tableKey={ o => o.bill.contractId }
-    itemUrl={ o => o.bill.contractId }
-    />
+           tableKey={ o => o.bill.contractId }
+           itemUrl={ o => o.bill.contractId }
+  />
 }
 
 const useBillData = () => {
@@ -57,7 +62,7 @@ const Bill : React.FC = () => {
       { label: "Paid", getter: o => o?.overview?.receipt ? "Yes" : "No" },
       { label: "Patient Name", getter: o => o?.overview?.bill?.payload?.encounterDetails?.patient},
       { label: "Appointment Date", getter: o => "" },
-      { label: "Appointment Pririty", getter: o => o?.overview?.bill?.payload?.encounterDetails.appointmentPriority},
+      { label: "Appointment Priority", getter: o => o?.overview?.bill?.payload?.encounterDetails.appointmentPriority},
       { label: "Procedure Code", getter: o => o?.overview?.bill?.payload?.encounterDetails.procedureCode},
       { label: "Diagnosis Code", getter: o => o?.overview?.bill?.payload?.encounterDetails.diagnosisCode},
       { label: "Site Service Code", getter: o => o?.overview?.bill?.payload?.encounterDetails.siteServiceCode},
@@ -72,8 +77,8 @@ const Bill : React.FC = () => {
             <ChoiceModal className="flex flex-col"
                          choice={Main.Claim.PatientObligation.PayPatientObligation}
                          contract={d.overview?.bill?.contractId}
-                         submitTitle="Complete Treatment"
-                         buttonTitle="Complete Treatment"
+                         submitTitle="Bill Pay"
+                         buttonTitle="Bill Pay"
                          icon={<Share />}
                          successWidget={({ rv: [v, evts] }, close)=><>
                            <h2 className="2xl">Bill has been paid!</h2>

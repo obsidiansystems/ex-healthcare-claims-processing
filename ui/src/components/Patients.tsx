@@ -4,10 +4,10 @@ import { Main } from '@daml.js/healthcare-claims-processing';
 import { CreateEvent } from '@daml/ledger';
 import { useStreamQuery } from '@daml/react';
 import { CaretRight, Share, ArrowRight } from "phosphor-react";
-import { innerJoin, intercalate, Field, FieldsRow, PageTitle, TabLink } from "./Common";
+import { mapIter, innerJoin, intercalate, Field, FieldsRow, PageTitle, TabLink } from "./Common";
 import { Formik, Form, Field as FField, useField } from 'formik';
 import Select from 'react-select';
-import { LField, EField, ChoiceModal, Nothing, creations } from "./ChoiceModal";
+import { LField, EField, ChoiceModal, ChoiceErrorsType, Nothing, creations, validateNonEmpty, RenderError } from "./ChoiceModal";
 import { TabularScreenRoutes, TabularView, SingleItemView } from "./TabularScreen";
 
 
@@ -39,10 +39,12 @@ const usePatients = (query: any) => {
     .contracts
   const disclosed = disclosedRaw.map(resp => resp.payload)
 
-  const keyedAcceptance = Object.fromEntries(acceptances.map(p => [p.patient, p]));
-  const keyedDisclosed = Object.fromEntries(disclosed.map(p => [p.patient, p]));
-  const overviews = Object.values(innerJoin(keyedAcceptance, keyedDisclosed))
-                         .map(p => ({ acceptance: p[0], policy : p[1]}));
+  const keyedAcceptance = new Map(acceptances.map(p => [p.patient, p]));
+  const keyedDisclosed = new Map(disclosed.map(p => [p.patient, p]));
+  const overviews = Array.from(mapIter(
+    ([acceptance, policy]) => ({ acceptance, policy }),
+    innerJoin(keyedAcceptance, keyedDisclosed).values(),
+  ));
   return { acceptances, disclosed, overviews, disclosedRaw };
 }
 
@@ -51,11 +53,11 @@ const Patients: React.FC = () => {
   return <TabularView
     title="Patients"
     useData={useAllPatients}
-    fields={ [ 
-         { label: "Name", getter : o => o.policy.patientName },
-         /* { label: "PCP", getter : o => "" }, */
-         { label: "Insurance ID", getter : o => o.policy.insuranceID },
-        ] }
+    fields={ [
+      { label: "Name", getter : o => o.policy.patientName },
+      /* { label: "PCP", getter : o => "" }, */
+      { label: "Insurance ID", getter : o => o.policy.insuranceID },
+    ] }
     tableKey={ o => o.policy.patient }
     itemUrl={ o => o.policy.patient }
     />
@@ -157,30 +159,34 @@ const Patient: React.FC = () => {
                            siteServiceCode: Nothing,
                            appointmentPriority: Nothing,
                          } } >
-              <h1 className="heading-2xl mb-7">Create Referral</h1>
-              <PolicySelect label="Policy" name="policy" disclosedRaw={disclosedRaw} />
-              <div className="grid grid-cols-2 gap-4 gap-x-8 mb-7.5 mt-4">
-              <LField name="receiver" label="Receiver"/>
-              <EField name="diagnosisCode" e={Main.Types.DiagnosisCode} label="Diagnosis Code"/>
-              <LField name="encounterId" placeholder='eg "1"' label="Encounter ID"/>
-              <LField name="siteServiceCode" placeholder='eg "11"' label="Site Service Code"/>
-              <EField name="procedureCode" e={Main.Types.ProcedureCode} label="Procedure Code"/>
-              <LField name="appointmentPriority" placeholder='eg "Elective"' label="Appointment Priority"/>
-              </div>
+              {({ errors, touched }) => (
+                <>
+                  <h1 className="heading-2xl mb-7">Create Referral</h1>
+                  <PolicySelect label="Policy" name="policy" disclosedRaw={disclosedRaw} errors={errors} />
+                  <div className="grid grid-cols-2 gap-4 gap-x-8 mb-7.5 mt-4">
+                    <LField name="receiver" label="Receiver" errors={errors} />
+                    <EField name="diagnosisCode" e={Main.Types.DiagnosisCode} label="Diaxgnosis Code" errors={errors} />
+                    <LField name="encounterId" placeholder='eg "1"' label="Encounter ID" errors={errors}/>
+                    <LField name="siteServiceCode" placeholder='eg "11"' label="Site Service Code" errors={errors}/>
+                    <EField name="procedureCode" e={Main.Types.ProcedureCode} label="Procedure Code" errors={errors}/>
+                    <LField name="appointmentPriority" placeholder='eg "Elective"' label="Appointment Priority" errors={errors} />
+                  </div>
+                </>
+              )}
             </ChoiceModal>
-          </div>
-          <hr />
-          <FieldsRow fields={[
-            { label: "Name", value: po.policy.patientName},
-            { label: "Insurance ID", value: po.policy.insuranceID},
-            { label: "Primary Care Provider", value: ""},
-          ]} />
-        </Route>
-        <Route>
-          <Redirect to={match.url} />
-        </Route>
-      </Switch>
-    </div>
+      </div>
+      <hr />
+      <FieldsRow fields={[
+        { label: "Name", value: po.policy.patientName},
+        { label: "Insurance ID", value: po.policy.insuranceID},
+        { label: "Primary Care Provider", value: ""},
+      ]} />
+      </Route>
+      <Route>
+        <Redirect to={match.url} />
+      </Route>
+    </Switch>
+      </div>
   );
 
   return (
@@ -203,27 +209,39 @@ const Patient: React.FC = () => {
   )
 }
 
-const PolicySelect : React.FC< { name: string, label: string, disclosedRaw: readonly CreateEvent<Main.Policy.DisclosedPolicy>[] } > = ({name, label, disclosedRaw}) => {
-  const [ field, meta, helpers ] = useField(name);
+const PolicySelect : React.FC< {
+  name: string,
+  label: string,
+  disclosedRaw: readonly CreateEvent<Main.Policy.DisclosedPolicy>[],
+  errors?: ChoiceErrorsType,
+} > = ({ name, label, disclosedRaw, errors }) => {
+  const [ field, meta, helpers ] = useField({
+    name,
+    validate: validateNonEmpty(label),
+  });
   const { setValue } = helpers;
-  const formatOptionLabel= (a : CreateEvent<Main.Policy.DisclosedPolicy>) =>
+  const formatOptionLabel= (a : CreateEvent<Main.Policy.DisclosedPolicy>) => (
     <div className="">
       Policy Provider: <b>{a.payload.payer}</b><br/>
       Disclosed Parties: <b>{a.payload.receivers}</b><br/>
       <div style={ {textOverflow: "ellipsis", display: "inline-block", maxWidth: "20em", overflow: "hidden", whiteSpace: "nowrap" } }>
         Contract ID: <b>{a.contractId}</b></div>
     </div>
+  );
+  const error = errors?.[name];
   return (
     <div className="flow flow-col mb-2 mt-0.5"><label htmlFor={name} className="block label-sm">{label}</label>
-    <Select
-      classNamePrefix="react-select-modal-enum"
-      options={disclosedRaw}
-      onChange={(option) => setValue(option?.contractId) }
-      formatOptionLabel={formatOptionLabel}
-      getOptionValue={a=>a.contractId}
-      styles={({singleValue: (base) => ({ textOverflow: "ellipsis" }) })}
- />
- </div>);
+      <Select
+        classNamePrefix="react-select-modal-enum"
+        options={disclosedRaw}
+        onChange={(option) => setValue(option?.contractId) }
+        formatOptionLabel={formatOptionLabel}
+        getOptionValue={a=>a.contractId}
+        styles={({singleValue: (base) => ({ textOverflow: "ellipsis" }) })}
+      />
+      <RenderError error={error} />
+    </div>
+  );
 
 }
 
