@@ -3,7 +3,7 @@ import { Link, NavLink, Redirect, Route, Switch, useRouteMatch, useParams } from
 import { Main } from '@daml.js/healthcare-claims-processing';
 import { CreateEvent } from '@daml/ledger';
 import { useStreamQuery, useLedger } from '@daml/react';
-import { CaretRight, Share } from "phosphor-react";
+import { CalendarBlank, CaretRight } from "phosphor-react";
 import { mapIter, leftJoin, intercalate, Field, FieldsRow, PageTitle, TabLink, useAsync } from "./Common";
 import { Formik, Form, Field as FField, useField } from 'formik';
 import Select from 'react-select';
@@ -86,7 +86,7 @@ const Claim : React.FC = () => {
                          contract={d.overview?.claim?.contractId}
                          submitTitle="Pay Claim"
                          buttonTitle="Pay Claim"
-                         icon={<Share />}
+                         icon={<CalendarBlank size={20}/>}
                          initialValues={ { } } >
               <h1 className="text-center">Pay Claim</h1>
             </ChoiceModal>
