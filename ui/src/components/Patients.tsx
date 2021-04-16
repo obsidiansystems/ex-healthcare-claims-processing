@@ -165,7 +165,7 @@ const Patient: React.FC = () => {
                   <PolicySelect label="Policy" name="policy" disclosedRaw={disclosedRaw} errors={errors} />
                   <div className="grid grid-cols-2 gap-4 gap-x-8 mb-7.5 mt-4">
                     <LField name="receiver" label="Receiver" errors={errors} />
-                    <EField name="diagnosisCode" e={Main.Types.DiagnosisCode} label="Diaxgnosis Code" errors={errors} />
+                    <EField name="diagnosisCode" e={Main.Types.DiagnosisCode} label="Diagnosis Code" errors={errors} />
                     <LField name="encounterId" placeholder='eg "1"' label="Encounter ID" errors={errors}/>
                     <LField name="siteServiceCode" placeholder='eg "11"' label="Site Service Code" errors={errors}/>
                     <EField name="procedureCode" e={Main.Types.ProcedureCode} label="Procedure Code" errors={errors}/>
