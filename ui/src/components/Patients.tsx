@@ -4,10 +4,10 @@ import { Main } from '@daml.js/healthcare-claims-processing';
 import { CreateEvent } from '@daml/ledger';
 import { useStreamQuery } from '@daml/react';
 import { CaretRight, Share, ArrowRight } from "phosphor-react";
-import { mapIter, innerJoin, intercalate, Field, FieldsRow, PageTitle, TabLink } from "./Common";
+import { mapIter, innerJoin, intercalate, Field, FieldsRow, Message, PageTitle, TabLink } from "./Common";
 import { Formik, Form, Field as FField, useField } from 'formik';
 import Select from 'react-select';
-import { LField, EField, ChoiceModal, ChoiceErrorsType, Nothing, creations, validateNonEmpty, RenderError } from "./ChoiceModal";
+import { LField, EField, ChoiceModal, ChoiceErrorsType, FollowUp, Nothing, creations, validateNonEmpty, RenderError } from "./ChoiceModal";
 import { TabularScreenRoutes, TabularView, SingleItemView } from "./TabularScreen";
 
 
@@ -145,11 +145,14 @@ const Patient: React.FC = () => {
                          submitTitle="Create Referral"
                          buttonTitle="Refer Patient"
                          icon={<Share />}
-                         successWidget={({ rv: [v, evts] }, close)=><>
-                           <h2 className="2xl">Referral Created!</h2>
-                             Referral has been checked in and is ready for treatment.
-                             <Link to={"/treatments/"+(creations(evts)[0]?.contractId)}>View Treatment <ArrowRight/></Link>
-                           </>}
+                         successWidget={({ rv: [v, evts] }, close) =>
+                           <>
+                             <Message
+                               title="Referral Created!"
+                               content="Change to the Radiologist role to see the referral and schedule an appointment with the patient."
+                             />
+                           </>
+                         }
                          initialValues={ {
                            policy: Nothing,
                            receiver: Nothing,

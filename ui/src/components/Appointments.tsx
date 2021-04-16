@@ -4,10 +4,10 @@ import { Main } from '@daml.js/healthcare-claims-processing';
 import { CreateEvent } from '@daml/ledger';
 import { useStreamQuery, useLedger } from '@daml/react';
 import { CaretRight, Share, ArrowRight } from "phosphor-react";
-import { mapIter, innerJoin, intercalate, Field, FieldsRow, PageTitle, TabLink, useAsync } from "./Common";
+import { mapIter, innerJoin, intercalate, Field, FieldsRow, Message, PageTitle, TabLink, useAsync } from "./Common";
 import { Formik, Form, Field as FField, useField } from 'formik';
 import Select from 'react-select';
-import { LField, EField, ChoiceModal, Nothing, creations } from "./ChoiceModal";
+import { LField, EField, ChoiceModal, FollowUp, Nothing, creations } from "./ChoiceModal";
 import { TabularScreenRoutes, TabularView, SingleItemView } from "./TabularScreen";
 
 const AppointmentRoutes : React.FC = () =>
@@ -71,22 +71,30 @@ const Appointment : React.FC = () => {
     tableKey={ o => o.overview?.appointment.contractId }
     itemUrl={ o => "" }
     choices={ d => [
-            <ChoiceModal className="flex flex-col"
+            <ChoiceModal className="flex flex-col space-y-6 w-170 mt-3"
                          choice={Main.Appointment.Appointment.CheckInPatient}
                          contract={d.overview?.appointment?.contractId}
                          submitTitle="Check In Patient Now"
                          buttonTitle="Check In Patient"
                          icon={<Share />}
-                         initialValues={ { } } 
-                         successWidget={({ rv: [v, evts] }, close)=><>
-                           <h2 className="2xl">Patient has been Checked In!</h2>
-                             {d.overview?.policy?.payload?.patientName} has been checked in and is ready for treatment.
-                             <Link to={"/treatments/"+(creations(evts)[0]?.contractId)}>View Treatment <ArrowRight/></Link>
+                         initialValues={ { } }
+                         successWidget={({ rv: [v, evts] }, close) =>
+                           <>
+                             <Message
+                               title="Patient has been Checked In!"
+                               content={d.overview?.policy?.payload?.patientName + " has been checked in and is ready for treatment."}
+                             />
+                             <FollowUp
+                               to={"/treatments/" + (creations(evts)[0]?.contractId) }
+                               label="View Treatment"
+                             />
                            </>}
                          failureWidget={()=><>Failure</>}
                          >
-              <h1 className="text-center">Check In Patient</h1>
-              <p>{d.overview?.policy?.payload?.patientName} is present and ready for treatment?</p>
+              <Message
+                title="Check In Patient"
+                content={d.overview?.policy?.payload?.patientName + " is present and ready for treatment?"}
+              />
             </ChoiceModal>
     ] }
 

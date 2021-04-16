@@ -4,7 +4,8 @@ import { Event as DEvent, CreateEvent } from '@daml/ledger';
 import { useLedger } from '@daml/react';
 
 import FormikMod, { Formik, Form, Field, FieldProps, FormikHelpers, FieldAttributes, useField } from 'formik';
-import { Share, Check, X } from 'phosphor-react';
+import { ArrowRight, Share, Check, X } from 'phosphor-react';
+import { Link } from 'react-router-dom';
 import Select, { Props } from 'react-select';
 import Modal from './Modal';
 import DayPicker from "./DayPicker";
@@ -67,7 +68,7 @@ type MaybeSuccessOrFailure<C, R> = Nothing | Success<C, R> | Failure<C>;
 export const SubmitButton: React.FC<{ submitTitle: string, isSubmitting: boolean }> = ({ submitTitle, isSubmitting }) => (
   <button type="submit"
           disabled={isSubmitting}
-          className={"flex justify-center items-center space-x-2 px-4 py-2 rounded-lg border-black border-2 bg-blue text-white"}>
+          className={"flex justify-center items-center space-x-2 px-6 py-3 rounded-lg border-black border-2 bg-blue text-white"}>
     {submitTitle}
   </button>
 );
@@ -98,19 +99,29 @@ export function ChoiceModal<T extends object, C, R, K>({ choice, contract, submi
   if(successOrFailure != Nothing) {
   switch(successOrFailure.tag) {
       case SuccessTag: {
-        content = (<div className="w-170 py-24 flex justify-center align-center flex-col text-center content-center">
+        content = (<div className="w-170 py-24 space-y-8 flex justify-center items-center flex-col text-center">
           <div className="rounded-full bg-green-100 h-12 w-12 flex"><Check className="m-auto" size="24" weight="bold"/></div>
-          {successWidget?successWidget(successOrFailure, ()=>setModalActive(false)):<>Success</>}
+          { successWidget
+            ? successWidget(successOrFailure, () => setModalActive(false))
+            : <> Success </>
+          }
           </div>
           );
         break;
       }
       case FailureTag: {
-        content = (<div className="w-170 py-24 flex justify-center align-center flex-col text-center content-center">
+        content = (<div className="w-170 py-24 space-y-8 flex justify-center items-center flex-col text-center">
           <div className="rounded-full bg-red-100 h-12 w-12 flex"><X className="m-auto" size="24" weight="bold"/></div>
-          {failureWidget?failureWidget(successOrFailure, ()=>setModalActive(false)):<><h3>Could not {submitTitle}</h3><p>{successOrFailure.error.errors.map((a:string)=>a?.match("Error: (.*\\().*:.*:(.*)(\\).*) Details:")?.slice(1,4))}</p></>}
-          </div>
-          );
+          { failureWidget
+            ? failureWidget(successOrFailure, () => setModalActive(false))
+            : <>
+              <h3> Could not {submitTitle} </h3>
+              <p>{successOrFailure.error.errors.map((a:string)=>a?.match("Error: (.*\\().*:.*:(.*)(\\).*) Details:")?.slice(1,4))}
+              </p>
+            </>
+          }
+        </div>
+        );
         break;
       }
     }
@@ -229,3 +240,13 @@ export const DayPickerField : React.FC<{
 }
 
 export const creations : (_ : DEvent<object>[]) => CreateEvent<object>[] = (evts) => evts.flatMap(a=>"created" in a?[a.created]:[])
+
+
+export const FollowUp: React.FC<{to: string, label: string}> = ({to, label}) => {
+  return (
+    <Link to={to} className="flex flex-row space-between items-center space-x-2 text-blue">
+      {label}
+      <ArrowRight/>
+    </Link>
+  )
+}
