@@ -66,17 +66,26 @@ const Claim : React.FC = () => {
     title="Claim"
     useData={useClaimData}
     fields={ [
-      { label: "Paid", getter: o => o?.overview?.receipt ? "Yes" : "No" },
-      { label: "Patient Name", getter: o => o?.overview?.claim?.payload?.encounterDetails?.patient},
-      { label: "Appointment Date", getter: o => "" },
-      { label: "Appointment Priority", getter: o => o?.overview?.claim?.payload?.encounterDetails.appointmentPriority},
-      { label: "Procedure Code", getter: o => o?.overview?.claim?.payload?.encounterDetails.procedureCode},
-      { label: "Diagnosis Code", getter: o => o?.overview?.claim?.payload?.encounterDetails.diagnosisCode},
-      { label: "Site Service Code", getter: o => o?.overview?.claim?.payload?.encounterDetails.siteServiceCode},
-      { label: "Allowed Amount", getter: o => o?.overview?.claim?.payload?.encounterDetails?.allowedAmount || ""},
-      { label: "CoPay", getter: o => o?.overview?.claim?.payload?.encounterDetails?.coPay || ""},
-      { label: "Patient Responsibility", getter: o => o?.overview?.claim?.payload?.encounterDetails?.patientResponsibility || ""},
-      { label: "Claim Amount", getter: o => o?.overview?.claim?.payload?.amount || ""},
+      [
+        { label: "Allowed Amount", getter: o => o?.overview?.claim?.payload?.encounterDetails?.allowedAmount || ""},
+        { label: "CoPay", getter: o => o?.overview?.claim?.payload?.encounterDetails?.coPay || ""},
+        { label: "Patient Responsibility", getter: o => o?.overview?.claim?.payload?.encounterDetails?.patientResponsibility || ""},
+        { label: "Claim Amount", getter: o => o?.overview?.claim?.payload?.amount || ""},
+      ],
+      [
+        /* provider name */
+        { label: "Patient Name", getter: o => o?.overview?.claim?.payload?.encounterDetails?.patient},
+        { label: "Appointment Date", getter: o => "" },
+        { label: "Appointment Priority", getter: o => o?.overview?.claim?.payload?.encounterDetails.appointmentPriority},
+      ],
+      [
+        { label: "Procedure Code", getter: o => o?.overview?.claim?.payload?.encounterDetails.procedureCode},
+        { label: "Diagnosis Code", getter: o => o?.overview?.claim?.payload?.encounterDetails.diagnosisCode},
+        { label: "Site Service Code", getter: o => o?.overview?.claim?.payload?.encounterDetails.siteServiceCode},
+      ],
+      [
+        { label: "Paid", getter: o => o?.overview?.receipt ? "Yes" : "No" },
+      ]
     ] }
     tableKey={ o => o.overview?.claim?.contractId }
     itemUrl={ o => "" }

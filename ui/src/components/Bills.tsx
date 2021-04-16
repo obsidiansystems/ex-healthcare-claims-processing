@@ -58,7 +58,7 @@ const Bill : React.FC = () => {
   return <SingleItemView
     title="Bill"
     useData={useBillData}
-    fields={ [
+    fields={ [[
       { label: "Paid", getter: o => o?.overview?.receipt ? "Yes" : "No" },
       { label: "Patient Name", getter: o => o?.overview?.bill?.payload?.encounterDetails?.patient},
       { label: "Appointment Date", getter: o => "" },
@@ -70,7 +70,7 @@ const Bill : React.FC = () => {
       { label: "CoPay", getter: o => o?.overview?.bill?.payload?.encounterDetails?.coPay || ""},
       { label: "Patient Responsibility", getter: o => o?.overview?.bill?.payload?.encounterDetails?.patientResponsibility || ""},
       { label: "Bill Amount", getter: o => o?.overview?.bill?.payload?.amount || ""},
-    ] }
+    ]] }
     tableKey={ o => o.overview?.bill?.contractId }
     itemUrl={ o => "" }
     choices={ d => [

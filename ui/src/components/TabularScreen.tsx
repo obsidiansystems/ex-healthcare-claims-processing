@@ -28,16 +28,16 @@ type TabularViewFields<T> = {
   getter: (a: T) => string,
 };
 
-type TabularViewConfig<T> = {
+type TabularViewConfig<T, F> = {
   title : string,
   tableKey: (a: T) => string,
   itemUrl: (a: T) => string,
-  fields: TabularViewFields<T>[],
+  fields: F,
   useData: () => readonly T[],
   searchFunc?: (a: string) => (b: T) => boolean,
 };
 
-export function TabularView<T, > ( { title, fields, tableKey, itemUrl, useData, searchFunc } : PropsWithChildren< TabularViewConfig<T> > ) {
+export function TabularView<T, > ( { title, fields, tableKey, itemUrl, useData, searchFunc } : PropsWithChildren<TabularViewConfig<T, TabularViewFields<T>[]> > ) {
   const match = useRouteMatch();
   const [search, setSearch] = useState("");
   const searchedFor = (s: string) => s.toLowerCase().indexOf(search.toLowerCase()) != -1;
@@ -79,7 +79,7 @@ export function TabularView<T, > ( { title, fields, tableKey, itemUrl, useData, 
    );
 }
 
-export function SingleItemView<T, > ( { title, fields, tableKey, itemUrl, useData, choices } : PropsWithChildren< TabularViewConfig<T> & { choices: (data: T) => ReactNode } > ) {
+export function SingleItemView<T, > ( { title, fields, tableKey, itemUrl, useData, choices } : PropsWithChildren< TabularViewConfig<T, TabularViewFields<T>[][]> & { choices: (data: T) => ReactNode } > ) {
   const data = useData();
   const match = useRouteMatch();
 
@@ -91,9 +91,14 @@ export function SingleItemView<T, > ( { title, fields, tableKey, itemUrl, useDat
             { choices(po) }
           </div>
           <hr />
-          <FieldsRow fields={
-            fields.map(f=>({label: f.label, value: f.getter(po)}))
-            } />
+          { fields.map((row, i) =>
+            <>
+              <FieldsRow fields={
+              row.map(f=>({label: f.label, value: f.getter(po)}))
+              } />
+              { i == fields.length - 1 ? <> </> : <hr/> }
+            </>
+          )}
         </Route>
         <Route>
           <Redirect to={match.url} />

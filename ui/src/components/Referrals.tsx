@@ -56,12 +56,12 @@ const Referral: React.FC = () => {
   return <SingleItemView
     title="Referral"
     useData={useReferralData}
-    fields={ [
+    fields={ [[
       { label: "Name", getter: o => o?.overview?.policy?.payload?.patientName},
       { label: "Referring Party", getter: o => o?.overview?.referral?.payload?.referringProvider},
       { label: "Referral Date", getter: o => "unknown" },
       { label: "Appointment Priority", getter: o => o?.overview?.referral?.payload?.referralDetails?.encounterDetails?.appointmentPriority},
-    ] }
+    ]] }
     tableKey={ o => o.overview.referral.contractId }
     itemUrl={ o => "" }
     choices={ d => [
