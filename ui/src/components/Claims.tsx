@@ -62,20 +62,21 @@ const useClaimData = () => {
 }
 
 const Claim : React.FC = () => {
+  const dollars = (n: any) => n ? "$" + n : "";
   return <SingleItemView
     title="Claim"
     useData={useClaimData}
     fields={ [
       [
-        { label: "Allowed Amount", getter: o => o?.overview?.claim?.payload?.encounterDetails?.allowedAmount || ""},
-        { label: "CoPay", getter: o => o?.overview?.claim?.payload?.encounterDetails?.coPay || ""},
-        { label: "Patient Responsibility", getter: o => o?.overview?.claim?.payload?.encounterDetails?.patientResponsibility || ""},
-        { label: "Claim Amount", getter: o => o?.overview?.claim?.payload?.amount || ""},
+        { label: "Allowed Amount", getter: o => dollars(o?.overview?.claim?.payload?.encounterDetails?.allowedAmount)},
+        { label: "CoPay", getter: o => dollars(o?.overview?.claim?.payload?.encounterDetails?.coPay)},
+        { label: "Patient Responsibility", getter: o => dollars(o?.overview?.claim?.payload?.encounterDetails?.patientResponsibility)},
+        { label: "Claim Amount", getter: o => dollars(o?.overview?.claim?.payload?.amount)},
       ],
       [
-        /* provider name */
+        { label: "Provider Name", getter: o => "" }, //TODO
         { label: "Patient Name", getter: o => o?.overview?.claim?.payload?.encounterDetails?.patient},
-        { label: "Appointment Date", getter: o => "" },
+        { label: "Appointment Date", getter: o => "" }, //TODO
         { label: "Appointment Priority", getter: o => o?.overview?.claim?.payload?.encounterDetails.appointmentPriority},
       ],
       [
@@ -83,9 +84,6 @@ const Claim : React.FC = () => {
         { label: "Diagnosis Code", getter: o => o?.overview?.claim?.payload?.encounterDetails.diagnosisCode},
         { label: "Site Service Code", getter: o => o?.overview?.claim?.payload?.encounterDetails.siteServiceCode},
       ],
-      [
-        { label: "Paid", getter: o => o?.overview?.receipt ? "Yes" : "No" },
-      ]
     ] }
     tableKey={ o => o.overview?.claim?.contractId }
     itemUrl={ o => "" }
