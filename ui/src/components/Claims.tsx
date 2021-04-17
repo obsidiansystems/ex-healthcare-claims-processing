@@ -3,7 +3,7 @@ import { Link, NavLink, Redirect, Route, Switch, useRouteMatch, useParams } from
 import { Main } from '@daml.js/healthcare-claims-processing';
 import { CreateEvent } from '@daml/ledger';
 import { useStreamQuery, useLedger } from '@daml/react';
-import { CaretRight, Share } from "phosphor-react";
+import { CalendarBlank, CaretRight } from "phosphor-react";
 import { mapIter, leftJoin, intercalate, Field, FieldsRow, PageTitle, TabLink, useAsync } from "./Common";
 import { Formik, Form, Field as FField, useField } from 'formik';
 import Select from 'react-select';
@@ -62,21 +62,28 @@ const useClaimData = () => {
 }
 
 const Claim : React.FC = () => {
+  const dollars = (n: any) => n ? "$" + n : "";
   return <SingleItemView
     title="Claim"
     useData={useClaimData}
     fields={ [
-      { label: "Paid", getter: o => o?.overview?.receipt ? "Yes" : "No" },
-      { label: "Patient Name", getter: o => o?.overview?.claim?.payload?.encounterDetails?.patient},
-      { label: "Appointment Date", getter: o => "" },
-      { label: "Appointment Priority", getter: o => o?.overview?.claim?.payload?.encounterDetails.appointmentPriority},
-      { label: "Procedure Code", getter: o => o?.overview?.claim?.payload?.encounterDetails.procedureCode},
-      { label: "Diagnosis Code", getter: o => o?.overview?.claim?.payload?.encounterDetails.diagnosisCode},
-      { label: "Site Service Code", getter: o => o?.overview?.claim?.payload?.encounterDetails.siteServiceCode},
-      { label: "Allowed Amount", getter: o => o?.overview?.claim?.payload?.encounterDetails?.allowedAmount || ""},
-      { label: "CoPay", getter: o => o?.overview?.claim?.payload?.encounterDetails?.coPay || ""},
-      { label: "Patient Responsibility", getter: o => o?.overview?.claim?.payload?.encounterDetails?.patientResponsibility || ""},
-      { label: "Claim Amount", getter: o => o?.overview?.claim?.payload?.amount || ""},
+      [
+        { label: "Allowed Amount", getter: o => dollars(o?.overview?.claim?.payload?.encounterDetails?.allowedAmount)},
+        { label: "CoPay", getter: o => dollars(o?.overview?.claim?.payload?.encounterDetails?.coPay)},
+        { label: "Patient Responsibility", getter: o => dollars(o?.overview?.claim?.payload?.encounterDetails?.patientResponsibility)},
+        { label: "Claim Amount", getter: o => dollars(o?.overview?.claim?.payload?.amount)},
+      ],
+      [
+        { label: "Provider Name", getter: o => "" }, //TODO
+        { label: "Patient Name", getter: o => o?.overview?.claim?.payload?.encounterDetails?.patient},
+        { label: "Appointment Date", getter: o => "" }, //TODO
+        { label: "Appointment Priority", getter: o => o?.overview?.claim?.payload?.encounterDetails.appointmentPriority},
+      ],
+      [
+        { label: "Procedure Code", getter: o => o?.overview?.claim?.payload?.encounterDetails.procedureCode},
+        { label: "Diagnosis Code", getter: o => o?.overview?.claim?.payload?.encounterDetails.diagnosisCode},
+        { label: "Site Service Code", getter: o => o?.overview?.claim?.payload?.encounterDetails.siteServiceCode},
+      ],
     ] }
     tableKey={ o => o.overview?.claim?.contractId }
     itemUrl={ o => "" }
@@ -86,7 +93,7 @@ const Claim : React.FC = () => {
                          contract={d.overview?.claim?.contractId}
                          submitTitle="Pay Claim"
                          buttonTitle="Pay Claim"
-                         icon={<Share />}
+                         icon={<CalendarBlank size={20}/>}
                          initialValues={ { } } >
               <h1 className="text-center">Pay Claim</h1>
             </ChoiceModal>
