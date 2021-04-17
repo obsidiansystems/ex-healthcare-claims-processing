@@ -56,7 +56,7 @@ const Treatment : React.FC = () => {
   return <SingleItemView
     title="Treatment"
     useData={useTreatmentData}
-    fields={ [
+    fields={ [[
       { label: "Patient Name", getter: o => o?.overview?.policy?.payload?.patientName},
       { label: "Appointment Date", getter: o => "" },
       { label: "Appointment Priority", getter: o => o?.overview?.treatment?.payload?.encounterDetails.appointmentPriority},
@@ -66,7 +66,7 @@ const Treatment : React.FC = () => {
       { label: "Allowed Amount", getter: o => o?.overview?.treatment?.payload?.encounterDetails?.allowedAmount || ""},
       { label: "CoPay", getter: o => o?.overview?.treatment?.payload?.encounterDetails?.coPay || ""},
       { label: "Patient Responsibility", getter: o => o?.overview?.treatment?.payload?.encounterDetails?.patientResponsibility || ""},
-    ] }
+    ]] }
     tableKey={ o => o.overview?.treatment.contractId }
     itemUrl={ o => "" }
     choices={ d => [

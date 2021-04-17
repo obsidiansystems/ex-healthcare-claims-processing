@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Link, NavLink, Redirect, Route, Switch, useRouteMatch, useParams } from 'react-router-dom';
 import { Main } from '@daml.js/healthcare-claims-processing';
 import { CreateEvent } from '@daml/ledger';
-import { useStreamQuery } from '@daml/react';
+import { useParty, useStreamQuery } from '@daml/react';
 import { CaretRight, Share, ArrowRight } from "phosphor-react";
 import { mapIter, innerJoin, intercalate, Field, FieldsRow, Message, PageTitle, TabLink } from "./Common";
 import { Formik, Form, Field as FField, useField } from 'formik';
@@ -31,12 +31,13 @@ const PatientRoutes: React.FC = () => {
   )
 }
 
-const usePatients = (query: any) => {
+const usePatients = (query: any, predicate: any = () => true) => {
   const acceptances = useStreamQuery(Main.Patient.NotifyPatientOfPCPAcceptance, () => query)
     .contracts
     .map(resp => resp.payload)
   const disclosedRaw = useStreamQuery(Main.Policy.DisclosedPolicy, () => query)
     .contracts
+    .filter(resp => predicate(resp.payload))
   const disclosed = disclosedRaw.map(resp => resp.payload)
 
   const keyedAcceptance = new Map(acceptances.map(p => [p.patient, p]));
@@ -113,8 +114,11 @@ const NotPatients: React.FC = () => {
 }
 
 const Patient: React.FC = () => {
+  const username = useParty();
+  const controlled = (d: Main.Policy.DisclosedPolicy) => d.receivers.length > 0 && d.receivers[0] == username;
+
   const { patientId } = useParams< { patientId: string } >();
-  const { overviews, disclosed, disclosedRaw } = usePatients({ patient: patientId });
+  const { overviews, disclosed, disclosedRaw } = usePatients({ patient: patientId }, controlled);
   const match = useRouteMatch();
 
   const policyRows = disclosed.map((d) =>
