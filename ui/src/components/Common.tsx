@@ -80,6 +80,26 @@ const Field: React.FC<FieldProps> = ({label, value}) => {
   )
 }
 
+const Label: React.FC<{content: string}> = ({content}) => {
+  return (
+    <div className="text-sm text-center text-trueGray-500">
+      { content }
+    </div>
+  )
+}
+
+const Message: React.FC<{title: string, content: string}> = ({title, content}) => {
+  return (
+    <div className="flex flex-col space-y-6">
+      <div className="text-2xl text-center">
+        {title}
+      </div>
+      <Label content={content}/>
+    </div>
+
+  )
+}
+
 function useAsync<T>(f: () => Promise<T>, memoKeys: [any]) : T | null {
   const [[v, lastMemoKeys], setV] = useState<[T | null, any]>([null, null]);
   useMemo(
@@ -89,4 +109,4 @@ function useAsync<T>(f: () => Promise<T>, memoKeys: [any]) : T | null {
   return v;
 }
 
-export { Field, FieldsRow, PageTitle, TabLink, innerJoin, leftJoin, intercalate, useAsync };
+export { Field, FieldsRow, Label, Message, PageTitle, TabLink, innerJoin, leftJoin, intercalate, useAsync };

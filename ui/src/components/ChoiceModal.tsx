@@ -1,9 +1,11 @@
 import React, { Dispatch, SetStateAction } from 'react'
 import { Choice, ContractId } from '@daml/types';
+import { Event as DEvent, CreateEvent } from '@daml/ledger';
 import { useLedger } from '@daml/react';
 
 import FormikMod, { Formik, Form, Field, FieldProps, FormikHelpers, FieldAttributes, useField } from 'formik';
-import { Share } from 'phosphor-react';
+import { ArrowRight, Share, Check, X } from 'phosphor-react';
+import { Link } from 'react-router-dom';
 import Select, { Props } from 'react-select';
 import Modal from './Modal';
 import DayPicker from "./DayPicker";
@@ -25,6 +27,24 @@ function complete<T>(i: PartialMaybe<T>) : T | undefined {
   return i as T;
 }
 
+export const SuccessTag = Symbol('Success');
+type SuccessTag = typeof SuccessTag;
+
+interface Success<C, R> {
+  tag: SuccessTag;
+  sentS: C;
+  rv: [R, DEvent<object>[]];
+}
+
+export const FailureTag = Symbol('Failure');
+type FailureTag = typeof FailureTag;
+
+interface Failure<C> {
+  tag: FailureTag;
+  sentF: C;
+  error: any;
+};
+
 type ChoiceModalProps<T extends object, C, R, K> =
   { choice: Choice<T,C,R,K>,
     contract: ContractId<T>,
@@ -33,6 +53,8 @@ type ChoiceModalProps<T extends object, C, R, K> =
     icon?: React.ReactNode,
     initialValues: PartialMaybe<C>,
     className?: string,
+    successWidget?: ((succ: Success<C, R>, close: ()=>void) => React.ReactNode),
+    failureWidget?: ((fail: Failure<C>, close: ()=>void) => React.ReactNode),
     children:
       React.ReactNode |
       ((_: {
@@ -41,26 +63,19 @@ type ChoiceModalProps<T extends object, C, R, K> =
       }) => React.ReactNode),
   };
 
-export const Success = Symbol('Success');
-type Success = typeof Success;
-
-interface Failure {
-  error: any;
-};
-
-type MaybeSuccessOrFailure = Nothing | Success | Failure;
+type MaybeSuccessOrFailure<C, R> = Nothing | Success<C, R> | Failure<C>;
 
 export const SubmitButton: React.FC<{ submitTitle: string, isSubmitting: boolean }> = ({ submitTitle, isSubmitting }) => (
   <button type="submit"
-  disabled={isSubmitting}
-  className={"flex justify-center items-center space-x-2 px-4 py-2 rounded-lg border-black border-2 bg-blue text-white"}>
-  {submitTitle}
+          disabled={isSubmitting}
+          className={"flex justify-center items-center space-x-2 px-6 py-3 rounded-lg border-black border-2 bg-blue text-white"}>
+    {submitTitle}
   </button>
 );
 
-export function ChoiceModal<T extends object, C, R, K>({ choice, contract, submitTitle, buttonTitle, initialValues, icon, className, children }: ChoiceModalProps<T,C,R,K>) {
-  const [modalActive, setModalActiveInner] = React.useState(false);
-  const [successOrFailure, setSuccessOrFailure] = React.useState<MaybeSuccessOrFailure>(Nothing);
+export function ChoiceModal<T extends object, C, R, K>({ choice, contract, submitTitle, buttonTitle, initialValues, icon, className, successWidget, failureWidget, children }: ChoiceModalProps<T,C,R,K>) {
+      const [modalActive, setModalActiveInner] = React.useState(false);
+  const [successOrFailure, setSuccessOrFailure] = React.useState<MaybeSuccessOrFailure<C, R> >(Nothing);
   const setModalActive = (s : SetStateAction<boolean>) => {
     setModalActiveInner((p : boolean) => {
       const shown = typeof s == 'function' ? s(p) : s;
@@ -73,16 +88,44 @@ export function ChoiceModal<T extends object, C, R, K>({ choice, contract, submi
     console.log(values);
     const arg = complete(values);
     if(arg) {
-        const success=() => { setSuccessOrFailure(Success); };
-        const failure=(f : any) => { console.log(f); setSuccessOrFailure({error: f})};
+        const success=(a : [ R, DEvent<object>[] ] ) => { setSuccessOrFailure({tag: SuccessTag, sentS: arg, rv: a}); };
+        const failure=(f : any) => { console.log(f); setSuccessOrFailure({tag: FailureTag, sentF: arg, error: f})};
         ledger.exercise(choice, contract, arg).then(success, failure);
     } else {
         console.log("Incomplete Parameters");
     }
   };
   var content;
-  switch(successOrFailure) {
-    case Nothing: {
+  if(successOrFailure != Nothing) {
+  switch(successOrFailure.tag) {
+      case SuccessTag: {
+        content = (<div className="w-170 py-24 space-y-8 flex justify-center items-center flex-col text-center">
+          <div className="rounded-full bg-green-100 h-12 w-12 flex"><Check className="m-auto" size="24" weight="bold"/></div>
+          { successWidget
+            ? successWidget(successOrFailure, () => setModalActive(false))
+            : <> Success </>
+          }
+          </div>
+          );
+        break;
+      }
+      case FailureTag: {
+        content = (<div className="w-170 py-24 space-y-8 flex justify-center items-center flex-col text-center">
+          <div className="rounded-full bg-red-100 h-12 w-12 flex"><X className="m-auto" size="24" weight="bold"/></div>
+          { failureWidget
+            ? failureWidget(successOrFailure, () => setModalActive(false))
+            : <>
+              <h3> Could not {submitTitle} </h3>
+              <p>{successOrFailure.error.errors.map((a:string)=>a?.match("Error: (.*\\().*:.*:(.*)(\\).*) Details:")?.slice(1,4))}
+              </p>
+            </>
+          }
+        </div>
+        );
+        break;
+      }
+    }
+  } else {
       content = (
         <Formik initialValues={initialValues} onSubmit={ submitF } >
           {({ errors, touched, isValidating, isSubmitting}) => (<Form className={className}>
@@ -97,21 +140,7 @@ export function ChoiceModal<T extends object, C, R, K>({ choice, contract, submi
                 <button type="submit">Submit</button> */}
           </Form>)}
         </Formik>
-      )
-      break;
-    }
-    case Success: {
-      content = (
-        <>Success</>
       );
-      break;
-    }
-    default: { // Failure case
-      content = (
-        <>Failure</>
-      );
-      break;
-    }
   }
   return (
     <>
@@ -208,4 +237,16 @@ export const DayPickerField : React.FC<{
       <RenderError error={error} />
     </>
         );
+}
+
+export const creations : (_ : DEvent<object>[]) => CreateEvent<object>[] = (evts) => evts.flatMap(a=>"created" in a?[a.created]:[])
+
+
+export const FollowUp: React.FC<{to: string, label: string}> = ({to, label}) => {
+  return (
+    <Link to={to} className="flex flex-row space-between items-center space-x-2 text-blue">
+      {label}
+      <ArrowRight/>
+    </Link>
+  )
 }

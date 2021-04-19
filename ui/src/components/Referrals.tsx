@@ -4,10 +4,10 @@ import { Main } from '@daml.js/healthcare-claims-processing';
 import { CreateEvent } from '@daml/ledger';
 import { useStreamQuery, useLedger } from '@daml/react';
 import { CaretRight, Share } from "phosphor-react";
-import { mapIter, innerJoin, intercalate, Field, FieldsRow, PageTitle, TabLink, useAsync } from "./Common";
+import { mapIter, innerJoin, intercalate, Field, FieldsRow, Message, PageTitle, TabLink, useAsync } from "./Common";
 import { Formik, Form, Field as FField, useField } from 'formik';
 import Select from 'react-select';
-import { LField, EField, ChoiceModal, DayPickerField, Nothing } from "./ChoiceModal";
+import { LField, EField, ChoiceModal, DayPickerField, FollowUp, Nothing } from "./ChoiceModal";
 import { TabularScreenRoutes, TabularView, SingleItemView } from "./TabularScreen";
 
 const ReferralRoutes : React.FC = () =>
@@ -71,7 +71,17 @@ const Referral: React.FC = () => {
                          submitTitle="Schedule Appointment"
                          buttonTitle="Schedule Appointment"
                          icon={<Share />}
-                         initialValues={ { appointmentDate: Nothing } } >
+                         initialValues={ { appointmentDate: Nothing } }
+                         successWidget={({ rv: [v, evts] }, close) =>
+                           <>
+                             <Message
+                               title="Appointment Created!"
+                               content={"An appointment has been scheduled for " + d.overview?.policy?.payload?.patientName + "." /* TODO: date */}
+                             />
+                             {  /* TODO: "View Appointment" link */ }
+                           </>}
+                         failureWidget={()=><>Failure</>}
+            >
               <h1 className="text-center">Schedule Appointment</h1>
               <p>Select a date for this appointment</p>
               <DayPickerField name="appointmentDate" />

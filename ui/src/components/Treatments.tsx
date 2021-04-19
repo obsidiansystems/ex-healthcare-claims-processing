@@ -4,10 +4,10 @@ import { Main } from '@daml.js/healthcare-claims-processing';
 import { CreateEvent } from '@daml/ledger';
 import { useStreamQuery, useLedger } from '@daml/react';
 import { CaretRight, Share } from "phosphor-react";
-import { mapIter, innerJoin, intercalate, Field, FieldsRow, PageTitle, TabLink, useAsync } from "./Common";
+import { mapIter, innerJoin, intercalate, Field, FieldsRow, Message, PageTitle, TabLink, useAsync } from "./Common";
 import { Formik, Form, Field as FField, useField } from 'formik';
 import Select from 'react-select';
-import { LField, EField, ChoiceModal, Nothing } from "./ChoiceModal";
+import { LField, EField, ChoiceModal, FollowUp, Nothing } from "./ChoiceModal";
 import { TabularScreenRoutes, TabularView, SingleItemView } from "./TabularScreen";
 
 const TreatmentRoutes : React.FC = () =>
@@ -70,15 +70,27 @@ const Treatment : React.FC = () => {
     tableKey={ o => o.overview?.treatment.contractId }
     itemUrl={ o => "" }
     choices={ d => [
-            <ChoiceModal className="flex flex-col"
-                         choice={Main.Treatment.Treatment.CompleteTreatment}
-                         contract={d.overview?.treatment?.contractId}
-                         submitTitle="Complete Treatment"
-                         buttonTitle="Complete Treatment"
-                         icon={<Share />}
-                         initialValues={ { } } >
-              <h1 className="text-center">Check In Patient</h1>
-              <p>{d.overview?.policy?.payload?.patientName} is present and ready for treatment?</p>
+      <ChoiceModal className="flex flex-col space-y-6 w-170 mt-3"
+                   choice={Main.Treatment.Treatment.CompleteTreatment}
+                   contract={d.overview?.treatment?.contractId}
+                   submitTitle="Complete Treatment"
+                   buttonTitle="Complete Treatment"
+                   icon={<Share />}
+                   initialValues={ { } }
+                   successWidget={({ rv: [v, evts] }, close) =>
+                     <>
+                       <Message
+                         title="Treatment Complete!"
+                         content={d.overview?.policy?.payload?.patientName + " has received treatment and a claim has been made to his insurance provider."}
+                       />
+                     </>
+                   }
+                   failureWidget={()=><>Failure</>}
+      >
+              <Message
+                title="Check In Patient"
+                content={d.overview?.policy?.payload?.patientName + " is present and ready for treatment?"}
+              />
             </ChoiceModal>
     ] }
 

@@ -3,11 +3,11 @@ import { Link, NavLink, Redirect, Route, Switch, useRouteMatch, useParams } from
 import { Main } from '@daml.js/healthcare-claims-processing';
 import { CreateEvent } from '@daml/ledger';
 import { useParty, useStreamQuery } from '@daml/react';
-import { CaretRight, Share } from "phosphor-react";
-import { mapIter, innerJoin, intercalate, Field, FieldsRow, PageTitle, TabLink } from "./Common";
+import { CaretRight, Share, ArrowRight } from "phosphor-react";
+import { mapIter, innerJoin, intercalate, Field, FieldsRow, Message, PageTitle, TabLink } from "./Common";
 import { Formik, Form, Field as FField, useField } from 'formik';
 import Select from 'react-select';
-import { LField, EField, ChoiceModal, ChoiceErrorsType, Nothing, validateNonEmpty, RenderError } from "./ChoiceModal";
+import { LField, EField, ChoiceModal, ChoiceErrorsType, FollowUp, Nothing, creations, validateNonEmpty, RenderError } from "./ChoiceModal";
 import { TabularScreenRoutes, TabularView, SingleItemView } from "./TabularScreen";
 
 
@@ -149,6 +149,14 @@ const Patient: React.FC = () => {
                          submitTitle="Create Referral"
                          buttonTitle="Refer Patient"
                          icon={<Share />}
+                         successWidget={({ rv: [v, evts] }, close) =>
+                           <>
+                             <Message
+                               title="Referral Created!"
+                               content="Change to the Radiologist role to see the referral and schedule an appointment with the patient."
+                             />
+                           </>
+                         }
                          initialValues={ {
                            policy: Nothing,
                            receiver: Nothing,
@@ -164,7 +172,7 @@ const Patient: React.FC = () => {
                   <PolicySelect label="Policy" name="policy" disclosedRaw={disclosedRaw} errors={errors} />
                   <div className="grid grid-cols-2 gap-4 gap-x-8 mb-7.5 mt-4">
                     <LField name="receiver" label="Receiver" errors={errors} />
-                    <EField name="diagnosisCode" e={Main.Types.DiagnosisCode} label="Diaxgnosis Code" errors={errors} />
+                    <EField name="diagnosisCode" e={Main.Types.DiagnosisCode} label="Diagnosis Code" errors={errors} />
                     <LField name="encounterId" placeholder='eg "1"' label="Encounter ID" errors={errors}/>
                     <LField name="siteServiceCode" placeholder='eg "11"' label="Site Service Code" errors={errors}/>
                     <EField name="procedureCode" e={Main.Types.ProcedureCode} label="Procedure Code" errors={errors}/>
