@@ -102,9 +102,9 @@ const MainScreen: React.FC<Props> = ({onLogout}) => {
             <div>Today's Date:</div>
             <div className="text-sm text-trueGray-400">
               {formatDate(date)}
-              <button className="text-blue ml-2" onClick={() => setModalActive(true)}>
+              {/*<button className="text-blue ml-2" onClick={() => setModalActive(true)}>
                 Set Date
-              </button>
+              </button>*/}
             </div>
           </div>
           {/*<div className="my-2">Show developer tabs</div>*/}
