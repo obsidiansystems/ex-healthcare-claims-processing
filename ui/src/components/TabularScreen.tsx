@@ -4,7 +4,7 @@ import { Main } from '@daml.js/healthcare-claims-processing';
 import { CreateEvent } from '@daml/ledger';
 import { useStreamQuery, useLedger } from '@daml/react';
 import { CaretRight, Share } from "phosphor-react";
-import { intercalate, Field, FieldsRow, PageTitle, TabLink, useAsync } from "./Common";
+import { intercalate, Field, FieldsRow, PageTitleDiv, PageTitleSpan, PageSubTitleSpan, TabLink, useAsync } from "./Common";
 import { Formik, Form, Field as FField, useField } from 'formik';
 import Select from 'react-select';
 import { LField, EField, ChoiceModal, Nothing } from "./ChoiceModal";
@@ -43,7 +43,7 @@ export function TabularView<T, > ( { title, fields, tableKey, itemUrl, useData, 
   const searchedFor = (s: string) => s.toLowerCase().indexOf(search.toLowerCase()) != -1;
   const data = useData().filter((searchFunc || (a=>b=>true))(search));
   return (<>
-      <PageTitle title={ title } />
+      <PageTitleDiv><PageTitleSpan title={title} /></PageTitleDiv>
       <div className="flex p-3 bg-white m-6">
         <input
           type="text"
@@ -109,10 +109,10 @@ export function SingleItemView<T, > ( { title, fields, tableKey, itemUrl, useDat
 
   return (
     <>
-      <div className="flex items-end space-x-4">
-        <PageTitle title={title}/>
-        <div className="text-trueGray-500 text-sm"> { /* patientId */ "" } </div>
-      </div>
+      <PageTitleDiv>
+        <PageTitleSpan title={title} />
+        <PageSubTitleSpan title={/* patientId */ "" } />
+      </PageTitleDiv>
 
       <div className="flex flex-col space-y-2">
 

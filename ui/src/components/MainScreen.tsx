@@ -133,7 +133,7 @@ const MainScreen: React.FC<Props> = ({onLogout}) => {
         </Formik>
       </Modal>
 
-      <div className="relative bg-trueGray-100 z-0">
+      <div className="relative bg-trueGray-100">
         <MainView />
       </div>
     </div>

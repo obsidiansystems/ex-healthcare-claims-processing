@@ -51,9 +51,21 @@ const TabLink: React.FC<{to:string}> = ({children,to}) => {
   )
 }
 
-const PageTitle: React.FC<{title:string}> = ({title}) => {
+const PageTitleDiv: React.FC<{}> = ({children}) => {
   return (
-    <div className="text-3xl text-trueGray-700 m-6"> {title} </div>
+    <div className="flex items-baseline space-x-4 p-6"> {children} </div>
+  )
+}
+
+const PageTitleSpan: React.FC<{title: string}> = ({title}) => {
+  return (
+    <span className="text-3xl text-trueGray-700"> {title} </span>
+  )
+}
+
+const PageSubTitleSpan: React.FC<{title: string}> = ({title}) => {
+  return (
+    <span className="text-trueGray-500 text-sm"> {title} </span>
   )
 }
 
@@ -109,4 +121,4 @@ function useAsync<T>(f: () => Promise<T>, memoKeys: [any]) : T | null {
   return v;
 }
 
-export { Field, FieldsRow, Label, Message, PageTitle, TabLink, innerJoin, leftJoin, intercalate, useAsync };
+export { Field, FieldsRow, Label, Message, PageTitleDiv, PageTitleSpan, PageSubTitleSpan, TabLink, innerJoin, leftJoin, intercalate, useAsync };

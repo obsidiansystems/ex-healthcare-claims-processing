@@ -4,7 +4,7 @@ import { Main } from '@daml.js/healthcare-claims-processing';
 import { CreateEvent } from '@daml/ledger';
 import { useParty, useStreamQuery } from '@daml/react';
 import { CaretRight, Share, ArrowRight } from "phosphor-react";
-import { mapIter, innerJoin, intercalate, Field, FieldsRow, Message, PageTitle, TabLink } from "./Common";
+import { mapIter, innerJoin, intercalate, Field, FieldsRow, Message, PageTitleDiv, PageTitleSpan, PageSubTitleSpan, TabLink } from "./Common";
 import { Formik, Form, Field as FField, useField } from 'formik';
 import Select from 'react-select';
 import { LField, EField, ChoiceModal, ChoiceErrorsType, FollowUp, Nothing, creations, validateNonEmpty, RenderError } from "./ChoiceModal";
@@ -73,7 +73,7 @@ const NotPatients: React.FC = () => {
 
   return (
     <>
-    <PageTitle title="Patients" />
+      <PageTitleDiv><PageTitleSpan title="Patients" /></PageTitleDiv>
       <div className="flex p-2 bg-white">
         <input
           type="text"
@@ -198,10 +198,10 @@ const Patient: React.FC = () => {
 
   return (
     <>
-      <div className="flex items-end space-x-4">
-        <PageTitle title="Patient"/>
-        <div className="text-trueGray-500 text-sm"> { patientId } </div>
-      </div>
+      <PageTitleDiv>
+        <PageTitleSpan title="Patient"/>
+        <PageSubTitleSpan title={ patientId } />
+      </PageTitleDiv>
 
       <div className="flex flex-col space-y-2">
         <div className="flex">
