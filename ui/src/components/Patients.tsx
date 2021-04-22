@@ -79,7 +79,7 @@ const NotPatients: React.FC = () => {
           type="text"
           value={search}
           onChange={e => setSearch(e.target.value)}
-          placeholder="Search by name of insurance ID..."
+          placeholder="Search by name or insurance ID..."
           className="w-full px-3 py-2 h-10 bg-trueGray-100"
         />
       </div>
