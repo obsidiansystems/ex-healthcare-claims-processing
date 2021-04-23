@@ -97,7 +97,7 @@ const LoginScreen: React.FC<Props> = ({onLogin}) => {
             onClick={handleLogin(username)}
           >
             {label}
-            <ArrowRight size={21} />
+            <ArrowRight size={21} color="var(--blue)"/>
           </button>
           ))}
       </div>
