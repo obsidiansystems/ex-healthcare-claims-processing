@@ -113,8 +113,14 @@ const MainScreen: React.FC<Props> = ({onLogout}) => {
             <div className="text-sm text-trueGray-400">{role}</div>
           </div>
         </div>
-        <a onClick={onLogout} className="flex flex-grow-0 h-9 items-center text-blue text-sm mr-3 ml-3 mt-1 mb-1 rounded tab-hover"><i className={"ph-users text-blueGray-400 text-2xl center m-4"}/>Change Roles</a>
-        <a onClick={onLogout} className="flex flex-grow-0 h-9 items-center text-blue text-sm mr-3 ml-3 mt-1 mb-1 rounded tab-hover"><i className={"ph-sign-out text-blueGray-400 text-2xl center m-4"}/>Sign Out</a>
+        <button onClick={onLogout} className="flex flex-grow-0 h-9 items-center text-blue text-sm mr-3 ml-3 mt-1 mb-1 rounded tab-hover">
+          <i className={"ph-users text-blueGray-400 text-2xl center m-4"}/>
+          Change Roles
+        </button>
+        <button onClick={onLogout} className="flex flex-grow-0 h-9 items-center text-blue text-sm mr-3 ml-3 mt-1 mb-1 rounded tab-hover">
+          <i className={"ph-sign-out text-blueGray-400 text-2xl center m-4"}/>
+          Sign Out
+        </button>
       </div>
       <Modal active={modalActive} setActive={setModalActive} hasCloseButton={true}>
         <Formik initialValues={{newDate: Nothing }} onSubmit={({}) => {} /* change time itself */}>
