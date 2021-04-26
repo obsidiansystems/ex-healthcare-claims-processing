@@ -122,16 +122,16 @@ public class HealthcareClaimsProcessingIT {
         ledgerAdapter.getCreatedContractId(
             RADIOLOGIST_PARTY, ReferralDetails.TEMPLATE_ID, ReferralDetails.ContractId::new);
 
-    LocalDate appointmentDate = LocalDate.of(2019, 7, 7);
+    LocalDate appointmentTime = LocalDate.of(2019, 7, 7);
     sandbox
         .getLedgerAdapter()
         .exerciseChoice(
-            RADIOLOGIST_PARTY, updatedReferral.exerciseScheduleAppointment(appointmentDate));
+            RADIOLOGIST_PARTY, updatedReferral.exerciseScheduleAppointment(appointmentTime));
 
     // Check-in should happen on appointment date
     sandbox
         .getLedgerAdapter()
-        .setCurrentTime(Instant.ofEpochSecond(appointmentDate.toEpochDay() * 24 * 60 * 60));
+        .setCurrentTime(Instant.ofEpochSecond(appointmentTime.toEpochDay() * 24 * 60 * 60));
     Appointment.ContractId appointment =
         ledgerAdapter.getCreatedContractId(
             RADIOLOGIST_PARTY, Appointment.TEMPLATE_ID, Appointment.ContractId::new);
@@ -192,11 +192,11 @@ public class HealthcareClaimsProcessingIT {
         ledgerAdapter.getCreatedContractId(
             RADIOLOGIST_PARTY, ReferralDetails.TEMPLATE_ID, ReferralDetails.ContractId::new);
 
-    LocalDate appointmentDate = LocalDate.of(2019, 7, 7);
+    LocalDate appointmentTime = LocalDate.of(2019, 7, 7);
     sandbox
         .getLedgerAdapter()
         .exerciseChoice(
-            RADIOLOGIST_PARTY, updatedReferral.exerciseScheduleAppointment(appointmentDate));
+            RADIOLOGIST_PARTY, updatedReferral.exerciseScheduleAppointment(appointmentTime));
 
     // Check-in should happen on appointment date!
     Appointment.ContractId appointment =
