@@ -3,7 +3,7 @@ import { Link, NavLink, Redirect, Route, Switch, useRouteMatch, useParams } from
 import { Main } from '@daml.js/healthcare-claims-processing';
 import { CreateEvent } from '@daml/ledger';
 import { useStreamQuery, useLedger } from '@daml/react';
-import { CaretRight, Share, ArrowRight } from "phosphor-react";
+import { CaretRight, Clock, ArrowRight } from "phosphor-react";
 import { mapIter, innerJoin, intercalate, Field, FieldsRow, Message, TabLink, useAsync } from "./Common";
 import { Formik, Form, Field as FField, useField } from 'formik';
 import Select from 'react-select';
@@ -76,7 +76,7 @@ const Appointment : React.FC = () => {
                          contract={d.overview?.appointment?.contractId}
                          submitTitle="Check In Patient Now"
                          buttonTitle="Check In Patient"
-                         icon={<Share />}
+                         icon={<Clock />}
                          initialValues={ { } }
                          successWidget={({ rv: [v, evts] }, close) =>
                            <>
