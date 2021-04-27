@@ -71,7 +71,7 @@ const Referral: React.FC = () => {
                          submitTitle="Schedule Appointment"
                          buttonTitle="Schedule Appointment"
                          icon={<Share />}
-                         initialValues={ { appointmentDate: Nothing } }
+                         initialValues={ { appointmentTime: Nothing } }
                          successWidget={({ rv: [v, evts] }, close) =>
                            <>
                              <Message
@@ -84,7 +84,7 @@ const Referral: React.FC = () => {
             >
               <h1 className="text-center">Schedule Appointment</h1>
               <p>Select a date for this appointment</p>
-              <DayPickerField name="appointmentDate" />
+              <DayPickerField name="appointmentTime" />
             </ChoiceModal>
     ] }
 
