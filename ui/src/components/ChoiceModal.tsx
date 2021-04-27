@@ -224,14 +224,26 @@ export const DayPickerField : React.FC<{
 }> = ({ name, errors }) => {
   const [ field, meta, { setValue } ] = useField<string | Nothing>(name);
   const error = errors?.[name];
+  const DAY_VS_MIN = 1440;
+  const daysToMin = (d: Date) => {
+    const ret = new Date();
+    ret.setTime(d.getTime() / DAY_VS_MIN);
+    return ret;
+  };
+  const minToDays = (d: Date) => {
+    const ret = new Date();
+    ret.setTime(d.getTime() * DAY_VS_MIN);
+    return ret;
+  };
   return (
     <>
       <DayPicker
-        date={field.value == Nothing
+        date={minToDays(
+          field.value == Nothing
             ? new Date()
-            : new Date(field.value + "T00:10:00")
-        }
-        setDate={(d)=>setValue(d.toISOString().split('T')[0])}
+            : new Date(field.value)
+        )}
+        setDate={(d)=>setValue(daysToMin(d).toISOString())}
         theme={({ blue: "var(--blue)" })}
       />
       <RenderError error={error} />
