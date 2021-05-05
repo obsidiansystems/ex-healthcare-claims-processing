@@ -8,7 +8,7 @@
 
 module Main.Appointment where
 
-import DA.Time
+import DA.Date
 
 import Main.Treatment
 import Main.Types()
@@ -35,9 +35,8 @@ template Appointment
       CheckInPatient : Either (ContractId FailedCheckIn) (ContractId Treatment)
         do
           now <- getTime
-          let diff = appointmentTime `subTime` now
-          assertMsg ("Check-in should happen on appointment date: " <> show appointmentTime) $
-            diff >= minutes 0 && diff < minutes 2
+          assertMsg ("Check-in should happen on right day for appointment at: " <> show appointmentTime) $
+            toDateUTC now == toDateUTC appointmentTime
           rulesCheck <- create RulesCheck with
             requestingParty = provider
             ruleParams = encounterDetails
