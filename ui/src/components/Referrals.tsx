@@ -7,7 +7,7 @@ import { CaretRight, Share } from "phosphor-react";
 import { mapIter, innerJoin, intercalate, Field, FieldsRow, Message, TabLink, useAsync } from "./Common";
 import { Formik, Form, Field as FField, useField } from 'formik';
 import Select from 'react-select';
-import { LField, EField, ChoiceModal, DayPickerField, FollowUp, Nothing } from "./ChoiceModal";
+import { LField, EField, ChoiceModal, DayTimePickerField, FollowUp, Nothing } from "./ChoiceModal";
 import { TabularScreenRoutes, TabularView, SingleItemView } from "./TabularScreen";
 
 const ReferralRoutes : React.FC = () =>
@@ -83,7 +83,7 @@ const Referral: React.FC = () => {
             >
               <h1 className="text-center">Schedule Appointment</h1>
               <p>Select a date for this appointment</p>
-              <DayPickerField name="appointmentTime" />
+              <DayTimePickerField name="appointmentTime" />
             </ChoiceModal>
     ] }
 
