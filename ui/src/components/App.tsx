@@ -6,7 +6,8 @@ import LoginScreen from './LoginScreen';
 import MainScreen from './MainScreen';
 import DamlLedger from '@daml/react';
 import Credentials from '../Credentials';
-import { BrowserRouter as Router } from 'react-router-dom';
+import { Router } from 'react-router';
+import { createBrowserHistory as createHistory } from 'history';
 import { httpBaseUrl } from '../config';
 
 /**
@@ -17,6 +18,14 @@ const App: React.FC = () => {
   // const [user, setUser] = React.useState<String | undefined>();
   const [credentials, setCredentials] = React.useState<Credentials | undefined>();
 
+  const history = createHistory();
+
+  const onLogout = () => {
+    setCredentials(undefined)
+    // Go back to main profile page; others might not be visible.
+    history.replace('')
+  };
+
   // return <LoginScreen onLogin={setCredentials} />
   return credentials
     ? <DamlLedger
@@ -24,7 +33,7 @@ const App: React.FC = () => {
         party={credentials.party}
         httpBaseUrl={httpBaseUrl}
       >
-        <Router><MainScreen onLogout={() => setCredentials(undefined)}/></Router>
+        <Router history={history}><MainScreen onLogout={onLogout}/></Router>
       </DamlLedger>
     : <LoginScreen onLogin={setCredentials} />
 }
