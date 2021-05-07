@@ -41,46 +41,45 @@ const Profile: React.FC = () => {
   return (<>
     <div className="shadow-2xl size-card rounded-xl content-center flex flex-col text-center m-auto justify-self-center self-center p-12 z-20 bg-white relative">
       {[...pcpResult].map(({payload: p})=> <>
-              <div className="label-sm">Welcome!</div>
-              <UserIcon className="mx-auto mt-16 mb-4"/>
-              <div className="text-2xl text-trueGray-800 mt-1.5">
-                  {p.providerName}
-              </div>
-              <div className="label-sm mt-2 mb-8">Provider</div>
-              <hr/>
-              {[p].map(({demographics: d})=>
-              <div className="flex text-left sm-trueGray-500 mt-8">
-              <div > <div className="sm-trueGray-400">HIN</div> {d.providerHIN}</div>
-              <div className="mx-auto"> <div className="sm-trueGray-400">Tax ID</div> {d.providerTaxID}</div>
-              <div > <div className="sm-trueGray-400">Address</div>
-              {d.providerAddressFirstLine}<br/>
-              {d.providerAddressSecondLine}<br/>
-              {d.providerCity}, {d.providerState} {d.providerZipCode} </div>
-               </div>)}
-              </>)
-               }
-            {[...patientResult].map(({payload: p})=>
-            <Segment>
-              <Header as='h2'>
-                <div>Welcome!</div>
-                <UserIcon className="mx-auto mt-16 mb-4"/>
-                <Header.Content>
-                  {p.patientName}
-                  <Header.Subheader>Patient</Header.Subheader>
-                </Header.Content>
-              </Header>
-              <Divider />
-              {[p].map(({demographics: d})=>
-                <div>
-              <div> PCP {p.primaryCareProviderID}</div>
-              <div> Insurance ID {p.insuranceID}</div>
-              <div> Plan {policyResult[0]?.payload.policyType}</div>
-              </div>)}
-            </Segment>
-            )}
+        <div className="label-sm">Welcome!</div>
+        <UserIcon className="mx-auto mt-16 mb-4"/>
+        <div className="text-2xl text-trueGray-800 mt-1.5">
+          {p.providerName}
+        </div>
+        <div className="label-sm mt-2 mb-8">Provider</div>
+        <hr/>
+        {[p].map(({demographics: d})=>
+        <div className="flex text-left sm-trueGray-500 mt-8">
+        <div>
+          <div className="sm-trueGray-400">HIN</div> {d.providerHIN}</div>
+          <div className="mx-auto"> <div className="sm-trueGray-400">Tax ID</div> {d.providerTaxID}</div>
+          <div>
+          <div className="sm-trueGray-400">Address</div>
+            {d.providerAddressFirstLine}<br/>
+            {d.providerAddressSecondLine}<br/>
+            {d.providerCity}, {d.providerState} {d.providerZipCode}
           </div>
-          <div className="card-GraphicalDots card-gdots-pos1 z-10"/>
-          <div className="card-GraphicalDots card-gdots-pos2 z-10"/>
+        </div>)}
+      </>)}
+      {[...patientResult].map(({payload: p})=> <Segment>
+        <Header as='h2'>
+          <div>Welcome!</div>
+          <UserIcon className="mx-auto mt-16 mb-4"/>
+          <Header.Content>
+            {p.patientName}
+            <Header.Subheader>Patient</Header.Subheader>
+          </Header.Content>
+        </Header>
+        <Divider />
+        {[p].map(({demographics: d})=> <div>
+          <div> PCP {p.primaryCareProviderID}</div>
+          <div> Insurance ID {p.insuranceID}</div>
+          <div> Plan {policyResult[0]?.payload.policyType}</div>
+        </div>)}
+      </Segment>)}
+      </div>
+      <div className="card-GraphicalDots card-gdots-pos1 z-10"/>
+      <div className="card-GraphicalDots card-gdots-pos2 z-10"/>
      </>
   );
 }
