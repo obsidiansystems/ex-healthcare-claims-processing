@@ -80,7 +80,6 @@ const Referral: React.FC = () => {
                              />
                              {  /* TODO: "View Appointment" link */ }
                            </>}
-                         failureWidget={()=><>Failure</>}
             >
               <h1 className="text-center">Schedule Appointment</h1>
               <p>Select a date for this appointment</p>

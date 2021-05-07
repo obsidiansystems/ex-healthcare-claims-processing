@@ -89,7 +89,6 @@ const Appointment : React.FC = () => {
                                label="View Treatment"
                              />
                            </>}
-                         failureWidget={()=><>Failure</>}
                          >
               <Message
                 title="Check In Patient"

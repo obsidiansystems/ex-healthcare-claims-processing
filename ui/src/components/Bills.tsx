@@ -85,7 +85,6 @@ const Bill : React.FC = () => {
                              The bill for this procedure has been paid.
                              <a onClick={(e)=>close()}>close</a>
                            </>}
-                         failureWidget={()=><>Failure</>}
                          initialValues={ { } } >
               <h1 className="text-center">Pay Bill</h1>
             </ChoiceModal>

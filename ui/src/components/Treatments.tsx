@@ -85,7 +85,6 @@ const Treatment : React.FC = () => {
                        />
                      </>
                    }
-                   failureWidget={()=><>Failure</>}
       >
               <Message
                 title="Check In Patient"
