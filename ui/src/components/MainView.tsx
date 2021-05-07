@@ -33,6 +33,26 @@ const UserIcon: React.FC<{className: string}> = ({className}) => {
   )
 }
 
+const ProfileTop: React.FC<{name: string, role: string}> = ({name, role}) => <>
+  <div className="label-sm">Welcome!</div>
+  <UserIcon className="mx-auto mt-16 mb-4"/>
+  <Header className="text-2xl" as='h2'>{name}</Header>
+  <div className="label-sm mt-2 mb-8">{role}</div>
+  <hr/>
+</>;
+
+const ProfileKV: React.FC<{keyS: string, value?: string | null}> = ({keyS, value, children}) =>
+  <div>
+    <div className="sm-trueGray-400">{keyS}</div>
+    {value}{children}
+  </div>;
+
+const ProfileKVCenter: React.FC<{keyS: string, value?: string | null}> = ({keyS, value, children}) =>
+  <div className="mx-auto">
+    <div className="sm-trueGray-400">{keyS}</div>
+    {value || children || "has none"}
+  </div>;
+
 const Profile: React.FC = () => {
   const username = useParty();
   const pcpResult = useStreamQueries(Main.Provider.Provider).contracts;
@@ -41,47 +61,30 @@ const Profile: React.FC = () => {
   return (<>
     <div className="shadow-2xl size-card rounded-xl content-center flex flex-col text-center m-auto justify-self-center self-center p-12 z-20 bg-white relative">
       {[...pcpResult].map(({payload: p})=> <>
-        <div className="label-sm">Welcome!</div>
-        <UserIcon className="mx-auto mt-16 mb-4"/>
-        <div className="text-2xl text-trueGray-800 mt-1.5">
-          {p.providerName}
-        </div>
-        <div className="label-sm mt-2 mb-8">Provider</div>
-        <hr/>
+        <ProfileTop name={p.providerName} role="Provider" />
         {[p].map(({demographics: d})=>
         <div className="flex text-left sm-trueGray-500 mt-8">
-        <div>
-          <div className="sm-trueGray-400">HIN</div> {d.providerHIN}</div>
-          <div className="mx-auto"> <div className="sm-trueGray-400">Tax ID</div> {d.providerTaxID}</div>
-          <div>
-          <div className="sm-trueGray-400">Address</div>
+          <ProfileKV keyS="HIN" value={d.providerHIN} />
+          <ProfileKVCenter keyS="Tax ID" value={d.providerTaxID} />
+          <ProfileKV keyS="Address">
             {d.providerAddressFirstLine}<br/>
             {d.providerAddressSecondLine}<br/>
             {d.providerCity}, {d.providerState} {d.providerZipCode}
-          </div>
+          </ProfileKV>
         </div>)}
       </>)}
-      {[...patientResult].map(({payload: p})=> <Segment>
-        <Header as='h2'>
-          <div>Welcome!</div>
-          <UserIcon className="mx-auto mt-16 mb-4"/>
-          <Header.Content>
-            {p.patientName}
-            <Header.Subheader>Patient</Header.Subheader>
-          </Header.Content>
-        </Header>
-        <Divider />
-        {[p].map(({demographics: d})=> <div>
-          <div> PCP {p.primaryCareProviderID}</div>
-          <div> Insurance ID {p.insuranceID}</div>
-          <div> Plan {policyResult[0]?.payload.policyType}</div>
-        </div>)}
-      </Segment>)}
-      </div>
-      <div className="card-GraphicalDots card-gdots-pos1 z-10"/>
-      <div className="card-GraphicalDots card-gdots-pos2 z-10"/>
-     </>
-  );
+      {[...patientResult].map(({payload: p})=> <>
+        <ProfileTop name={p.patientName} role="Provider" />
+        <div className="flex text-left sm-trueGray-500 mt-8">
+          <ProfileKV keyS="PCP" value={p.primaryCareProviderID} />
+          <ProfileKVCenter keyS="Insurance ID" value={p.insuranceID} />
+          <ProfileKV keyS="Plan" value={policyResult[0]?.payload.policyType} />
+        </div>
+      </>)}
+    </div>
+    <div className="card-GraphicalDots card-gdots-pos1 z-10"/>
+    <div className="card-GraphicalDots card-gdots-pos2 z-10"/>
+  </>);
 }
 
 // USERS_BEGIN
