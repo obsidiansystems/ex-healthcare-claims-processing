@@ -9,7 +9,6 @@ import { Link } from 'react-router-dom';
 import Select, { Props } from 'react-select';
 import Modal from './Modal';
 import DayPicker from "./DayPicker";
-import TimePicker from 'react-time-picker';
 
 export const Nothing = Symbol('Nothing');
 type Nothing = typeof Nothing;
@@ -225,43 +224,27 @@ export const DayPickerField : React.FC<{
 }> = ({ name, errors }) => {
   const [ field, meta, { setValue } ] = useField<string | Nothing>(name);
   const error = errors?.[name];
+  const DAY_VS_MIN = 1440;
+  const daysToMin = (d: Date) => {
+    const ret = new Date();
+    ret.setTime(d.getTime() / DAY_VS_MIN);
+    return ret;
+  };
+  const minToDays = (d: Date) => {
+    const ret = new Date();
+    ret.setTime(d.getTime() * DAY_VS_MIN);
+    return ret;
+  };
   return (
     <>
       <DayPicker
-        date={field.value == Nothing
-            ? new Date()
-            : new Date(field.value + "T00:10:00")
-        }
-        setDate={(d)=>setValue(d.toISOString().split('T')[0])}
-        theme={({ blue: "var(--blue)" })}
-      />
-      <RenderError error={error} />
-    </>
-        );
-}
-
-export const DayTimePickerField : React.FC<{
-  name: string
-  errors?: ChoiceErrorsType,
-}> = ({ name, errors }) => {
-  const [ field, meta, { setValue } ] = useField<Date | Nothing>(name);
-  const error = errors?.[name];
-  return (
-    <>
-      <DayPicker
-        date={field.value == Nothing
+        date={minToDays(
+          field.value == Nothing
             ? new Date()
             : new Date(field.value)
-        }
-        setDate={setValue}
+        )}
+        setDate={(d)=>setValue(daysToMin(d).toISOString())}
         theme={({ blue: "var(--blue)" })}
-      />
-      <TimePicker
-        onChange={t => t instanceof Date ? t : new Date(t)}
-        value={field.value == Nothing
-            ? new Date()
-            : new Date(field.value)
-        }
       />
       <RenderError error={error} />
     </>
