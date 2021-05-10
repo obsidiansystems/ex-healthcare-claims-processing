@@ -2,9 +2,13 @@
  * Copyright (c) 2019, Digital Asset (Switzerland) GmbH and/or its affiliates. All rights reserved.
  * SPDX-License-Identifier: Apache-2.0
  */
-package com.digitalasset.refapps.healthcareclaims;
+package com.daml.product.healthcareclaims;
 
+import com.daml.extensions.testing.junit4.Sandbox;
+import com.daml.extensions.testing.ledger.DefaultLedgerAdapter;
 import com.daml.ledger.javaapi.data.Party;
+import com.daml.product.healthcareclaims.trigger.Builder;
+import com.daml.product.healthcareclaims.trigger.Trigger;
 import com.digitalasset.nanobot.healthcare.models.main.appointment.Appointment;
 import com.digitalasset.nanobot.healthcare.models.main.claim.Claim;
 import com.digitalasset.nanobot.healthcare.models.main.claim.PatientObligation;
@@ -15,10 +19,6 @@ import com.digitalasset.nanobot.healthcare.models.main.provider.ReferralDetails;
 import com.digitalasset.nanobot.healthcare.models.main.treatment.Treatment;
 import com.digitalasset.nanobot.healthcare.models.main.types.DiagnosisCode;
 import com.digitalasset.nanobot.healthcare.models.main.types.ProcedureCode;
-import com.digitalasset.refapps.healthcareclaims.trigger.Builder;
-import com.digitalasset.refapps.healthcareclaims.trigger.Trigger;
-import com.digitalasset.testing.junit4.Sandbox;
-import com.digitalasset.testing.ledger.DefaultLedgerAdapter;
 import com.google.protobuf.InvalidProtocolBufferException;
 import io.grpc.StatusRuntimeException;
 import java.nio.file.Path;
