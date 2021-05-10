@@ -66,7 +66,7 @@ const tabs = {
 };
 
 const sidebar: Map<string, Array<TabProps>> = new Map([
-  ["Patient 1",
+  ["Patient1",
    [tabs.profile, tabs.appointments, tabs.treatments, tabs.bills]],
   ["PrimaryCareProvider",
    [tabs.profile, tabs.referrals, tabs.patients]],
