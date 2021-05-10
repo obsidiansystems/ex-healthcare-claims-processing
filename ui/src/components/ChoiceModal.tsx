@@ -246,22 +246,17 @@ export const DayTimePickerField : React.FC<{
 }> = ({ name, errors }) => {
   const [ field, meta, { setValue } ] = useField<Date | Nothing>(name);
   const error = errors?.[name];
+  const defaultDate = field.value == Nothing ? new Date() : field.value;
   return (
     <>
       <DayPicker
-        date={field.value == Nothing
-            ? new Date()
-            : new Date(field.value)
-        }
+        date={defaultDate}
         setDate={setValue}
         theme={({ blue: "var(--blue)" })}
       />
       <TimePicker
-        onChange={t => t instanceof Date ? t : new Date(t)}
-        value={field.value == Nothing
-            ? new Date()
-            : new Date(field.value)
-        }
+        onChange={t => setValue(t instanceof Date ? t : new Date(t))}
+        value={defaultDate}
       />
       <RenderError error={error} />
     </>
