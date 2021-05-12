@@ -78,7 +78,7 @@ const LoginScreen: React.FC<Props> = ({onLogin}) => {
     },
     {
       label: "Insurance Company",
-      username: "Insurance Company",
+      username: "InsuranceCompany",
     },
   ];
 
