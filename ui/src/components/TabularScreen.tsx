@@ -63,14 +63,16 @@ export function TabularView<T, > ( { title, fields, tableKey, itemUrl, useData, 
         <tbody>
           {data.map((po) =>
             <tr key={tableKey(po)} className="bg-white text-trueGray-500 hover:bg-trueGray-100 ">
-              { fields.map( (g)=><td>{g.getter(po)}</td> ) }
-              <td>
-                <div className="">
-                  <Link to={match.url + "/" + itemUrl(po)} className="flex justify-end">
-                    <CaretRight />
-                  </Link>
-                </div>
-              </td>
+              { fields.map( (g, idx) =>
+                  // We enable tabbing only to the first cell since
+                  //  all table cells for each row link to the same URL.
+                  // Thus, pressing the Tab key will move down one row per press.
+                  <td>
+                    <Link to={match.url + "/" + itemUrl(po)} {...idx == 0 ? {} : {'tabIndex': -1}}>
+                      {g.getter(po)}
+                    </Link>
+                  </td>
+              )}
             </tr>
           )}
         </tbody>
