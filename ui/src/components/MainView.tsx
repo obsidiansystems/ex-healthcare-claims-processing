@@ -114,7 +114,7 @@ const MainView: React.FC = () => {
           <PatientRoutes />
         </Route>
         <Route path="/provider/referrals">
-          <ReferralRoutes />
+          <ReferralRoutes role={username} />
         </Route>
         <Route path="/provider/appointments">
           <AppointmentRoutes />
