@@ -115,7 +115,7 @@ const NotPatients: React.FC = () => {
 
 const Patient: React.FC = () => {
   const username = useParty();
-  const controlled = (d: Main.Policy.DisclosedPolicy) => d.receivers.length > 0 && d.receivers[0] == username;
+  const controlled = (d: Main.Policy.DisclosedPolicy) => d.receivers.length > 0 && d.receivers.includes(username);
 
   const { patientId } = useParams< { patientId: string } >();
   const { overviews, disclosed, disclosedRaw } = usePatients({ patient: patientId }, controlled);
