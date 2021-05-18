@@ -62,19 +62,29 @@ export function TabularView<T, > ( { title, fields, tableKey, itemUrl, useData, 
         </thead>
         <tbody>
           {data.map((po) =>
-            <tr key={tableKey(po)} className="bg-white text-trueGray-500 hover:bg-trueGray-100 ">
-              { fields.map( (g, idx) =>
-                  // We enable tabbing only to the first cell since
-                  //  all table cells for each row link to the same URL.
-                  // Thus, pressing the Tab key will move down one row per press.
-                  <td>
-                    <Link to={match.url + "/" + itemUrl(po)} {...idx == 0 ? {} : {'tabIndex': -1}}>
-                      {g.getter(po)}
-                    </Link>
-                  </td>
-              )}
-            </tr>
-          )}
+            { let url = match.url + "/" + itemUrl(po)
+              return (<tr key={tableKey(po)} className="bg-white text-trueGray-500 hover:bg-trueGray-100 ">
+                        { fields.map( (g, idx) =>
+                            // NOTE 1: We enable tabbing only to the first cell since
+                            //  all table cells for each row link to the same URL.
+                            // Thus, pressing the Tab key will move down one row per press.
+                            //
+                            // NOTE 2: Adding the "flex" className makes the entire table cell
+                            //  become a link, instead of just the text inside the table cell.
+                            <td>
+                              <Link to={url} className="flex" {...idx == 0 ? {} : {'tabIndex': -1}}>
+                                {g.getter(po)}
+                              </Link>
+                            </td>
+                        )}
+                        <td>
+                          <Link to={url} className="flex justify-end" {...{'tabIndex': -1}}>
+                            <CaretRight />
+                          </Link>
+                        </td>
+                      </tr>)
+            })
+          }
         </tbody>
       </table>
     </>
