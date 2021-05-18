@@ -9,9 +9,14 @@ import { Formik, Form, Field as FField, useField } from 'formik';
 import Select from 'react-select';
 import { LField, EField, ChoiceModal, Nothing } from "./ChoiceModal";
 import { TabularScreenRoutes, TabularView, SingleItemView } from "./TabularScreen";
+import { Party } from '@daml/types';
 
-const ClaimRoutes : React.FC = () =>
-  <TabularScreenRoutes metavar=":claimId" table={Claims} detail={Claim}/>
+type Props = {
+  role: Party;
+}
+
+const ClaimRoutes : React.FC<Props> = ({role}) =>
+  <TabularScreenRoutes metavar=":claimId" table={Claims} detail={Claim({role})}/>
 
 const useClaims = (query: any) => {
   const ledger = useLedger();
@@ -61,7 +66,7 @@ const useClaimData = () => {
   return [ { claimId, overview: overview } ];
 }
 
-const Claim : React.FC = () => {
+const Claim : React.FC<Props> = ({role}) => {
   const dollars = (n: any) => n ? "$" + n : "";
   return <SingleItemView
     title="Claim"
@@ -87,7 +92,7 @@ const Claim : React.FC = () => {
     ] }
     tableKey={ o => o.overview?.claim?.contractId }
     itemUrl={ o => "" }
-    choices={ d => [
+    choices={ d => d.overview?.claim?.payload?.payer === role ? [
             <ChoiceModal className="flex flex-col"
                          choice={Main.Claim.Claim.PayClaim}
                          contract={d.overview?.claim?.contractId}
@@ -97,7 +102,7 @@ const Claim : React.FC = () => {
                          initialValues={ { } } >
               <h1 className="text-center">Pay Claim</h1>
             </ChoiceModal>
-    ] }
+    ] : [] }
     />
   ;
 }
