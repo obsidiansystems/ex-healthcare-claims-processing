@@ -90,7 +90,7 @@ const Appointment : React.FC<Props> = ({role}) => {
                                content={d.overview?.policy?.payload?.patientName + " has been checked in and is ready for treatment."}
                              />
                              <FollowUp
-                               to={"/treatments/" + (creations(evts)[0]?.contractId) }
+                               to={"/provider/treatments/" + (creations(evts)[1]?.contractId) }
                                label="View Treatment"
                              />
                            </>}
