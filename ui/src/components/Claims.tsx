@@ -49,11 +49,11 @@ const Claims: React.FC = () => {
   title="Claims"
   useData={useClaimsData}
   fields={ [
-    { label: "Patient Name", getter: o => o?.disclosed?.payload?.patientName || "unknown patient" },
-    { label: "Payer", getter: o => o?.claim?.payload?.payer },
+    // NB: outputs provider role (e.g. "Radiologist") instead of provider name (e.g. "Beta Imaging Labs")
+    { label: "Provider", getter: o => o?.claim?.payload?.provider },
+    { label: "Patient", getter: o => o?.claim?.payload?.encounterDetails?.patient },
     { label: "Procedure Code", getter: o => o?.claim?.payload?.encounterDetails.procedureCode },
-    { label: "Amount", getter: o => o?.claim?.payload?.amount },
-    { label: "Complete", getter: o => o?.receipt ? "Yes" : "No" },
+    { label: "Amount", getter: o => o?.claim?.payload?.amount }
   ] }
   tableKey={ o => o.claim.contractId }
   itemUrl={ o => o.claim.contractId }
@@ -79,15 +79,15 @@ const Claim : React.FC<Props> = ({role}) => {
         { label: "Claim Amount", getter: o => dollars(o?.overview?.claim?.payload?.amount)},
       ],
       [
-        { label: "Provider Name", getter: o => "" }, //TODO
-        { label: "Patient Name", getter: o => o?.overview?.claim?.payload?.encounterDetails?.patient},
-        { label: "Appointment Date", getter: o => "" }, //TODO
-        { label: "Appointment Priority", getter: o => o?.overview?.claim?.payload?.encounterDetails.appointmentPriority},
-      ],
-      [
         { label: "Procedure Code", getter: o => o?.overview?.claim?.payload?.encounterDetails.procedureCode},
         { label: "Diagnosis Code", getter: o => o?.overview?.claim?.payload?.encounterDetails.diagnosisCode},
         { label: "Site Service Code", getter: o => o?.overview?.claim?.payload?.encounterDetails.siteServiceCode},
+      ],
+      [
+        // NB: outputs provider role (e.g. "Radiologist") instead of provider name (e.g. "Beta Imaging Labs")
+        { label: "Provider", getter: o => o?.overview?.claim?.payload?.provider },
+        { label: "Patient", getter: o => o?.overview?.claim?.payload?.encounterDetails?.patient},
+        { label: "Appointment Priority", getter: o => o?.overview?.claim?.payload?.encounterDetails.appointmentPriority},
       ],
     ] }
     tableKey={ o => o.overview?.claim?.contractId }
