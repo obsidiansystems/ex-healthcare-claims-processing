@@ -74,7 +74,7 @@ const Profile: React.FC = () => {
         </div>)}
       </>)}
       {[...patientResult].map(({payload: p})=> <>
-        <ProfileTop name={p.patientName} role="Provider" />
+        <ProfileTop name={p.patientName} role="Patient" />
         <div className="flex text-left sm-trueGray-500 mt-8">
           <ProfileKV keyS="PCP" value={p.primaryCareProviderID} />
           <ProfileKVCenter keyS="Insurance ID" value={p.insuranceID} />
