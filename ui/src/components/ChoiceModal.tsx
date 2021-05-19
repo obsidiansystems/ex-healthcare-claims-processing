@@ -94,6 +94,9 @@ export function ChoiceModal<T extends object, C, R, K>({ choice, contract, submi
         ledger.exercise(choice, contract, arg).then(success, failure);
     } else {
         console.log("Incomplete Parameters");
+        // unless we do this then the "isSubmitting" property will be "true",
+        //  which results in the Submit button being disabled.
+        setSubmitting(false);
     }
   };
   var content;
