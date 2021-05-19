@@ -21,7 +21,7 @@ type Props = {
 const LoginScreen: React.FC<Props> = ({onLogin}) => {
   const login = useCallback(async (credentials: Credentials) => {
     try {
-      console.log("Attempting ogin");
+      console.log("Attempting Login");
       const ledger = new Ledger({token: credentials.token, httpBaseUrl});
       console.log("Got ledger" + ledger);
 //      let userContract = await ledger.fetchByKey(User.User, credentials.party);
