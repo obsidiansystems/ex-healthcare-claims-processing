@@ -97,7 +97,7 @@ const Appointment : React.FC<Props> = ({role}) => {
                          >
               <Message
                 title="Check In Patient"
-                content={d.overview?.policy?.payload?.patientName + " is present and ready for treatment?"}
+                content={d.overview?.policy?.payload?.patientName + " is present and ready for their appointment?"}
               />
             </ChoiceModal>
     ] : [] }
