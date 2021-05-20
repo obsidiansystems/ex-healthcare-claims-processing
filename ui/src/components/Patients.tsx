@@ -46,21 +46,21 @@ const usePatients = (query: any, predicate: any = () => true) => {
     ([acceptance, policy]) => ({ acceptance, policy }),
     innerJoin(keyedAcceptance, keyedDisclosed).values(),
   ));
-  return { acceptances, disclosed, overviews, disclosedRaw };
+  return { acceptances, disclosed, overviews, disclosedRaw, 'disclosedUnique' : Array.from(keyedDisclosed.values()) };
 }
 
-const useAllPatients: (() => PatientOverview[]) = () => usePatients({}).overviews;
+const useAllPatients: (() => Main.Policy.DisclosedPolicy[]) = () => usePatients({}).disclosedUnique;
 const Patients: React.FC = () => {
   return <TabularView
     title="Patients"
     useData={useAllPatients}
     fields={ [
-      { label: "Name", getter : o => o.policy.patientName },
+      { label: "Name", getter : o => o.patientName },
       /* { label: "PCP", getter : o => "" }, */
-      { label: "Insurance ID", getter : o => o.policy.insuranceID },
+      { label: "Insurance ID", getter : o => o.insuranceID },
     ] }
-    tableKey={ o => o.policy.patient }
-    itemUrl={ o => o.policy.patient }
+    tableKey={ o => o.patient }
+    itemUrl={ o => o.patient }
     />
   ;
 }
@@ -118,7 +118,7 @@ const Patient: React.FC = () => {
   const controlled = (d: Main.Policy.DisclosedPolicy) => d.receivers.length > 0 && d.receivers.includes(username);
 
   const { patientId } = useParams< { patientId: string } >();
-  const { overviews, disclosed, disclosedRaw } = usePatients({ patient: patientId }, controlled);
+  const { disclosedUnique, disclosed, disclosedRaw } = usePatients({ patient: patientId }, controlled);
   const match = useRouteMatch();
 
   const policyRows = disclosed.map((d) =>
@@ -133,7 +133,7 @@ const Patient: React.FC = () => {
   const pcpResult = useStreamQuery(Main.Provider.Provider).contracts;
   const pcpContract = pcpResult[0];
 
-  const content = (po: PatientOverview) => (
+  const content = (dp: Main.Policy.DisclosedPolicy) => (
     <div className="flex flex-col p-5 space-y-4 bg-white rounded shadow-lg">
       <Switch>
         <Route exact path={match.path + "/policies"}>
@@ -184,8 +184,8 @@ const Patient: React.FC = () => {
       </div>
       <hr />
       <FieldsRow fields={[
-        { label: "Name", value: po.policy.patientName},
-        { label: "Insurance ID", value: po.policy.insuranceID},
+        { label: "Name", value: dp.patientName},
+        { label: "Insurance ID", value: dp.insuranceID},
         { label: "Primary Care Provider", value: ""},
       ]} />
       </Route>
@@ -209,7 +209,7 @@ const Patient: React.FC = () => {
           <TabLink to={match.url + "/policies"}>  Disclosed Policies </TabLink>
         </div>
 
-        { overviews.length > 0 && content(overviews[0]) }
+        { disclosedUnique.length > 0 && content(disclosedUnique[0]) }
 
       </div>
     </>
