@@ -4,7 +4,7 @@ import { Main } from '@daml.js/healthcare-claims-processing';
 import { CreateEvent } from '@daml/ledger';
 import { useStreamQuery, useLedger } from '@daml/react';
 import { CalendarBlank, CaretRight } from "phosphor-react";
-import { mapIter, leftJoin, intercalate, Field, FieldsRow, TabLink, useAsync } from "./Common";
+import { mapIter, leftJoin, intercalate, Field, FieldsRow, TabLink, useAsync, Message } from "./Common";
 import { Formik, Form, Field as FField, useField } from 'formik';
 import Select from 'react-select';
 import { LField, EField, ChoiceModal, Nothing } from "./ChoiceModal";
@@ -96,11 +96,15 @@ const Claim : React.FC<Props> = ({role}) => {
             <ChoiceModal className="flex flex-col"
                          choice={Main.Claim.Claim.PayClaim}
                          contract={d.overview?.claim?.contractId}
-                         submitTitle="Pay Claim"
+                         submitTitle="Pay Claim Now"
                          buttonTitle="Pay Claim"
                          icon={<CalendarBlank size={20}/>}
                          initialValues={ { } } >
-              <h1 className="text-center">Pay Claim</h1>
+              <Message
+                title="Pay Claim"
+                content={`This claim is approved and ready to be paid?`}
+              />
+
             </ChoiceModal>
     ] : [] }
     />
