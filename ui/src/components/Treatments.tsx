@@ -58,7 +58,6 @@ const Treatment : React.FC = () => {
     useData={useTreatmentData}
     fields={ [[
       { label: "Patient Name", getter: o => o?.overview?.policy?.payload?.patientName},
-      { label: "Appointment Date", getter: o => "" },
       { label: "Appointment Priority", getter: o => o?.overview?.treatment?.payload?.encounterDetails.appointmentPriority},
       { label: "Procedure Code", getter: o => o?.overview?.treatment?.payload?.encounterDetails.procedureCode},
       { label: "Diagnosis Code", getter: o => o?.overview?.treatment?.payload?.encounterDetails.diagnosisCode},
