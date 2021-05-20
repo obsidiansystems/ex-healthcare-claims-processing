@@ -93,7 +93,7 @@ const Claim : React.FC<Props> = ({role}) => {
     tableKey={ o => o.overview?.claim?.contractId }
     itemUrl={ o => "" }
     choices={ d => d.overview?.claim?.payload?.payer === role ? [
-            <ChoiceModal className="flex flex-col"
+            <ChoiceModal className="flex flex-col space-y-6 w-170 mt-3"
                          choice={Main.Claim.Claim.PayClaim}
                          contract={d.overview?.claim?.contractId}
                          submitTitle="Pay Claim Now"
