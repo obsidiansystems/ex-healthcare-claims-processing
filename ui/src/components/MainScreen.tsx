@@ -3,7 +3,6 @@
 
 import React from 'react'
 import { Image, Menu } from 'semantic-ui-react'
-import dateFormat from 'dateformat';
 import DayPicker from './DayPicker'
 import FormikMod, { Formik, Form, Field, FieldProps, FormikHelpers, FieldAttributes, useField } from 'formik';
 import { SubmitButton, DayPickerField, Nothing } from "./ChoiceModal";
@@ -13,6 +12,7 @@ import { useParty } from '@daml/react';
 import { Link, Route } from 'react-router-dom';
 import { TabularScreenRoutes } from './TabularScreen';
 import '@fontsource/alata';
+import { formatDate } from './Common';
 
 type Props = {
   onLogout: () => void;
@@ -79,7 +79,6 @@ const sidebar: Map<string, Array<TabProps>> = new Map([
 const MainScreen: React.FC<Props> = ({onLogout}) => {
   const [modalActive,setModalActive] = React.useState(false);
   const [date, setDate] = React.useState(new Date());
-  const formatDate = (d:Date) => dateFormat(d, "ddd, mmm d, yyyy");
   const role = useParty();
   const theme = {
     blue: '#4c6fea',

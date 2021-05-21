@@ -4,16 +4,18 @@ import { Main } from '@daml.js/healthcare-claims-processing';
 import { CreateEvent } from '@daml/ledger';
 import { useStreamQuery, useLedger } from '@daml/react';
 import { CaretRight, Clock, ArrowRight } from "phosphor-react";
-import { mapIter, innerJoin, intercalate, Field, FieldsRow, Message, TabLink, useAsync } from "./Common";
+import { mapIter, innerJoin, intercalate, Field, FieldsRow, Message, TabLink, useAsync, formatDate } from "./Common";
 import { Formik, Form, Field as FField, useField } from 'formik';
 import Select from 'react-select';
 import { LField, EField, ChoiceModal, FollowUp, Nothing, creations } from "./ChoiceModal";
 import { TabularScreenRoutes, TabularView, SingleItemView } from "./TabularScreen";
-import { Party } from '@daml/types';
+import { Party, Time } from '@daml/types';
 
 type Props = {
   role: Party;
 }
+
+const formatDateHelper = (timeStr : Time) => timeStr ? formatDate(new Date(timeStr)) : "";
 
 const AppointmentRoutes : React.FC<Props> = ({role}) =>
   <TabularScreenRoutes metavar=":appointmentId" table={Appointments} detail={Appointment({role})}/>
@@ -41,7 +43,7 @@ const Appointments: React.FC = () => {
     title="Appointments"
     useData={useAppointmentsData}
     fields={ [
-      { label: "Appointment Date", getter: o => o?.appointment?.payload?.appointmentTime },
+      { label: "Appointment Date", getter: o => formatDateHelper(o?.appointment?.payload?.appointmentTime) },
       { label: "Patient Name", getter: o => o?.policy?.payload?.patientName },
       { label: "Insurance ID", getter: o => o?.policy?.payload?.insuranceID },
       { label: "Procedure Code", getter: o => o?.appointment?.payload?.encounterDetails.encounterDetails.procedureCode },
@@ -64,7 +66,7 @@ const Appointment : React.FC<Props> = ({role}) => {
     useData={useAppointmentData}
     fields={ [[
       { label: "Patient Name", getter: o => o?.overview?.policy?.payload?.patientName },
-      { label: "Appointment Date", getter: o => o?.overview?.appointment?.payload?.appointmentTime },
+      { label: "Appointment Date", getter: o => formatDateHelper(o?.overview?.appointment?.payload?.appointmentTime) },
       { label: "Appointment Priority", getter: o => o?.overview?.appointment?.payload?.encounterDetails.encounterDetails.appointmentPriority },
       { label: "Procedure Code", getter: o => o?.overview?.appointment?.payload?.encounterDetails.encounterDetails.procedureCode },
       { label: "Diagnosis Code", getter: o => o?.overview?.appointment?.payload?.encounterDetails.encounterDetails.diagnosisCode },
