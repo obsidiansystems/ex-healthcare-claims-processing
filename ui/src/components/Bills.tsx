@@ -39,7 +39,6 @@ const Bills: React.FC = () => {
            fields={ [
              { label: "Provider", getter: o => "Provider name hidden" },
              { label: "Amount", getter: o => o?.bill?.payload?.amount },
-             { label: "Appointment Date", getter: o => o?.bill?.payload?.encounterDetails.diagnosisCode },
              { label: "Procedure Code", getter: o => o?.bill?.payload?.encounterDetails.procedureCode },
              { label: "Paid", getter: o => (o?.receipt?.payload) ? "YES" : "NO" },
            ] }
