@@ -8,7 +8,7 @@ BACKEND_READY_TEXT="Press 'Ctrl-C' to quit"
 
 run_backend() {
     cd ../model || exit
-    daml start --sandbox-option --address=localhost
+    daml start --sandbox-option --address=localhost  --open-browser "no"
 }
 
 run_triggers() {
