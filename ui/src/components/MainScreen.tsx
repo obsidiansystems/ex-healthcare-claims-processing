@@ -10,7 +10,7 @@ import { SubmitButton, DayPickerField, Nothing } from "./ChoiceModal";
 import MainView from './MainView';
 import Modal from './Modal';
 import { useParty } from '@daml/react';
-import { Link, Route } from 'react-router-dom';
+import { Link, Route, useHistory } from 'react-router-dom';
 import { TabularScreenRoutes } from './TabularScreen';
 import '@fontsource/alata';
 
@@ -76,6 +76,12 @@ const sidebar: Map<string, Array<TabProps>> = new Map([
    [tabs.claims]],
 ])
 
+// Defines the page that is shown after logging in for a certain role.
+// If a role doesn't have a route here it defaults to '/' (the Profile page).
+const roleRoutes: Map<string, string> = new Map([
+  ["InsuranceCompany", '/provider/claims']
+])
+
 const MainScreen: React.FC<Props> = ({onLogout}) => {
   const [modalActive,setModalActive] = React.useState(false);
   const [date, setDate] = React.useState(new Date());
@@ -84,6 +90,9 @@ const MainScreen: React.FC<Props> = ({onLogout}) => {
   const theme = {
     blue: '#4c6fea',
   }
+
+  // Navigate to the role's start page
+  useHistory().push(roleRoutes.get(role) || '/');
 
   const roleTabs = sidebar.get(role) ?? [];
 
