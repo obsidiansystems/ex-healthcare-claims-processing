@@ -30,6 +30,7 @@ Be sure you have the following installed.
     ```shell
     launchers/sandbox+populate
     launchers/automation
+    launchers/heathcareUI
     ```
 
 ### Stopping the App
