@@ -91,7 +91,7 @@ const Treatment : React.FC = () => {
                    }
       >
               <Message
-                title="Check In Patient"
+                title="Complete Treatment"
                 content={d.overview?.policy?.payload?.patientName + " is present and ready for treatment?"}
               />
             </ChoiceModal>

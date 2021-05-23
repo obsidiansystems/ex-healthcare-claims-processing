@@ -4,7 +4,7 @@ import { Main } from '@daml.js/healthcare-claims-processing';
 import { CreateEvent } from '@daml/ledger';
 import { useStreamQuery, useLedger } from '@daml/react';
 import { CaretRight, Share, ArrowRight } from "phosphor-react";
-import { mapIter, leftJoin, intercalate, Field, FieldsRow, TabLink, useAsync } from "./Common";
+import { mapIter, leftJoin, intercalate, Field, FieldsRow, TabLink, useAsync, Message } from "./Common";
 import { Formik, Form, Field as FField, useField } from 'formik';
 import Select from 'react-select';
 import { LField, EField, ChoiceModal, Nothing } from "./ChoiceModal";
@@ -74,11 +74,11 @@ const Bill : React.FC = () => {
     tableKey={ o => o.overview?.bill?.contractId }
     itemUrl={ o => "" }
     choices={ d => [
-            <ChoiceModal className="flex flex-col"
+            <ChoiceModal className="flex flex-col space-y-6 w-170 mt-3"
                          choice={Main.Claim.PatientObligation.PayPatientObligation}
                          contract={d.overview?.bill?.contractId}
-                         submitTitle="Bill Pay"
-                         buttonTitle="Bill Pay"
+                         submitTitle="Pay Bill Now"
+                         buttonTitle="Pay Bill"
                          icon={<Share />}
                          successWidget={({ rv: [v, evts] }, close)=><>
                            <h2 className="2xl">Bill has been paid!</h2>
@@ -86,7 +86,10 @@ const Bill : React.FC = () => {
                              <a onClick={(e)=>close()}>close</a>
                            </>}
                          initialValues={ { } } >
-              <h1 className="text-center">Pay Bill</h1>
+              <Message
+                title="Pay Bill"
+                content={"This bill is accurate and ready to be paid?"}
+              />
             </ChoiceModal>
     ] }
     />
