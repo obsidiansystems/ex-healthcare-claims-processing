@@ -8,10 +8,21 @@ build: build-dars ui/daml.js
 clean:
 	rm -rf model/.daml triggers/.daml
 	rm -rf target
+	rm -rf ui/daml.js
+	$(MAKE) clean -C ui
 
 ui/daml.js: build-dars
 	rm -rf ui/daml.js
 	daml codegen js target/healthcare-claims-processing.dar -o ui/daml.js
+
+build-ui: ui/daml.js
+	$(MAKE) -C ui
+
+test-ui: build-ui
+	$(MAKE) -C ui test
+
+daml-hub-package: build
+	$(MAKE) -C ui daml-hub-package LEDGER_ID=$(LEDGER_ID)
 
 ### DARS ###
 

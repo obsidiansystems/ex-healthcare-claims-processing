@@ -43,7 +43,6 @@ const Referrals: React.FC = () => {
     fields={ [
       { label: "Name", getter: o => o?.policy?.payload?.patientName},
       { label: "Referring Party", getter: o => o?.referral?.payload?.referringProvider},
-      { label: "Referral Date", getter: o => "unknown" },
       { label: "Appointment Priority", getter: o => o?.referral?.payload?.referralDetails?.encounterDetails?.appointmentPriority},
     ] }
     tableKey={ o => o.referral.contractId }
@@ -64,7 +63,6 @@ const Referral: React.FC<Props> = ({role}) => {
     fields={ [[
       { label: "Name", getter: o => o?.overview?.policy?.payload?.patientName},
       { label: "Referring Party", getter: o => o?.overview?.referral?.payload?.referringProvider},
-      { label: "Referral Date", getter: o => "unknown" },
       { label: "Appointment Priority", getter: o => o?.overview?.referral?.payload?.referralDetails?.encounterDetails?.appointmentPriority},
     ]] }
     tableKey={ o => o.overview.referral.contractId }
