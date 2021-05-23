@@ -32,8 +32,6 @@ Be sure you have the following installed.
     launchers/automation
     ```
 
-    The navigator will automatically open in new browser tab at http://localhost:7500.
-
 ### Stopping the App
 
 1. Stop the every running command by pressing **Ctrl+C**.
