@@ -66,7 +66,6 @@ jobs:
           path: target/daml-test-reports
       - store_artifacts:
           path: target/daml-test-reports
-      - slack_notification
 
   integration_test:
     parameters:
@@ -118,7 +117,6 @@ jobs:
             - "*.dar"
             - "lib"
             - "NOTICE"
-      - slack_notification
 
   blackduck_check:
     parameters:
@@ -164,29 +162,6 @@ workflows:
     jobs:
       - daml_test:
           daml_sdk_version: "1.12.0"
-          context: refapps
       - integration_test:
           daml_sdk_version: "1.12.0"
-          context: refapps
-  scheduled_test:
-    triggers:
-      - schedule:
-          # need to scatter jobs to reduce Blackduck load
-          # see also https://digitalasset.atlassian.net/browse/ERA-913
-          cron: "30 2 * * *"
-          filters:
-            branches:
-              only:
-                - main
-    jobs:
-      - daml_test:
-          daml_sdk_version: "1.12.0"
-          context: refapps
-      - integration_test:
-          daml_sdk_version: "1.12.0"
-          context: refapps
-      - blackduck_check:
-          daml_sdk_version: "1.12.0"
-          context:
-            - blackduck
-            - refapps
+
