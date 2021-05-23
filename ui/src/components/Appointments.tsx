@@ -64,17 +64,22 @@ const Appointment : React.FC<Props> = ({role}) => {
   return <SingleItemView
     title="Appointment"
     useData={useAppointmentData}
-    fields={ [[
-      { label: "Patient Name", getter: o => o?.overview?.policy?.payload?.patientName },
-      { label: "Appointment Date", getter: o => formatDateHelper(o?.overview?.appointment?.payload?.appointmentTime) },
-      { label: "Appointment Priority", getter: o => o?.overview?.appointment?.payload?.encounterDetails.encounterDetails.appointmentPriority },
-      { label: "Procedure Code", getter: o => o?.overview?.appointment?.payload?.encounterDetails.encounterDetails.procedureCode },
-      { label: "Diagnosis Code", getter: o => o?.overview?.appointment?.payload?.encounterDetails.encounterDetails.diagnosisCode },
-      { label: "Site Service Code", getter: o => o?.overview?.appointment?.payload?.encounterDetails.encounterDetails.siteServiceCode },
-      { label: "Allowed Amount", getter: o => o?.overview?.appointment?.payload?.encounterDetails.encounterDetails?.allowedAmount || "" },
-      { label: "CoPay", getter: o => o?.overview?.appointment?.payload?.encounterDetails.encounterDetails?.coPay || "" },
-      { label: "Patient Responsibility", getter: o => o?.overview?.appointment?.payload?.encounterDetails.encounterDetails?.patientResponsibility || "" },
-    ]] }
+    fields={ [
+      [ { label: "Patient Name", getter: o => o?.overview?.policy?.payload?.patientName },
+        { label: "Appointment Date", getter: o => formatDateHelper(o?.overview?.appointment?.payload?.appointmentTime) },
+        { label: "Appointment Priority", getter: o => o?.overview?.appointment?.payload?.encounterDetails.encounterDetails.appointmentPriority }
+      ],
+
+      [ { label: "Procedure Code", getter: o => o?.overview?.appointment?.payload?.encounterDetails.encounterDetails.procedureCode },
+        { label: "Diagnosis Code", getter: o => o?.overview?.appointment?.payload?.encounterDetails.encounterDetails.diagnosisCode },
+        { label: "Site Service Code", getter: o => o?.overview?.appointment?.payload?.encounterDetails.encounterDetails.siteServiceCode }
+      ],
+
+      [ { label: "Allowed Amount", getter: o => o?.overview?.appointment?.payload?.encounterDetails.encounterDetails?.allowedAmount || "" },
+        { label: "CoPay", getter: o => o?.overview?.appointment?.payload?.encounterDetails.encounterDetails?.coPay || "" },
+        { label: "Patient Responsibility", getter: o => o?.overview?.appointment?.payload?.encounterDetails.encounterDetails?.patientResponsibility || "" }
+      ]
+    ] }
     tableKey={ o => o.overview?.appointment.contractId }
     itemUrl={ o => "" }
     choices={ d => d?.overview?.appointment?.payload?.provider == role ? [
