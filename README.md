@@ -28,7 +28,7 @@ Be sure you have the following installed.
 2. Use **separate terminals** to launch the individual components:
 
     ```shell
-    launchers/sandbox+navigator+populate
+    launchers/sandbox+populate
     launchers/automation
     ```
 
