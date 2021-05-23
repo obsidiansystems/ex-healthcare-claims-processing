@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react'
 import { NavLink, Route, Switch, useRouteMatch, useParams } from 'react-router-dom';
+import dateFormat from 'dateformat';
 
 type FieldProps = {label: string, value: string};
 
@@ -33,6 +34,8 @@ function innerJoin<K, X, Y>(xs: Map<K, X>, ys: Map<K, Y>): Map<K, [X, Y]> {
   }
   return ret;
 }
+
+export const formatDate = (d:Date) => dateFormat(d, "ddd, mmm d, yyyy");
 
 const TabLink: React.FC<{to:string}> = ({children,to}) => {
   const match = useRouteMatch();
