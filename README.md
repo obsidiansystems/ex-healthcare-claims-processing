@@ -112,45 +112,30 @@ This User Guide will take you step-by-step through healthcare claims processing,
 
 
 <table>
+<thead>
   <tr>
-   <td><strong>Role</strong>
-   </td>
-   <td><strong>Responsibility</strong>
-   </td>
+    <th>Role</th>
+    <th>Responsibility</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td>Primary Care Provider</td>
+    <td>A physician, who creates a referral for a Patient to a Radiologist</td>
   </tr>
   <tr>
-   <td>Primary Care Provider
-   </td>
-   <td>A physician, who creates a referral for a patient
-   </td>
+    <td>Patient</td>
+    <td>Visits the Primary Care Provider and is referred to a Radiologist<br>Pays their portion of the Bill/Claim after the Radiologist submits a Claim</td>
   </tr>
   <tr>
-   <td>Patient
-   </td>
-   <td>
-     <p>Visits both physician and specialist (radiology lab)
-<p>
-After procedure is performed, pays appropriate portion of the bill
-   </td>
+    <td>Radiologist</td>
+    <td>Checks Referrals and schedules an Appointment for a Patient<br>On the Appointment date they Check-In the Patient in and perform a treatment <br>Marks the Treatment as Completed which creates a Claim for the Insurance Company</td>
   </tr>
   <tr>
-   <td>Radiologist
-   </td>
-   <td>
-<p>
-Specialist, who creates appointment for a patient
-<p>
-Checks patient in and performs procedure
-<p>
-Checks patient out after procedure
-   </td>
+    <td>Insurance Company</td>
+    <td>Pays their portion of the Claim/Bill after the Radiologist submits a Claim</td>
   </tr>
-  <tr>
-   <td>Insurance Company
-   </td>
-   <td>Pays for its portion of the bill after the procedure is performed
-   </td>
-  </tr>
+</tbody>
 </table>
 
 
