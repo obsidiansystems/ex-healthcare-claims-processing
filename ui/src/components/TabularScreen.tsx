@@ -63,7 +63,7 @@ export function TabularView<T, > ( { title, fields, tableKey, itemUrl, useData, 
         <tbody>
           {data.map((po) =>
             { let url = match.url + "/" + itemUrl(po)
-              return (<tr key={tableKey(po)} className="bg-white text-trueGray-500 hover:bg-trueGray-100 ">
+              return (<tr key={tableKey(po)} className="bg-white text-trueGray-500 hover:bg-trueGray-100 whitespace-pre">
                         { fields.map( (g, idx) =>
                             // NOTE 1: We enable tabbing only to the first cell since
                             //  all table cells for each row link to the same URL.
