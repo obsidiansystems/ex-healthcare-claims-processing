@@ -37,6 +37,7 @@ function innerJoin<K, X, Y>(xs: Map<K, X>, ys: Map<K, Y>): Map<K, [X, Y]> {
 
 export const formatDate = (d:Date) => dateFormat(d, "ddd, mmm d, yyyy");
 export const formatDateTime = (d:Date) => dateFormat(d, "ddd h:MM TT, mmm d, yyyy");
+export const formatDateTimeSplit = (d:Date) => dateFormat(d, "ddd h:MM TT") + "\n" + dateFormat(d, "mmm d, yyyy");
 
 const TabLink: React.FC<{to:string}> = ({children,to}) => {
   const match = useRouteMatch();
