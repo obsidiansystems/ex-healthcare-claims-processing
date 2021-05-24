@@ -253,34 +253,41 @@ export const DayTimePickerField : React.FC<{
   const [ field, meta, { setValue } ] = useField<Time | Nothing>(name);
   if (field.value == Nothing) {
     // can't help but render some picked date, so might as well set it
-    setValue(dateToTime(new Date()));
+    const f = new Date();
+    console.log("default combined", f);
+    setValue(dateToTime(f));
   }
   const defaultField = field.value == Nothing ? new Date() : new Date(field.value);
-  const [date, setDate] = React.useState(new Date(defaultField.getFullYear(), defaultField.getMonth(), defaultField.getDay()));
-  const [time, setTime] = React.useState(new Date(0, 0, 0, defaultField.getHours(), defaultField.getMinutes(), defaultField.getSeconds()));
-  const updateField = () => setValue(dateToTime(new Date(
-    date.getFullYear(), date.getMonth(), date.getDay(),
-    time.getHours(), time.getMinutes(), time.getSeconds(),
-  )));
+  let date = new Date(defaultField.getFullYear(), defaultField.getMonth(), defaultField.getDate());
+  let time = new Date(0, 0, 0, defaultField.getHours(), defaultField.getMinutes(), defaultField.getSeconds());
+  const updateField = () => {
+    const f = new Date(
+      date.getFullYear(), date.getMonth(), date.getDate(),
+      time.getHours(), time.getMinutes(), time.getSeconds(),
+    );
+    console.log("new combined", f);
+    setValue(dateToTime(f));
+  };
   const error = errors?.[name];
   return (
     <>
       <DayPicker
         date={date}
         setDate={d => {
-          setDate(d);
+          console.log("new date", d);
+          date = d;
           updateField();
         }}
         theme={({ blue: "var(--blue)" })}
       />
       <TimePicker
         onChange={t => {
-          console.log("SDF", t);
+          console.log("new time", t);
           if (t instanceof Date) {
-            setTime(t);
+            time = t;
           } else {
             const [hours, minutes] = t.split(':');
-            setTime(new Date(0, 0, 0, parseInt(hours), parseInt(minutes)));
+            time = new Date(0, 0, 0, parseInt(hours), parseInt(minutes));
           }
           updateField();
         }}
