@@ -1,5 +1,5 @@
 import React, { Dispatch, SetStateAction } from 'react'
-import { Choice, ContractId } from '@daml/types';
+import { Choice, ContractId, Time } from '@daml/types';
 import { Event as DEvent, CreateEvent } from '@daml/ledger';
 import { useLedger } from '@daml/react';
 
@@ -247,18 +247,20 @@ export const DayTimePickerField : React.FC<{
   name: string
   errors?: ChoiceErrorsType,
 }> = ({ name, errors }) => {
-  const [ field, meta, { setValue } ] = useField<Date | Nothing>(name);
+  const [ field, meta, { setValue } ] = useField<Time | Nothing>(name);
   const error = errors?.[name];
-  const defaultDate = field.value == Nothing ? new Date() : field.value;
+  const defaultDate = field.value == Nothing ? new Date() : new Date(field.value);
+  // convert a JavaScript "Date" value into a DAML-backend "Time" value
+  const dateToTime = (d : Date) : Time => d.toISOString();
   return (
     <>
       <DayPicker
         date={defaultDate}
-        setDate={setValue}
+        setDate={d => setValue(dateToTime(d))}
         theme={({ blue: "var(--blue)" })}
       />
       <TimePicker
-        onChange={t => setValue(t instanceof Date ? t : new Date(t))}
+        onChange={t => setValue(dateToTime(t instanceof Date ? t : new Date(t)))}
         value={defaultDate}
       />
       <RenderError error={error} />

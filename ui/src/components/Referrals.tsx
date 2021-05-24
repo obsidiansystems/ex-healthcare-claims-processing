@@ -74,7 +74,7 @@ const Referral: React.FC<Props> = ({role}) => {
                          submitTitle="Schedule Appointment"
                          buttonTitle="Schedule Appointment"
                          icon={<Share />}
-                         initialValues={ { appointmentTime: Nothing } }
+                         initialValues={ { appointmentTime: (new Date()).toISOString() } }
                          successWidget={({ rv: [v, evts] }, close) =>
                            <>
                              <Message
