@@ -9,9 +9,10 @@ import { Formik, Form, Field as FField, useField } from 'formik';
 import Select from 'react-select';
 import { LField, EField, ChoiceModal, FollowUp, Nothing } from "./ChoiceModal";
 import { TabularScreenRoutes, TabularView, SingleItemView } from "./TabularScreen";
+import { Party } from '@daml/types';
 
-const TreatmentRoutes : React.FC = () =>
-  <TabularScreenRoutes metavar=":treatmentId" table={Treatments} detail={Treatment}/>
+const TreatmentRoutes : React.FC<{role: Party}> = ({role}) =>
+  <TabularScreenRoutes metavar=":treatmentId" table={Treatments} detail={Treatment({role})}/>
 
 const useTreatments = (query: any) => {
   const ledger = useLedger();
@@ -52,7 +53,7 @@ const useTreatmentData = () => {
   return [ { treatmentId, overview: overviews[0] } ];
 }
 
-const Treatment : React.FC = () => {
+const Treatment : React.FC<{role: Party}> = ({role}) => {
   return <SingleItemView
     title="Treatment"
     useData={useTreatmentData}
@@ -73,7 +74,7 @@ const Treatment : React.FC = () => {
     ] }
     tableKey={ o => o.overview?.treatment.contractId }
     itemUrl={ o => "" }
-    choices={ d => [
+    choices={ d => d?.overview?.treatment?.payload?.provider == role ? [
       <ChoiceModal className="flex flex-col space-y-6 w-170 mt-3"
                    choice={Main.Treatment.Treatment.CompleteTreatment}
                    contract={d.overview?.treatment?.contractId}
@@ -95,7 +96,7 @@ const Treatment : React.FC = () => {
                 content={d.overview?.policy?.payload?.patientName + " is present and ready for treatment?"}
               />
             </ChoiceModal>
-    ] }
+    ] : [] }
 
     />
   ;

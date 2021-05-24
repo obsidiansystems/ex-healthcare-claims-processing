@@ -120,7 +120,7 @@ const MainView: React.FC = () => {
           <AppointmentRoutes role={username} />
         </Route>
         <Route path="/provider/treatments">
-          <TreatmentRoutes />
+          <TreatmentRoutes role={username} />
         </Route>
         <Route path="/provider/Claims">
           <ClaimsRoutes role={username} />
