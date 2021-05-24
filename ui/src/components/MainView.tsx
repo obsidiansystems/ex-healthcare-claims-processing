@@ -74,7 +74,7 @@ const Profile: React.FC = () => {
         </div>)}
       </>)}
       {[...patientResult].map(({payload: p})=> <>
-        <ProfileTop name={p.patientName} role="Provider" />
+        <ProfileTop name={p.patientName} role="Patient" />
         <div className="flex text-left sm-trueGray-500 mt-8">
           <ProfileKV keyS="PCP" value={p.primaryCareProviderID} />
           <ProfileKVCenter keyS="Insurance ID" value={p.insuranceID} />
@@ -111,19 +111,19 @@ const MainView: React.FC = () => {
           <Profile/>
         </Route>
         <Route path="/provider/patients">
-          <PatientRoutes />
+          <PatientRoutes role={username} />
         </Route>
         <Route path="/provider/referrals">
-          <ReferralRoutes />
+          <ReferralRoutes role={username} />
         </Route>
         <Route path="/provider/appointments">
-          <AppointmentRoutes />
+          <AppointmentRoutes role={username} />
         </Route>
         <Route path="/provider/treatments">
-          <TreatmentRoutes />
+          <TreatmentRoutes role={username} />
         </Route>
         <Route path="/provider/Claims">
-          <ClaimsRoutes />
+          <ClaimsRoutes role={username} />
         </Route>
         <Route path="/patient/bills">
           <BillRoutes />

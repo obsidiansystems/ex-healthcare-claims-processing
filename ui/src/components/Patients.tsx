@@ -9,6 +9,7 @@ import { Formik, Form, Field as FField, useField } from 'formik';
 import Select from 'react-select';
 import { LField, EField, ChoiceModal, ChoiceErrorsType, FollowUp, Nothing, creations, validateNonEmpty, RenderError } from "./ChoiceModal";
 import { TabularScreenRoutes, TabularView, SingleItemView } from "./TabularScreen";
+import { Party } from '@daml/types';
 
 
 type PatientOverview =
@@ -17,12 +18,12 @@ type PatientOverview =
   };
 
 
-const PatientRoutes: React.FC = () => {
+const PatientRoutes: React.FC<{role : Party}> = ({role}) => {
   const match = useRouteMatch();
   return (
     <Switch>
       <Route path={`${match.path}/:patientId`}>
-        <Patient/>
+        <Patient role={role}/>
       </Route>
       <Route path={match.path}>
         <Patients/>
@@ -46,21 +47,21 @@ const usePatients = (query: any, predicate: any = () => true) => {
     ([acceptance, policy]) => ({ acceptance, policy }),
     innerJoin(keyedAcceptance, keyedDisclosed).values(),
   ));
-  return { acceptances, disclosed, overviews, disclosedRaw };
+  return { acceptances, disclosed, overviews, disclosedRaw, 'disclosedUnique' : Array.from(keyedDisclosed.values()) };
 }
 
-const useAllPatients: (() => PatientOverview[]) = () => usePatients({}).overviews;
+const useAllPatients: (() => Main.Policy.DisclosedPolicy[]) = () => usePatients({}).disclosedUnique;
 const Patients: React.FC = () => {
   return <TabularView
     title="Patients"
     useData={useAllPatients}
     fields={ [
-      { label: "Name", getter : o => o.policy.patientName },
+      { label: "Name", getter : o => o.patientName },
       /* { label: "PCP", getter : o => "" }, */
-      { label: "Insurance ID", getter : o => o.policy.insuranceID },
+      { label: "Insurance ID", getter : o => o.insuranceID },
     ] }
-    tableKey={ o => o.policy.patient }
-    itemUrl={ o => o.policy.patient }
+    tableKey={ o => o.patient }
+    itemUrl={ o => o.patient }
     />
   ;
 }
@@ -113,12 +114,12 @@ const NotPatients: React.FC = () => {
   )
 }
 
-const Patient: React.FC = () => {
+const Patient: React.FC<{role : Party}> = ({role}) => {
   const username = useParty();
-  const controlled = (d: Main.Policy.DisclosedPolicy) => d.receivers.length > 0 && d.receivers[0] == username;
+  const controlled = (d: Main.Policy.DisclosedPolicy) => d.receivers.length > 0 && d.receivers.includes(username);
 
   const { patientId } = useParams< { patientId: string } >();
-  const { overviews, disclosed, disclosedRaw } = usePatients({ patient: patientId }, controlled);
+  const { disclosedUnique, disclosed, disclosedRaw } = usePatients({ patient: patientId }, controlled);
   const match = useRouteMatch();
 
   const policyRows = disclosed.map((d) =>
@@ -133,16 +134,7 @@ const Patient: React.FC = () => {
   const pcpResult = useStreamQuery(Main.Provider.Provider).contracts;
   const pcpContract = pcpResult[0];
 
-  const content = (po: PatientOverview) => (
-    <div className="flex flex-col p-5 space-y-4 bg-white rounded shadow-lg">
-      <Switch>
-        <Route exact path={match.path + "/policies"}>
-          <div className="flex flex-col space-y-4">
-            { intercalate(policyRows, <hr />) }
-          </div>
-        </Route>
-        <Route exact path={match.path}>
-          <div>
+  const choiceModal = (
             <ChoiceModal className="flex flex-col w-170"
                          choice={Main.Provider.Provider.CreateReferral}
                          contract={pcpContract?.contractId}
@@ -181,11 +173,24 @@ const Patient: React.FC = () => {
                 </>
               )}
             </ChoiceModal>
-      </div>
+  )
+
+  const content = (dp: Main.Policy.DisclosedPolicy) => (
+    <div className="flex flex-col p-5 space-y-4 bg-white rounded shadow-lg">
+      <Switch>
+        <Route exact path={match.path + "/policies"}>
+          <div className="flex flex-col space-y-4">
+            { intercalate(policyRows, <hr />) }
+          </div>
+        </Route>
+        <Route exact path={match.path}>
+          <div>
+            { role === "PrimaryCareProvider" ? choiceModal : <div></div> }
+          </div>
       <hr />
       <FieldsRow fields={[
-        { label: "Name", value: po.policy.patientName},
-        { label: "Insurance ID", value: po.policy.insuranceID},
+        { label: "Name", value: dp.patientName},
+        { label: "Insurance ID", value: dp.insuranceID},
         { label: "Primary Care Provider", value: ""},
       ]} />
       </Route>
@@ -209,7 +214,7 @@ const Patient: React.FC = () => {
           <TabLink to={match.url + "/policies"}>  Disclosed Policies </TabLink>
         </div>
 
-        { overviews.length > 0 && content(overviews[0]) }
+        { disclosedUnique.length > 0 && content(disclosedUnique[0]) }
 
       </div>
     </>

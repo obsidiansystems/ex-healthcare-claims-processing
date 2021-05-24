@@ -4,14 +4,19 @@ import { Main } from '@daml.js/healthcare-claims-processing';
 import { CreateEvent } from '@daml/ledger';
 import { useStreamQuery, useLedger } from '@daml/react';
 import { CalendarBlank, CaretRight } from "phosphor-react";
-import { mapIter, leftJoin, intercalate, Field, FieldsRow, TabLink, useAsync } from "./Common";
+import { mapIter, leftJoin, intercalate, Field, FieldsRow, TabLink, useAsync, Message } from "./Common";
 import { Formik, Form, Field as FField, useField } from 'formik';
 import Select from 'react-select';
 import { LField, EField, ChoiceModal, Nothing } from "./ChoiceModal";
 import { TabularScreenRoutes, TabularView, SingleItemView } from "./TabularScreen";
+import { Party } from '@daml/types';
 
-const ClaimRoutes : React.FC = () =>
-  <TabularScreenRoutes metavar=":claimId" table={Claims} detail={Claim}/>
+type Props = {
+  role: Party;
+}
+
+const ClaimRoutes : React.FC<Props> = ({role}) =>
+  <TabularScreenRoutes metavar=":claimId" table={Claims} detail={Claim({role})}/>
 
 const useClaims = (query: any) => {
   const ledger = useLedger();
@@ -44,11 +49,11 @@ const Claims: React.FC = () => {
   title="Claims"
   useData={useClaimsData}
   fields={ [
-    { label: "Patient Name", getter: o => o?.disclosed?.payload?.patientName || "unknown patient" },
-    { label: "Payer", getter: o => o?.claim?.payload?.payer },
+    // NB: outputs provider role (e.g. "Radiologist") instead of provider name (e.g. "Beta Imaging Labs")
+    { label: "Provider", getter: o => o?.claim?.payload?.provider },
+    { label: "Patient", getter: o => o?.claim?.payload?.encounterDetails?.patient },
     { label: "Procedure Code", getter: o => o?.claim?.payload?.encounterDetails.procedureCode },
-    { label: "Amount", getter: o => o?.claim?.payload?.amount },
-    { label: "Complete", getter: o => o?.receipt ? "Yes" : "No" },
+    { label: "Amount", getter: o => o?.claim?.payload?.amount }
   ] }
   tableKey={ o => o.claim.contractId }
   itemUrl={ o => o.claim.contractId }
@@ -61,7 +66,7 @@ const useClaimData = () => {
   return [ { claimId, overview: overview } ];
 }
 
-const Claim : React.FC = () => {
+const Claim : React.FC<Props> = ({role}) => {
   const dollars = (n: any) => n ? "$" + n : "";
   return <SingleItemView
     title="Claim"
@@ -74,30 +79,34 @@ const Claim : React.FC = () => {
         { label: "Claim Amount", getter: o => dollars(o?.overview?.claim?.payload?.amount)},
       ],
       [
-        { label: "Provider Name", getter: o => "" }, //TODO
-        { label: "Patient Name", getter: o => o?.overview?.claim?.payload?.encounterDetails?.patient},
-        { label: "Appointment Date", getter: o => "" }, //TODO
-        { label: "Appointment Priority", getter: o => o?.overview?.claim?.payload?.encounterDetails.appointmentPriority},
-      ],
-      [
         { label: "Procedure Code", getter: o => o?.overview?.claim?.payload?.encounterDetails.procedureCode},
         { label: "Diagnosis Code", getter: o => o?.overview?.claim?.payload?.encounterDetails.diagnosisCode},
         { label: "Site Service Code", getter: o => o?.overview?.claim?.payload?.encounterDetails.siteServiceCode},
       ],
+      [
+        // NB: outputs provider role (e.g. "Radiologist") instead of provider name (e.g. "Beta Imaging Labs")
+        { label: "Provider", getter: o => o?.overview?.claim?.payload?.provider },
+        { label: "Patient", getter: o => o?.overview?.claim?.payload?.encounterDetails?.patient},
+        { label: "Appointment Priority", getter: o => o?.overview?.claim?.payload?.encounterDetails.appointmentPriority},
+      ],
     ] }
     tableKey={ o => o.overview?.claim?.contractId }
     itemUrl={ o => "" }
-    choices={ d => [
-            <ChoiceModal className="flex flex-col"
+    choices={ d => d.overview?.claim?.payload?.payer === role ? [
+            <ChoiceModal className="flex flex-col space-y-6 w-170 mt-3"
                          choice={Main.Claim.Claim.PayClaim}
                          contract={d.overview?.claim?.contractId}
-                         submitTitle="Pay Claim"
+                         submitTitle="Pay Claim Now"
                          buttonTitle="Pay Claim"
                          icon={<CalendarBlank size={20}/>}
                          initialValues={ { } } >
-              <h1 className="text-center">Pay Claim</h1>
+              <Message
+                title="Pay Claim"
+                content={`This claim is approved and ready to be paid?`}
+              />
+
             </ChoiceModal>
-    ] }
+    ] : [] }
     />
   ;
 }

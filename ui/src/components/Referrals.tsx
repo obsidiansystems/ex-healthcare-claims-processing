@@ -2,16 +2,21 @@ import React, { useState, useMemo } from 'react'
 import { Link, NavLink, Redirect, Route, Switch, useRouteMatch, useParams } from 'react-router-dom';
 import { Main } from '@daml.js/healthcare-claims-processing';
 import { CreateEvent } from '@daml/ledger';
-import { useStreamQuery, useLedger, useParty } from '@daml/react';
+import { useStreamQuery, useLedger } from '@daml/react';
 import { CaretRight, Share } from "phosphor-react";
 import { mapIter, innerJoin, intercalate, Field, FieldsRow, Message, TabLink, useAsync } from "./Common";
 import { Formik, Form, Field as FField, useField } from 'formik';
 import Select from 'react-select';
 import { LField, EField, ChoiceModal, DayTimePickerField, FollowUp, Nothing } from "./ChoiceModal";
 import { TabularScreenRoutes, TabularView, SingleItemView } from "./TabularScreen";
+import { Party } from '@daml/types';
 
-const ReferralRoutes : React.FC = () =>
-  <TabularScreenRoutes metavar=":referralId" table={Referrals} detail={Referral}/>
+type Props = {
+  role: Party;
+}
+
+const ReferralRoutes : React.FC<Props> = ({role}) =>
+  <TabularScreenRoutes metavar=":referralId" table={Referrals} detail={Referral({role})}/>
 
 const useReferrals = (query: any) => {
   const ledger = useLedger();
@@ -38,7 +43,6 @@ const Referrals: React.FC = () => {
     fields={ [
       { label: "Name", getter: o => o?.policy?.payload?.patientName},
       { label: "Referring Party", getter: o => o?.referral?.payload?.referringProvider},
-      { label: "Referral Date", getter: o => "unknown" },
       { label: "Appointment Priority", getter: o => o?.referral?.payload?.referralDetails?.encounterDetails?.appointmentPriority},
     ] }
     tableKey={ o => o.referral.contractId }
@@ -52,15 +56,13 @@ const useReferralData = () => {
   return [ { referralId, overview: overviews[0] } ];
 }
 
-const Referral: React.FC = () => {
-  const role = useParty();
+const Referral: React.FC<Props> = ({role}) => {
   return <SingleItemView
     title="Referral"
     useData={useReferralData}
     fields={ [[
       { label: "Name", getter: o => o?.overview?.policy?.payload?.patientName},
       { label: "Referring Party", getter: o => o?.overview?.referral?.payload?.referringProvider},
-      { label: "Referral Date", getter: o => "unknown" },
       { label: "Appointment Priority", getter: o => o?.overview?.referral?.payload?.referralDetails?.encounterDetails?.appointmentPriority},
     ]] }
     tableKey={ o => o.overview.referral.contractId }
@@ -72,7 +74,7 @@ const Referral: React.FC = () => {
                          submitTitle="Schedule Appointment"
                          buttonTitle="Schedule Appointment"
                          icon={<Share />}
-                         initialValues={ { appointmentTime: Nothing } }
+                         initialValues={ { appointmentTime: (new Date()).toISOString() } }
                          successWidget={({ rv: [v, evts] }, close) =>
                            <>
                              <Message

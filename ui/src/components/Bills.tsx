@@ -4,7 +4,7 @@ import { Main } from '@daml.js/healthcare-claims-processing';
 import { CreateEvent } from '@daml/ledger';
 import { useStreamQuery, useLedger } from '@daml/react';
 import { CaretRight, Share, ArrowRight } from "phosphor-react";
-import { mapIter, leftJoin, intercalate, Field, FieldsRow, TabLink, useAsync } from "./Common";
+import { mapIter, leftJoin, intercalate, Field, FieldsRow, TabLink, useAsync, Message } from "./Common";
 import { Formik, Form, Field as FField, useField } from 'formik';
 import Select from 'react-select';
 import { LField, EField, ChoiceModal, Nothing } from "./ChoiceModal";
@@ -37,9 +37,9 @@ const Bills: React.FC = () => {
            title="Bills"
            useData={useBillsData}
            fields={ [
-             { label: "Provider", getter: o => "Provider name hidden" },
+             // NB: outputs provider role (e.g. "Radiologist") instead of provider name (e.g. "Beta Imaging Labs")
+             { label: "Provider", getter: o => o.bill?.payload?.provider },
              { label: "Amount", getter: o => o?.bill?.payload?.amount },
-             { label: "Appointment Date", getter: o => o?.bill?.payload?.encounterDetails.diagnosisCode },
              { label: "Procedure Code", getter: o => o?.bill?.payload?.encounterDetails.procedureCode },
              { label: "Paid", getter: o => (o?.receipt?.payload) ? "YES" : "NO" },
            ] }
@@ -58,35 +58,40 @@ const Bill : React.FC = () => {
   return <SingleItemView
     title="Bill"
     useData={useBillData}
-    fields={ [[
-      { label: "Paid", getter: o => o?.overview?.receipt ? "Yes" : "No" },
-      { label: "Patient Name", getter: o => o?.overview?.bill?.payload?.encounterDetails?.patient},
-      { label: "Appointment Date", getter: o => "" },
-      { label: "Appointment Priority", getter: o => o?.overview?.bill?.payload?.encounterDetails.appointmentPriority},
-      { label: "Procedure Code", getter: o => o?.overview?.bill?.payload?.encounterDetails.procedureCode},
-      { label: "Diagnosis Code", getter: o => o?.overview?.bill?.payload?.encounterDetails.diagnosisCode},
-      { label: "Site Service Code", getter: o => o?.overview?.bill?.payload?.encounterDetails.siteServiceCode},
-      { label: "Allowed Amount", getter: o => o?.overview?.bill?.payload?.encounterDetails?.allowedAmount || ""},
-      { label: "CoPay", getter: o => o?.overview?.bill?.payload?.encounterDetails?.coPay || ""},
-      { label: "Patient Responsibility", getter: o => o?.overview?.bill?.payload?.encounterDetails?.patientResponsibility || ""},
-      { label: "Bill Amount", getter: o => o?.overview?.bill?.payload?.amount || ""},
-    ]] }
+    fields={ [
+      [ { label: "CoPay", getter: o => o?.overview?.bill?.payload?.encounterDetails?.coPay || ""},
+        { label: "Patient Responsibility", getter: o => o?.overview?.bill?.payload?.encounterDetails?.patientResponsibility || ""},
+      ],
+
+      [ { label: "Provider", getter: o => o?.overview?.bill?.payload?.provider},
+        { label: "Appointment Priority", getter: o => o?.overview?.bill?.payload?.encounterDetails.appointmentPriority}
+      ],
+
+      [ { label: "Procedure Code", getter: o => o?.overview?.bill?.payload?.encounterDetails.procedureCode},
+        { label: "Diagnosis Code", getter: o => o?.overview?.bill?.payload?.encounterDetails.diagnosisCode},
+        { label: "Site Service Code", getter: o => o?.overview?.bill?.payload?.encounterDetails.siteServiceCode},
+      ]
+    ] }
     tableKey={ o => o.overview?.bill?.contractId }
     itemUrl={ o => "" }
     choices={ d => [
-            <ChoiceModal className="flex flex-col"
+            <ChoiceModal className="flex flex-col space-y-6 w-170 mt-3"
                          choice={Main.Claim.PatientObligation.PayPatientObligation}
                          contract={d.overview?.bill?.contractId}
-                         submitTitle="Bill Pay"
-                         buttonTitle="Bill Pay"
+                         submitTitle="Pay Bill Now"
+                         buttonTitle="Pay Bill"
                          icon={<Share />}
                          successWidget={({ rv: [v, evts] }, close)=><>
-                           <h2 className="2xl">Bill has been paid!</h2>
-                             The bill for this procedure has been paid.
-                             <a onClick={(e)=>close()}>close</a>
+                             <Message
+                               title="Bill has been paid!"
+                               content={"The bill for this procedure has been paid."}
+                             />
                            </>}
                          initialValues={ { } } >
-              <h1 className="text-center">Pay Bill</h1>
+              <Message
+                title="Pay Bill"
+                content={"This bill is accurate and ready to be paid?"}
+              />
             </ChoiceModal>
     ] }
     />

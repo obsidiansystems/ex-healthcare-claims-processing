@@ -28,11 +28,10 @@ Be sure you have the following installed.
 2. Use **separate terminals** to launch the individual components:
 
     ```shell
-    launchers/sandbox+navigator+populate
+    launchers/sandbox+populate
     launchers/automation
+    launchers/healthcareUI
     ```
-
-    The navigator will automatically open in new browser tab at http://localhost:7500.
 
 ### Stopping the App
 

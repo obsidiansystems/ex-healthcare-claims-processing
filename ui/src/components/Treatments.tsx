@@ -9,9 +9,10 @@ import { Formik, Form, Field as FField, useField } from 'formik';
 import Select from 'react-select';
 import { LField, EField, ChoiceModal, FollowUp, Nothing } from "./ChoiceModal";
 import { TabularScreenRoutes, TabularView, SingleItemView } from "./TabularScreen";
+import { Party } from '@daml/types';
 
-const TreatmentRoutes : React.FC = () =>
-  <TabularScreenRoutes metavar=":treatmentId" table={Treatments} detail={Treatment}/>
+const TreatmentRoutes : React.FC<{role: Party}> = ({role}) =>
+  <TabularScreenRoutes metavar=":treatmentId" table={Treatments} detail={Treatment({role})}/>
 
 const useTreatments = (query: any) => {
   const ledger = useLedger();
@@ -52,24 +53,28 @@ const useTreatmentData = () => {
   return [ { treatmentId, overview: overviews[0] } ];
 }
 
-const Treatment : React.FC = () => {
+const Treatment : React.FC<{role: Party}> = ({role}) => {
   return <SingleItemView
     title="Treatment"
     useData={useTreatmentData}
-    fields={ [[
-      { label: "Patient Name", getter: o => o?.overview?.policy?.payload?.patientName},
-      { label: "Appointment Date", getter: o => "" },
-      { label: "Appointment Priority", getter: o => o?.overview?.treatment?.payload?.encounterDetails.appointmentPriority},
-      { label: "Procedure Code", getter: o => o?.overview?.treatment?.payload?.encounterDetails.procedureCode},
-      { label: "Diagnosis Code", getter: o => o?.overview?.treatment?.payload?.encounterDetails.diagnosisCode},
-      { label: "Site Service Code", getter: o => o?.overview?.treatment?.payload?.encounterDetails.siteServiceCode},
-      { label: "Allowed Amount", getter: o => o?.overview?.treatment?.payload?.encounterDetails?.allowedAmount || ""},
-      { label: "CoPay", getter: o => o?.overview?.treatment?.payload?.encounterDetails?.coPay || ""},
-      { label: "Patient Responsibility", getter: o => o?.overview?.treatment?.payload?.encounterDetails?.patientResponsibility || ""},
-    ]] }
+    fields={ [
+      [ { label: "Patient Name", getter: o => o?.overview?.policy?.payload?.patientName},
+        { label: "Appointment Priority", getter: o => o?.overview?.treatment?.payload?.encounterDetails.appointmentPriority},
+      ],
+
+      [ { label: "Procedure Code", getter: o => o?.overview?.treatment?.payload?.encounterDetails.procedureCode},
+        { label: "Diagnosis Code", getter: o => o?.overview?.treatment?.payload?.encounterDetails.diagnosisCode},
+        { label: "Site Service Code", getter: o => o?.overview?.treatment?.payload?.encounterDetails.siteServiceCode},
+      ],
+
+      [ { label: "Allowed Amount", getter: o => o?.overview?.treatment?.payload?.encounterDetails?.allowedAmount || ""},
+        { label: "CoPay", getter: o => o?.overview?.treatment?.payload?.encounterDetails?.coPay || ""},
+        { label: "Patient Responsibility", getter: o => o?.overview?.treatment?.payload?.encounterDetails?.patientResponsibility || ""},
+      ]
+    ] }
     tableKey={ o => o.overview?.treatment.contractId }
     itemUrl={ o => "" }
-    choices={ d => [
+    choices={ d => d?.overview?.treatment?.payload?.provider == role ? [
       <ChoiceModal className="flex flex-col space-y-6 w-170 mt-3"
                    choice={Main.Treatment.Treatment.CompleteTreatment}
                    contract={d.overview?.treatment?.contractId}
@@ -87,11 +92,11 @@ const Treatment : React.FC = () => {
                    }
       >
               <Message
-                title="Check In Patient"
+                title="Complete Treatment"
                 content={d.overview?.policy?.payload?.patientName + " is present and ready for treatment?"}
               />
             </ChoiceModal>
-    ] }
+    ] : [] }
 
     />
   ;

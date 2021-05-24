@@ -4,14 +4,22 @@ import { Main } from '@daml.js/healthcare-claims-processing';
 import { CreateEvent } from '@daml/ledger';
 import { useStreamQuery, useLedger } from '@daml/react';
 import { CaretRight, Clock, ArrowRight } from "phosphor-react";
-import { mapIter, innerJoin, intercalate, Field, FieldsRow, Message, TabLink, useAsync } from "./Common";
+import { mapIter, innerJoin, intercalate, Field, FieldsRow, Message, TabLink, useAsync, formatDateTime, formatDateTimeSplit } from "./Common";
 import { Formik, Form, Field as FField, useField } from 'formik';
 import Select from 'react-select';
 import { LField, EField, ChoiceModal, FollowUp, Nothing, creations } from "./ChoiceModal";
 import { TabularScreenRoutes, TabularView, SingleItemView } from "./TabularScreen";
+import { Party, Time } from '@daml/types';
 
-const AppointmentRoutes : React.FC = () =>
-  <TabularScreenRoutes metavar=":appointmentId" table={Appointments} detail={Appointment}/>
+type Props = {
+  role: Party;
+}
+
+const formatDateHelper = (timeStr : Time) => timeStr ? formatDateTime(new Date(timeStr)) : "";
+const formatDateHelperSplit = (timeStr : Time) => timeStr ? formatDateTimeSplit(new Date(timeStr)) : "";
+
+const AppointmentRoutes : React.FC<Props> = ({role}) =>
+  <TabularScreenRoutes metavar=":appointmentId" table={Appointments} detail={Appointment({role})}/>
 
 const useAppointments = (query: any) => {
   const ledger = useLedger();
@@ -36,7 +44,7 @@ const Appointments: React.FC = () => {
     title="Appointments"
     useData={useAppointmentsData}
     fields={ [
-      { label: "Appointment Date", getter: o => o?.appointment?.payload?.appointmentTime },
+      { label: "Appointment Date", getter: o => formatDateHelperSplit(o?.appointment?.payload?.appointmentTime) },
       { label: "Patient Name", getter: o => o?.policy?.payload?.patientName },
       { label: "Insurance ID", getter: o => o?.policy?.payload?.insuranceID },
       { label: "Procedure Code", getter: o => o?.appointment?.payload?.encounterDetails.encounterDetails.procedureCode },
@@ -53,24 +61,29 @@ const useAppointmentData = () => {
   return [ { appointmentId, overview: overviews[0] } ];
 }
 
-const Appointment : React.FC = () => {
+const Appointment : React.FC<Props> = ({role}) => {
   return <SingleItemView
     title="Appointment"
     useData={useAppointmentData}
-    fields={ [[
-      { label: "Patient Name", getter: o => o?.overview?.policy?.payload?.patientName },
-      { label: "Appointment Date", getter: o => o?.overview?.appointment?.payload?.appointmentTime },
-      { label: "Appointment Priority", getter: o => o?.overview?.appointment?.payload?.encounterDetails.encounterDetails.appointmentPriority },
-      { label: "Procedure Code", getter: o => o?.overview?.appointment?.payload?.encounterDetails.encounterDetails.procedureCode },
-      { label: "Diagnosis Code", getter: o => o?.overview?.appointment?.payload?.encounterDetails.encounterDetails.diagnosisCode },
-      { label: "Site Service Code", getter: o => o?.overview?.appointment?.payload?.encounterDetails.encounterDetails.siteServiceCode },
-      { label: "Allowed Amount", getter: o => o?.overview?.appointment?.payload?.encounterDetails.encounterDetails?.allowedAmount || "" },
-      { label: "CoPay", getter: o => o?.overview?.appointment?.payload?.encounterDetails.encounterDetails?.coPay || "" },
-      { label: "Patient Responsibility", getter: o => o?.overview?.appointment?.payload?.encounterDetails.encounterDetails?.patientResponsibility || "" },
-    ]] }
+    fields={ [
+      [ { label: "Patient Name", getter: o => o?.overview?.policy?.payload?.patientName },
+        { label: "Appointment Date", getter: o => formatDateHelper(o?.overview?.appointment?.payload?.appointmentTime) },
+        { label: "Appointment Priority", getter: o => o?.overview?.appointment?.payload?.encounterDetails.encounterDetails.appointmentPriority }
+      ],
+
+      [ { label: "Procedure Code", getter: o => o?.overview?.appointment?.payload?.encounterDetails.encounterDetails.procedureCode },
+        { label: "Diagnosis Code", getter: o => o?.overview?.appointment?.payload?.encounterDetails.encounterDetails.diagnosisCode },
+        { label: "Site Service Code", getter: o => o?.overview?.appointment?.payload?.encounterDetails.encounterDetails.siteServiceCode }
+      ],
+
+      [ { label: "Allowed Amount", getter: o => o?.overview?.appointment?.payload?.encounterDetails.encounterDetails?.allowedAmount || "" },
+        { label: "CoPay", getter: o => o?.overview?.appointment?.payload?.encounterDetails.encounterDetails?.coPay || "" },
+        { label: "Patient Responsibility", getter: o => o?.overview?.appointment?.payload?.encounterDetails.encounterDetails?.patientResponsibility || "" }
+      ]
+    ] }
     tableKey={ o => o.overview?.appointment.contractId }
     itemUrl={ o => "" }
-    choices={ d => [
+    choices={ d => d?.overview?.appointment?.payload?.provider == role ? [
             <ChoiceModal className="flex flex-col space-y-6 w-170 mt-3"
                          choice={Main.Appointment.Appointment.CheckInPatient}
                          contract={d.overview?.appointment?.contractId}
@@ -85,17 +98,17 @@ const Appointment : React.FC = () => {
                                content={d.overview?.policy?.payload?.patientName + " has been checked in and is ready for treatment."}
                              />
                              <FollowUp
-                               to={"/treatments/" + (creations(evts)[0]?.contractId) }
+                               to={"/provider/treatments/" + (creations(evts)[1]?.contractId) }
                                label="View Treatment"
                              />
                            </>}
                          >
               <Message
                 title="Check In Patient"
-                content={d.overview?.policy?.payload?.patientName + " is present and ready for treatment?"}
+                content={d.overview?.policy?.payload?.patientName + " is present and ready for their appointment?"}
               />
             </ChoiceModal>
-    ] }
+    ] : [] }
 
     />
   ;
