@@ -1,4 +1,3 @@
-chmod +x
 cd ui
 npm install
 npm start
