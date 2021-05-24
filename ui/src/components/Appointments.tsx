@@ -4,7 +4,7 @@ import { Main } from '@daml.js/healthcare-claims-processing';
 import { CreateEvent } from '@daml/ledger';
 import { useStreamQuery, useLedger } from '@daml/react';
 import { CaretRight, Clock, ArrowRight } from "phosphor-react";
-import { mapIter, innerJoin, intercalate, Field, FieldsRow, Message, TabLink, useAsync, formatDate } from "./Common";
+import { mapIter, innerJoin, intercalate, Field, FieldsRow, Message, TabLink, useAsync, formatDateTime } from "./Common";
 import { Formik, Form, Field as FField, useField } from 'formik';
 import Select from 'react-select';
 import { LField, EField, ChoiceModal, FollowUp, Nothing, creations } from "./ChoiceModal";
@@ -15,7 +15,7 @@ type Props = {
   role: Party;
 }
 
-const formatDateHelper = (timeStr : Time) => timeStr ? formatDate(new Date(timeStr)) : "";
+const formatDateHelper = (timeStr : Time) => timeStr ? formatDateTime(new Date(timeStr)) : "";
 
 const AppointmentRoutes : React.FC<Props> = ({role}) =>
   <TabularScreenRoutes metavar=":appointmentId" table={Appointments} detail={Appointment({role})}/>
