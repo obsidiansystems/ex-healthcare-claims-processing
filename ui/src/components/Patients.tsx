@@ -9,6 +9,7 @@ import { Formik, Form, Field as FField, useField } from 'formik';
 import Select from 'react-select';
 import { LField, EField, ChoiceModal, ChoiceErrorsType, FollowUp, Nothing, creations, validateNonEmpty, RenderError } from "./ChoiceModal";
 import { TabularScreenRoutes, TabularView, SingleItemView } from "./TabularScreen";
+import { Party } from '@daml/types';
 
 
 type PatientOverview =
@@ -17,12 +18,12 @@ type PatientOverview =
   };
 
 
-const PatientRoutes: React.FC = () => {
+const PatientRoutes: React.FC<{role : Party}> = ({role}) => {
   const match = useRouteMatch();
   return (
     <Switch>
       <Route path={`${match.path}/:patientId`}>
-        <Patient/>
+        <Patient role={role}/>
       </Route>
       <Route path={match.path}>
         <Patients/>
@@ -113,7 +114,7 @@ const NotPatients: React.FC = () => {
   )
 }
 
-const Patient: React.FC = () => {
+const Patient: React.FC<{role : Party}> = ({role}) => {
   const username = useParty();
   const controlled = (d: Main.Policy.DisclosedPolicy) => d.receivers.length > 0 && d.receivers.includes(username);
 
@@ -133,16 +134,7 @@ const Patient: React.FC = () => {
   const pcpResult = useStreamQuery(Main.Provider.Provider).contracts;
   const pcpContract = pcpResult[0];
 
-  const content = (dp: Main.Policy.DisclosedPolicy) => (
-    <div className="flex flex-col p-5 space-y-4 bg-white rounded shadow-lg">
-      <Switch>
-        <Route exact path={match.path + "/policies"}>
-          <div className="flex flex-col space-y-4">
-            { intercalate(policyRows, <hr />) }
-          </div>
-        </Route>
-        <Route exact path={match.path}>
-          <div>
+  const choiceModal = (
             <ChoiceModal className="flex flex-col w-170"
                          choice={Main.Provider.Provider.CreateReferral}
                          contract={pcpContract?.contractId}
@@ -181,7 +173,20 @@ const Patient: React.FC = () => {
                 </>
               )}
             </ChoiceModal>
-      </div>
+  )
+
+  const content = (dp: Main.Policy.DisclosedPolicy) => (
+    <div className="flex flex-col p-5 space-y-4 bg-white rounded shadow-lg">
+      <Switch>
+        <Route exact path={match.path + "/policies"}>
+          <div className="flex flex-col space-y-4">
+            { intercalate(policyRows, <hr />) }
+          </div>
+        </Route>
+        <Route exact path={match.path}>
+          <div>
+            { role === "PrimaryCareProvider" ? choiceModal : <div></div> }
+          </div>
       <hr />
       <FieldsRow fields={[
         { label: "Name", value: dp.patientName},
