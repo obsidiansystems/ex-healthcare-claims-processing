@@ -36,36 +36,6 @@ commands:
           fail_only: true
           only_for_branches: main
           webhook: '${SLACK_WEBHOOK}'
-  install_yq:
-    description: "Install yq"
-    steps:
-      - run:
-          name: Install pipenv
-          command: |
-            sudo apt-get update || sudo apt-get update
-            sudo apt-get install python3-pip
-            pip3 install pipenv
-      - run:
-          name: Install yq
-          command: |
-            pip3 install yq
-  install_prerequisites:
-    description: "Install all prerequisites"
-    parameters:
-      daml_sdk_version:
-        type: string
-    steps:
-      - install_sdk:
-          version: << parameters.daml_sdk_version >>
-      - install_yq
-      - update_npm
-  update_npm:
-    description: "Upgrade npm to v7"
-    steps:
-      - run:
-          name: install npm v7
-          command: |
-            sudo npm install -g npm@7.13.0
 
 jobs:
   daml_test:
@@ -96,6 +66,7 @@ jobs:
           path: target/daml-test-reports
       - store_artifacts:
           path: target/daml-test-reports
+      - slack_notification
 
   integration_test:
     parameters:
@@ -147,6 +118,7 @@ jobs:
             - "*.dar"
             - "lib"
             - "NOTICE"
+      - slack_notification
 
   blackduck_check:
     parameters:
@@ -186,45 +158,35 @@ jobs:
             - "NOTICE"
       - slack_notification
 
-  ui_test:
-    parameters:
-      daml_sdk_version:
-        type: string
-    executor: daml-executor
-    steps:
-      - checkout
-      - restore_cache:
-          keys:
-            - node-v1-{{ .Branch }}-{{ checksum "ui/package-lock.json" }}
-            - node-v1-{{ .Branch }}-
-            - node-v1-
-      - install_prerequisites:
-          daml_sdk_version: << parameters.daml_sdk_version >>
-      - run:
-          name: UI install dependencies
-          command: |
-            make build -j3
-      - run:
-          name: UI build
-          command: |
-            make daml-hub-package LEDGER_ID=some_ledger_id
-      - run:
-          name: Npm test
-          command: |
-            make -C ui test
-      - save_cache:
-          paths:
-            - ui/node_modules
-          key: node-v1-{{ .Branch }}-{{ checksum "ui/package-lock.json" }}
-      - slack_notification
-
 workflows:
   version: 2
   test:
     jobs:
       - daml_test:
           daml_sdk_version: "1.12.0"
+          context: refapps
       - integration_test:
           daml_sdk_version: "1.12.0"
-      - ui_test:
-          daml_sdk_version: "1.13.1"
+          context: refapps
+  scheduled_test:
+    triggers:
+      - schedule:
+          # need to scatter jobs to reduce Blackduck load
+          # see also https://digitalasset.atlassian.net/browse/ERA-913
+          cron: "30 2 * * *"
+          filters:
+            branches:
+              only:
+                - main
+    jobs:
+      - daml_test:
+          daml_sdk_version: "1.12.0"
+          context: refapps
+      - integration_test:
+          daml_sdk_version: "1.12.0"
+          context: refapps
+      - blackduck_check:
+          daml_sdk_version: "1.12.0"
+          context:
+            - blackduck
+            - refapps
