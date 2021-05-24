@@ -82,9 +82,10 @@ const Bill : React.FC = () => {
                          buttonTitle="Pay Bill"
                          icon={<Share />}
                          successWidget={({ rv: [v, evts] }, close)=><>
-                           <h2 className="2xl">Bill has been paid!</h2>
-                             The bill for this procedure has been paid.
-                             <a onClick={(e)=>close()}>close</a>
+                             <Message
+                               title="Bill has been paid!"
+                               content={"The bill for this procedure has been paid."}
+                             />
                            </>}
                          initialValues={ { } } >
               <Message
