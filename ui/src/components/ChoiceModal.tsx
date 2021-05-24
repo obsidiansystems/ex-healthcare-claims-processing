@@ -75,7 +75,7 @@ export const SubmitButton: React.FC<{ submitTitle: string, isSubmitting: boolean
 );
 
 export function ChoiceModal<T extends object, C, R, K>({ choice, contract, submitTitle, buttonTitle, initialValues, icon, className, successWidget, failureWidget, children }: ChoiceModalProps<T,C,R,K>) {
-      const [modalActive, setModalActiveInner] = React.useState(false);
+  const [modalActive, setModalActiveInner] = React.useState(false);
   const [successOrFailure, setSuccessOrFailure] = React.useState<MaybeSuccessOrFailure<C, R> >(Nothing);
   const setModalActive = (s : SetStateAction<boolean>) => {
     setModalActiveInner((p : boolean) => {
@@ -243,25 +243,55 @@ export const DayPickerField : React.FC<{
         );
 }
 
+// convert a JavaScript "Date" value into a DAML-backend "Time" value
+const dateToTime = (d : Date) : Time => d.toISOString();
+
 export const DayTimePickerField : React.FC<{
   name: string
   errors?: ChoiceErrorsType,
 }> = ({ name, errors }) => {
   const [ field, meta, { setValue } ] = useField<Time | Nothing>(name);
+  if (field.value == Nothing) {
+    // can't help but render some picked date, so might as well set it
+    const f = new Date();
+    console.log("default combined", f);
+    setValue(dateToTime(f));
+  }
+  const defaultField = field.value == Nothing ? new Date() : new Date(field.value);
+  let date = new Date(defaultField.getFullYear(), defaultField.getMonth(), defaultField.getDate());
+  let time = new Date(0, 0, 0, defaultField.getHours(), defaultField.getMinutes(), defaultField.getSeconds());
+  const updateField = () => {
+    const f = new Date(
+      date.getFullYear(), date.getMonth(), date.getDate(),
+      time.getHours(), time.getMinutes(), time.getSeconds(),
+    );
+    console.log("new combined", f);
+    setValue(dateToTime(f));
+  };
   const error = errors?.[name];
-  const defaultDate = field.value == Nothing ? new Date() : new Date(field.value);
-  // convert a JavaScript "Date" value into a DAML-backend "Time" value
-  const dateToTime = (d : Date) : Time => d.toISOString();
   return (
     <>
       <DayPicker
-        date={defaultDate}
-        setDate={d => setValue(dateToTime(d))}
+        date={date}
+        setDate={d => {
+          console.log("new date", d);
+          date = d;
+          updateField();
+        }}
         theme={({ blue: "var(--blue)" })}
       />
       <TimePicker
-        onChange={t => setValue(dateToTime(t instanceof Date ? t : new Date(t)))}
-        value={defaultDate}
+        onChange={t => {
+          console.log("new time", t);
+          if (t instanceof Date) {
+            time = t;
+          } else {
+            const [hours, minutes] = t.split(':');
+            time = new Date(0, 0, 0, parseInt(hours), parseInt(minutes));
+          }
+          updateField();
+        }}
+        value={time}
       />
       <RenderError error={error} />
     </>
