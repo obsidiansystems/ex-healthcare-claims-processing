@@ -8,12 +8,12 @@ This application simulates processing a healthcare claim, starting with the refe
 
 ### Installing
 
-**Disclaimer:** This reference application is intended to demonstrate the capabilities of the DAML. You are recommended to consider other non-functional aspects, like security, resiliency, recoverability, etc prior to production use.
+**Disclaimer:** This reference application is intended to demonstrate the capabilities of Daml. You are recommended to consider other non-functional aspects, like security, resiliency, recoverability, etc prior to production use.
 
 #### Prerequisites
 
 Be sure you have the following installed.
-- [DAML SDK](https://docs.daml.com/)
+- [Daml SDK](https://docs.daml.com/)
 - Java 8 or higher
 - Make
 
@@ -23,7 +23,7 @@ Be sure you have the following installed.
     ```shell
     make build
     ```
-    **Note:** If you change the DAML models locally, you need to re-run this command before starting the application.
+    **Note:** If you change the Daml models locally, you need to re-run this command before starting the application.
 
 2. Use **separate terminals** to launch the individual components:
 
@@ -37,13 +37,13 @@ Be sure you have the following installed.
 
 1. Stop the every running command by pressing **Ctrl+C**.
 
-## Working with DAML Hub
+## Working with Daml Hub
 
 1. As a first step, build the whole project
     ```shell
     make clean build
     ```
-2. Create a project and a ledger in DAML Hub
+2. Create a project and a ledger in Daml Hub
 3. Upload the DARs
 4. Add the parties to the ledger
    - PrimaryCareProvider
@@ -72,7 +72,7 @@ Be sure you have the following installed.
 
     The following table contains the necessary name mapping:
 
-    | DAML Hub name (in `participants.json`) | Ledger Setup name |
+    | Daml Hub name (in `participants.json`) | Ledger Setup name |
     | :------------------------------------: | :---------------: |
     |          primaryCareProvider           |     provider1     |
     |              radiologist               |     provider2     |
@@ -88,7 +88,7 @@ Be sure you have the following installed.
       --script-name DemoOnboardScenario.StartScript:setupLedger \
       --input-file ledger-setup.json
     ```
-8. Run the triggers from the DAML Hub UI
+8. Run the triggers from the Daml Hub UI
 
    | Party            | Trigger                                                                        |
    | :--------------- | :----------------------------------------------------------------------------- |
