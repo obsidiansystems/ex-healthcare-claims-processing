@@ -245,13 +245,11 @@ After the x-ray is done, the patient is checked out from the facility, and the c
     * You can see the pending unpaid claim by locating it on the Claims tab. It will show both the Patient and Insurance Company's payment responsibilities.
 
 
-## Payment
+## Make Payments from Insurance Company and Patient
 
 The last step of this workflow is for payment to be made to the lab by both the Insurance Company and the Patient
 
-To make payment:
-
-
+### Make Payment
 
 1. Log in as Insurance Company and choose the **Claims** tab
 1. On the Claims list screen, click on the claim made from the Radiologist to the Insurance Company
