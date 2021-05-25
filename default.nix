@@ -57,8 +57,12 @@ rec {
     inherit pkgs nodejs daml-js;
   };
 
+  pyEnv = pkgs.python3.withPackages (p: with p; [
+    requests
+  ]);
+
   shell = pkgs.mkShell {
     name = "daml-shell";
-    nativeBuildInputs = [ daml pkgs.openjdk nodejs ];
+    nativeBuildInputs = [ daml pkgs.openjdk pyEnv nodejs ];
   };
 }
