@@ -40,7 +40,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - daml-{{ checksum "model/daml.yaml" }}-{{ checksum "trigger/daml.yaml" }}
+            - daml-{{ checksum "daml.yaml" }}
       - install_sdk:
           version: << parameters.daml_sdk_version >>
       - run:
@@ -54,7 +54,7 @@ jobs:
       - save_cache:
           paths:
             - ~/.daml
-          key: daml-{{ checksum "model/daml.yaml" }}-{{ checksum "trigger/daml.yaml" }}
+          key: daml-{{ checksum "daml.yaml" }}
       - store_test_results:
           path: target/daml-test-reports
       - store_artifacts:
@@ -69,7 +69,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - m2-{{ checksum "pom.xml" }}-{{ checksum "model/daml.yaml" }}-{{ checksum "trigger/daml.yaml" }}
+            - m2-{{ checksum "pom.xml" }}-{{ checksum "daml.yaml" }}
             - m2
       - install_sdk:
           version: << parameters.daml_sdk_version >>
@@ -98,7 +98,7 @@ jobs:
           paths:
             - ~/.m2
             - ~/.daml
-          key: m2-{{ checksum "pom.xml" }}-{{ checksum "model/daml.yaml" }}-{{ checksum "trigger/daml.yaml" }}
+          key: m2-{{ checksum "pom.xml" }}-{{ checksum "daml.yaml" }}
       - store_test_results:
           path: target/failsafe-reports
       - store_artifacts:
@@ -129,7 +129,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - m2-{{ checksum "pom.xml" }}-{{ checksum "model/daml.yaml" }}-{{ checksum "trigger/daml.yaml" }}
+            - m2-{{ checksum "pom.xml" }}-{{ checksum "daml.yaml" }}
             - m2
       - run:
           name: Install pipenv
@@ -143,7 +143,7 @@ jobs:
           paths:
             - ~/.m2
             - ~/.daml
-          key: m2-{{ checksum "pom.xml" }}-{{ checksum "model/daml.yaml" }}-{{ checksum "trigger/daml.yaml" }}
+          key: m2-{{ checksum "pom.xml" }}-{{ checksum "daml.yaml" }}
       - run:
           name: Install Python dependencies
           working_directory: scripts
