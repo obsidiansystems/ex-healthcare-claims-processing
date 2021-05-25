@@ -29,13 +29,6 @@ commands:
             curl -sSL https://get.daml.com/ | sh /dev/stdin << parameters.version >>
             # idea from https://circleci.com/docs/2.0/env-vars/
             >> $BASH_ENV echo 'export PATH="$HOME/.daml/bin:$PATH"'
-  slack_notification:
-    description: "Notify about failure on Slack"
-    steps:
-      - slack/status:
-          fail_only: true
-          only_for_branches: main
-          webhook: '${SLACK_WEBHOOK}'
   install_yq:
     description: "Install yq"
     steps:
@@ -206,7 +199,6 @@ jobs:
           root: .
           paths:
             - "NOTICE"
-      - slack_notification
 
   ui_test:
     parameters:
@@ -238,7 +230,6 @@ jobs:
           paths:
             - ui/node_modules
           key: node-v1-{{ .Branch }}-{{ checksum "ui/package-lock.json" }}
-      - slack_notification
 
 workflows:
   version: 2
@@ -246,38 +237,5 @@ workflows:
     jobs:
       - daml_test:
           daml_sdk_version: "1.13.1"
-          context: refapps
       - integration_test:
           daml_sdk_version: "1.13.1"
-          context: refapps
-      - blackduck_check:
-          daml_sdk_version: "1.13.1"
-          filters:
-            branches:
-              only:
-                - /.*blackduck.*/
-          context:
-            - blackduck
-            - refapps
-  scheduled_test:
-    triggers:
-      - schedule:
-          # need to scatter jobs to reduce Blackduck load
-          # see also https://digitalasset.atlassian.net/browse/ERA-913
-          cron: "30 2 * * *"
-          filters:
-            branches:
-              only:
-                - main
-    jobs:
-      - daml_test:
-          daml_sdk_version: "1.13.1"
-          context: refapps
-      - integration_test:
-          daml_sdk_version: "1.13.1"
-          context: refapps
-      - blackduck_check:
-          daml_sdk_version: "1.13.1"
-          context:
-            - blackduck
-            - refapps
