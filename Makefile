@@ -6,7 +6,7 @@ build: build-dars ui/daml.js
 
 .PHONY: clean
 clean:
-	rm -rf model/.daml triggers/.daml
+	rm -rf .daml triggers/.daml
 	rm -rf target
 	rm -rf ui/daml.js
 	$(MAKE) clean -C ui
@@ -29,10 +29,10 @@ daml-hub-package: build
 .PHONY: build-dars
 build-dars: $(MODELS_DAR) $(TRIGGERS_DAR)
 
-DAML_SRC=$(shell find model/daml/ -name '*.daml')
+DAML_SRC=$(shell find daml/ -name '*.daml')
 
-$(MODELS_DAR): $(DAML_SRC) model/daml.yaml
-	cd model && daml build --output ../$@
+$(MODELS_DAR): $(DAML_SRC) daml.yaml
+	daml build --output $@
 
 TRIGGERS_DAML_SRC=$(shell find triggers/daml/ -name '*.daml')
 
@@ -44,4 +44,3 @@ $(TRIGGERS_DAR): $(TRIGGERS_DAML_SRC) triggers/daml.yaml $(MODELS_DAR)
 test-dars: build-dars
 	daml test --junit target/daml-test-reports/model.xml
 	cd triggers && daml test --junit ../target/daml-test-reports/triggers.xml
-
