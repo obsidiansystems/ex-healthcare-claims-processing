@@ -189,3 +189,5 @@ workflows:
           daml_sdk_version: "1.13.1"
       - integration_test:
           daml_sdk_version: "1.13.1"
+      - ui_test:
+          daml_sdk_version: "1.13.1"
