@@ -74,7 +74,7 @@ const Referral: React.FC<Props> = ({role}) => {
                          submitTitle="Schedule Appointment"
                          buttonTitle="Schedule Appointment"
                          icon={<Share />}
-                         initialValues={ { appointmentTime: (new Date()).toISOString() } }
+                         initialValues={ { appointmentDate: (new Date()).toISOString() } }
                          successWidget={({ rv: [v, evts] }, close) =>
                            <>
                              <Message
@@ -86,7 +86,7 @@ const Referral: React.FC<Props> = ({role}) => {
             >
               <h1 className="text-center">Schedule Appointment</h1>
               <p>Select a date for this appointment</p>
-              <DayTimePickerField name="appointmentTime" />
+              <DayTimePickerField name="appointmentDate" />
             </ChoiceModal>
     ] : [] }
 
