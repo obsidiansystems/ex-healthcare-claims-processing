@@ -7,8 +7,6 @@ package com.daml.product.healthcareclaims;
 import com.daml.extensions.testing.junit4.Sandbox;
 import com.daml.extensions.testing.ledger.DefaultLedgerAdapter;
 import com.daml.ledger.javaapi.data.Party;
-import com.daml.product.healthcareclaims.trigger.Builder;
-import com.daml.product.healthcareclaims.trigger.Trigger;
 import com.digitalasset.nanobot.healthcare.models.main.appointment.Appointment;
 import com.digitalasset.nanobot.healthcare.models.main.claim.Claim;
 import com.digitalasset.nanobot.healthcare.models.main.claim.PatientObligation;
@@ -21,11 +19,14 @@ import com.digitalasset.nanobot.healthcare.models.main.types.DiagnosisCode;
 import com.digitalasset.nanobot.healthcare.models.main.types.ProcedureCode;
 import com.google.protobuf.InvalidProtocolBufferException;
 import io.grpc.StatusRuntimeException;
+import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -36,8 +37,6 @@ import org.junit.rules.TestRule;
 public class HealthcareClaimsProcessingIT {
   private static final Path RELATIVE_DAR_PATH =
       Paths.get("target/healthcare-claims-processing.dar");
-  private static final Path TRIGGER_DAR_PATH =
-      Paths.get("target/healthcare-claims-processing-triggers.dar");
   private static final String TEST_MODULE = "DemoOnboardScenario.StartScript";
   private static final String TEST_SCRIPT = "insurancePoliciesSetSingle";
 
@@ -56,41 +55,29 @@ public class HealthcareClaimsProcessingIT {
               INSURANCE_COMPANY_PARTY.getValue(), PATIENT_PARTY.getValue())
           .build();
   @ClassRule public static ExternalResource sandboxClassRule = sandbox.getClassRule();
-  private final Builder trigger =
-      Trigger.builder()
-          .ledgerPort(sandbox::getSandboxPort)
-          .dar(TRIGGER_DAR_PATH)
-          .ledgerHost("localhost");
+  private Process triggers;
 
-  @Rule
-  public TestRule sandboxRule =
-      RuleChain.outerRule(sandbox.getRule())
-          .around(
-              createTrigger(
-                  "Triggers.AcceptClaimTrigger:acceptClaimTrigger", INSURANCE_COMPANY_PARTY))
-          .around(
-              createTrigger(
-                  "Triggers.EvaluateReferralTrigger:evaluateReferralTrigger", RADIOLOGIST_PARTY))
-          .around(
-              createTrigger(
-                  "Triggers.AcknowledgeAppointmentTrigger:acknowledgeAppointmentTrigger",
-                  INSURANCE_COMPANY_PARTY))
-          .around(
-              createTrigger(
-                  "Triggers.UpdateReferralDetailsTrigger:updateReferralDetailsTrigger",
-                  RADIOLOGIST_PARTY))
-          // TODO: There are no code that would actually test this trigger.
-          .around(
-              createTrigger(
-                  "Triggers.AcknowledgeAndDiscloseTrigger:acknowledgeAndDiscloseTrigger",
-                  PATIENT_PARTY))
-          .around(
-              createTrigger(
-                  "Triggers.AcceptPatientPaymentRequestTrigger:acceptPatientPaymentRequestTrigger",
-                  PATIENT_PARTY));
+  @Rule public TestRule sandboxRule = RuleChain.outerRule(sandbox.getRule());
 
-  private Trigger createTrigger(String triggerName, Party party) {
-    return trigger.triggerName(triggerName).party(party).build();
+  @Before
+  public void setUp() throws Throwable {
+    // Valid port is assigned only after the sandbox has been started.
+    // Therefore trigger has to be configured at the point where this can be guaranteed.
+    File log = new File("integration-triggers.log");
+    File errLog = new File("integration-triggers.err.log");
+    triggers =
+        new ProcessBuilder()
+            // need to call Python directly for proper subprocess cleanup (not sure why though)
+            .command("scripts/startTriggers.py", Integer.toString(sandbox.getSandboxPort()))
+            .redirectOutput(ProcessBuilder.Redirect.appendTo(log))
+            .redirectError(ProcessBuilder.Redirect.appendTo(errLog))
+            .start();
+  }
+
+  @After
+  public void tearDown() {
+    // Use destroy() to allow subprocess cleanup.
+    triggers.destroy();
   }
 
   @Test

@@ -6,6 +6,7 @@
 
 module Test.Treatment where
 
+import DA.Time
 import DA.Either
 import DA.Optional
 import Main.Appointment
@@ -29,7 +30,7 @@ treatmentTest' = treatmentTest =<< allocateParties
 treatmentTest parties@Parties{..} = script do
     apptScenario <- appointmentTest parties
 
-    setTime apptScenario.appointmentTime
+    setTime (time apptScenario.appointmentDate 0 0 0)
 
     let
       provider2Role = apptScenario.provider2Role

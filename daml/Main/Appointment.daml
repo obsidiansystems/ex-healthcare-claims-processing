@@ -25,7 +25,7 @@ template Appointment
     patient : Party
     policy : ContractId DisclosedPolicy
     encounterDetails : RuleParameters
-    appointmentTime : Time
+    appointmentDate: Date
   where
     signatory provider
     observer patient
@@ -35,8 +35,8 @@ template Appointment
       CheckInPatient : Either (ContractId FailedCheckIn) (ContractId Treatment)
         do
           now <- getTime
-          assertMsg ("Check-in should happen on right day for appointment at: " <> show appointmentTime) $
-            toDateUTC now == toDateUTC appointmentTime
+          let today = toDateUTC now
+          assertMsg ("Check-in should happen on appointment date: " <> show appointmentDate) $ appointmentDate == today
           rulesCheck <- create RulesCheck with
             requestingParty = provider
             ruleParams = encounterDetails
@@ -62,7 +62,7 @@ template FailedCheckIn
     operator : Party
     provider : Party
     patient: Party
-    appointmentTime: Time
+    appointmentDate: Date
     reason : Text
   where
     signatory provider
