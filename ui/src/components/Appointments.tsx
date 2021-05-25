@@ -44,7 +44,7 @@ const Appointments: React.FC = () => {
     title="Appointments"
     useData={useAppointmentsData}
     fields={ [
-      { label: "Appointment Date", getter: o => formatDateHelperSplit(o?.appointment?.payload?.appointmentDate) },
+      { label: "Appointment Date", getter: o => formatDateHelperSplit(o?.appointment?.payload?.appointmentTime) },
       { label: "Patient Name", getter: o => o?.policy?.payload?.patientName },
       { label: "Insurance ID", getter: o => o?.policy?.payload?.insuranceID },
       { label: "Procedure Code", getter: o => o?.appointment?.payload?.encounterDetails.encounterDetails.procedureCode },
@@ -67,7 +67,7 @@ const Appointment : React.FC<Props> = ({role}) => {
     useData={useAppointmentData}
     fields={ [
       [ { label: "Patient Name", getter: o => o?.overview?.policy?.payload?.patientName },
-        { label: "Appointment Date", getter: o => formatDateHelper(o?.overview?.appointment?.payload?.appointmentDate) },
+        { label: "Appointment Date", getter: o => formatDateHelper(o?.overview?.appointment?.payload?.appointmentTime) },
         { label: "Appointment Priority", getter: o => o?.overview?.appointment?.payload?.encounterDetails.encounterDetails.appointmentPriority }
       ],
 
