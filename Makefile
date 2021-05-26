@@ -2,7 +2,7 @@ MODELS_DAR=target/healthcare-claims-processing.dar
 TRIGGERS_DAR=target/healthcare-claims-processing-triggers.dar
 
 .PHONY: build
-build: build-dars ui/daml.js
+build: build-dars install-python-dependencies ui/daml.js
 
 .PHONY: clean
 clean:
@@ -23,6 +23,10 @@ test-ui: build-ui
 
 daml-hub-package: build
 	$(MAKE) -C ui daml-hub-package LEDGER_ID=$(LEDGER_ID)
+
+.PHONY: install-python-dependencies
+install-python-dependencies:
+	cd scripts && pipenv sync
 
 ### DARS ###
 

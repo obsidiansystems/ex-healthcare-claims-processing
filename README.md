@@ -18,6 +18,7 @@ Be sure you have the following installed.
 - Make
 - Node v12.13.0 or higher
 - NPM v7.14.0 or higher
+- [Python Pipenv](https://pipenv.pypa.io/)
 
 ### Starting the App
 
