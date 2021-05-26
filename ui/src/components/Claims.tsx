@@ -2,7 +2,7 @@ import React, {  } from 'react'
 import { useParams } from 'react-router-dom';
 import { Main } from '@daml.js/healthcare-claims-processing';
 import { CreateEvent } from '@daml/ledger';
-import { useStreamQuery, useLedger } from '@daml/react';
+import { useStreamQueries, useLedger } from '@daml/react';
 import { CalendarBlank } from "phosphor-react";
 import { mapIter, leftJoin, useAsync, Message } from "./Common";
 import { ChoiceModal } from "./ChoiceModal";
@@ -19,14 +19,15 @@ const ClaimRoutes : React.FC<Props> = ({role}) =>
 const useClaims = (query: any) => {
   const ledger = useLedger();
   const claim = useAsync(async () => query.claimId ? await ledger.fetch(Main.Claim.Claim, query.claimId) : null, [query]);
-  const claimsStream = useStreamQuery(Main.Claim.Claim, () => query).contracts;
+  const claimsStream = useStreamQueries(Main.Claim.Claim, () => query).contracts;
   const claims : readonly CreateEvent<Main.Claim.Claim>[] = query.claimId && claim ? [claim] : claimsStream;
-  const receipts = useStreamQuery(Main.Claim.PaymentReceipt, () => ({ })).contracts;
+  const claimIds = claims.map(claim => ({paymentId: claim.payload.claimId}));
+  const receipts = useStreamQueries(Main.Claim.PaymentReceipt, () => claimIds).contracts;
 
   const keyedClaims = new Map(claims.map(claim => [claim.payload.claimId, claim]));
   const keyedReceipts = new Map(receipts.map(receipt => [receipt.payload.paymentId, receipt]));
 
-  const disclosed = useStreamQuery(Main.Policy.DisclosedPolicy).contracts;
+  const disclosed = useStreamQueries(Main.Policy.DisclosedPolicy).contracts;
 
   const keyedDisclosed = new Map(disclosed.map(p => [p.payload.patient, p]));
 
