@@ -1,13 +1,11 @@
-import React, { useState, useMemo } from 'react'
-import { Link, NavLink, Redirect, Route, Switch, useRouteMatch, useParams } from 'react-router-dom';
+import React, {  } from 'react'
+import { useParams } from 'react-router-dom';
 import { Main } from '@daml.js/healthcare-claims-processing';
 import { CreateEvent } from '@daml/ledger';
 import { useStreamQuery, useLedger } from '@daml/react';
-import { CaretRight, Share } from "phosphor-react";
-import { mapIter, innerJoin, intercalate, Field, FieldsRow, Message, TabLink, useAsync } from "./Common";
-import { Formik, Form, Field as FField, useField } from 'formik';
-import Select from 'react-select';
-import { LField, EField, ChoiceModal, FollowUp, Nothing } from "./ChoiceModal";
+import { Share } from "phosphor-react";
+import { mapIter, innerJoin, Message, useAsync } from "./Common";
+import { ChoiceModal } from "./ChoiceModal";
 import { TabularScreenRoutes, TabularView, SingleItemView } from "./TabularScreen";
 import { Party } from '@daml/types';
 
@@ -74,7 +72,7 @@ const Treatment : React.FC<{role: Party}> = ({role}) => {
     ] }
     tableKey={ o => o.overview?.treatment.contractId }
     itemUrl={ o => "" }
-    choices={ d => d?.overview?.treatment?.payload?.provider == role ? [
+    choices={ d => d?.overview?.treatment?.payload?.provider === role ? [
       <ChoiceModal className="flex flex-col space-y-6 w-170 mt-3"
                    choice={Main.Treatment.Treatment.CompleteTreatment}
                    contract={d.overview?.treatment?.contractId}

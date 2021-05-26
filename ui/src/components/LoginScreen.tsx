@@ -3,7 +3,7 @@
 
 import React, { useCallback } from 'react'
 import { ArrowRight } from "phosphor-react";
-import { Button, Form, Grid, Header, Image, Segment } from 'semantic-ui-react'
+import { Button } from 'semantic-ui-react'
 import Credentials, { computeCredentials } from '../Credentials';
 import Ledger from '@daml/ledger';
 // import { User } from '@daml.js/example-create-daml-app';
@@ -24,12 +24,6 @@ const LoginScreen: React.FC<Props> = ({onLogin}) => {
       console.log("Attempting Login");
       const ledger = new Ledger({token: credentials.token, httpBaseUrl});
       console.log("Got ledger" + ledger);
-//      let userContract = await ledger.fetchByKey(User.User, credentials.party);
-      let userContract = null;
-      if (userContract === null) {
-        const user = {username: credentials.party, following: []};
-//        userContract = await ledger.create(User.User, user);
-      }
       console.log(credentials);
       onLogin(credentials);
     } catch(error) {
@@ -111,7 +105,7 @@ const LoginScreen: React.FC<Props> = ({onLogin}) => {
     }}>
       <Landing/>
       <div className="relative flex flex-col flex-grow justify-center items-center">
-        <img src="/logo-with-name.svg" className="absolute top-7 left-11"/>
+        <img src="/logo-with-name.svg" alt="Daml Health logo"  className="absolute top-7 left-11"/>
         <div className="flex flex-col justify-center items-stretch space-y-4 w-80">
           {deploymentMode === DeploymentMode.PROD_DABL
           ?

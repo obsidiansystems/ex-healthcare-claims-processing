@@ -2,15 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import React from 'react'
-import { Image, Menu } from 'semantic-ui-react'
-import DayPicker from './DayPicker'
-import FormikMod, { Formik, Form, Field, FieldProps, FormikHelpers, FieldAttributes, useField } from 'formik';
+import { Formik, Form } from 'formik';
 import { SubmitButton, DayPickerField, Nothing } from "./ChoiceModal";
 import MainView from './MainView';
 import Modal from './Modal';
 import { useParty } from '@daml/react';
 import { Link, Route, useHistory } from 'react-router-dom';
-import { TabularScreenRoutes } from './TabularScreen';
 import '@fontsource/alata';
 import { formatDate } from './Common';
 
@@ -84,11 +81,8 @@ const roleRoutes: Map<string, string> = new Map([
 
 const MainScreen: React.FC<Props> = ({onLogout}) => {
   const [modalActive,setModalActive] = React.useState(false);
-  const [date, setDate] = React.useState(new Date());
+  const [date] = React.useState(new Date());
   const role = useParty();
-  const theme = {
-    blue: '#4c6fea',
-  }
 
   // Navigate to the role's start page
   useHistory().push(roleRoutes.get(role) || '/');
@@ -98,7 +92,7 @@ const MainScreen: React.FC<Props> = ({onLogout}) => {
   return (
     <div className="main-grid font-alata">
       <div className="bg-trueGray-50 flex flex-col justify-start text-sm text-trueGray-500"> {/*px-20 inset-y-0 bg-blue w-64 object-center">*/}
-        <img src="/logo-with-name.svg" className="inline-block ml-px30 mt-px25 mb-7 self-start"/>
+        <img src="/logo-with-name.svg" alt="Daml Health logo" className="inline-block ml-px30 mt-px25 mb-7 self-start"/>
 
         { roleTabs.map(({to, exact, icon, label}) =>
           <TabLink icon={icon} to={to} exact={exact} label={label}/>
@@ -131,7 +125,7 @@ const MainScreen: React.FC<Props> = ({onLogout}) => {
         </button>
       </div>
       <Modal active={modalActive} setActive={setModalActive} hasCloseButton={true}>
-        <Formik initialValues={{newDate: Nothing }} onSubmit={({}) => {} /* change time itself */}>
+        <Formik initialValues={{newDate: Nothing }} onSubmit={() => {} /* change time itself */}>
           {({ errors, touched, isValidating, isSubmitting}) => (
             <Form>
               <DayPickerField name="newDate" />

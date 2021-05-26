@@ -1,13 +1,7 @@
-import React, { useState, useMemo, ReactNode, PropsWithChildren } from 'react'
-import { Link, NavLink, Redirect, Route, Switch, useRouteMatch, useParams } from 'react-router-dom';
-import { Main } from '@daml.js/healthcare-claims-processing';
-import { CreateEvent } from '@daml/ledger';
-import { useStreamQuery, useLedger } from '@daml/react';
-import { CaretRight, Share } from "phosphor-react";
-import { intercalate, Field, FieldsRow, PageTitleDiv, PageTitleSpan, PageSubTitleSpan, TabLink, useAsync } from "./Common";
-import { Formik, Form, Field as FField, useField } from 'formik';
-import Select from 'react-select';
-import { LField, EField, ChoiceModal, Nothing } from "./ChoiceModal";
+import React, { useState, ReactNode, PropsWithChildren } from 'react'
+import { Link, Redirect, Route, Switch, useRouteMatch } from 'react-router-dom';
+import { CaretRight } from "phosphor-react";
+import { FieldsRow, PageTitleDiv, PageTitleSpan, PageSubTitleSpan } from "./Common";
 
 export const TabularScreenRoutes : React.FC<{metavar: string, table: ReactNode, detail: ReactNode }> = ( { metavar, table, detail } ) => {
   const match = useRouteMatch();
@@ -40,7 +34,6 @@ type TabularViewConfig<T, F> = {
 export function TabularView<T, > ( { title, fields, tableKey, itemUrl, useData, searchFunc } : PropsWithChildren<TabularViewConfig<T, TabularViewFields<T>[]> > ) {
   const match = useRouteMatch();
   const [search, setSearch] = useState("");
-  const searchedFor = (s: string) => s.toLowerCase().indexOf(search.toLowerCase()) != -1;
   const data = useData().filter((searchFunc || (a=>b=>true))(search));
   return (<>
       <PageTitleDiv><PageTitleSpan title={title} /></PageTitleDiv>
@@ -72,7 +65,7 @@ export function TabularView<T, > ( { title, fields, tableKey, itemUrl, useData, 
                             // NOTE 2: Adding the "flex" className makes the entire table cell
                             //  become a link, instead of just the text inside the table cell.
                             <td>
-                              <Link to={url} className="flex" {...idx == 0 ? {} : {'tabIndex': -1}}>
+                              <Link to={url} className="flex" {...idx === 0 ? {} : {'tabIndex': -1}}>
                                 {g.getter(po)}
                               </Link>
                             </td>
@@ -108,7 +101,7 @@ export function SingleItemView<T, > ( { title, fields, tableKey, itemUrl, useDat
               <FieldsRow fields={
               row.map(f=>({label: f.label, value: f.getter(po)}))
               } />
-              { i == fields.length - 1 ? <> </> : <hr/> }
+              { i === fields.length - 1 ? <> </> : <hr/> }
             </>
           )}
         </Route>

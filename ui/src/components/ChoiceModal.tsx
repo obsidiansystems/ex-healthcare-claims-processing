@@ -1,17 +1,18 @@
-import React, { Dispatch, SetStateAction } from 'react'
+import React, { SetStateAction } from 'react'
 import { Choice, ContractId, Time } from '@daml/types';
 import { Event as DEvent, CreateEvent } from '@daml/ledger';
 import { useLedger } from '@daml/react';
 
-import FormikMod, { Formik, Form, Field, FieldProps, FormikHelpers, FieldAttributes, useField } from 'formik';
-import { ArrowRight, Share, Check, X } from 'phosphor-react';
+import FormikMod, { Formik, Form, Field, FormikHelpers, FieldAttributes, useField } from 'formik';
+import { ArrowRight, Check, X } from 'phosphor-react';
 import { Link } from 'react-router-dom';
-import Select, { Props } from 'react-select';
+import Select from 'react-select';
 import Modal from './Modal';
 import DayPicker from "./DayPicker";
 import TimePicker from 'react-time-picker';
 
 export const Nothing = Symbol('Nothing');
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 type Nothing = typeof Nothing;
 
 /// Each field is made optional without edge cases, provided nothing else uses `Nothing`.
@@ -20,8 +21,8 @@ type PartialMaybe<T> = {
 };
 
 function complete<T>(i: PartialMaybe<T>) : T | undefined {
-  for( const [key, value] of Object.entries(i) ) {
-    if (value == Nothing) {
+  for( const [, value] of Object.entries(i) ) {
+    if (value === Nothing) {
       return undefined;
     }
   }
@@ -29,6 +30,7 @@ function complete<T>(i: PartialMaybe<T>) : T | undefined {
 }
 
 export const SuccessTag = Symbol('Success');
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 type SuccessTag = typeof SuccessTag;
 
 interface Success<C, R> {
@@ -38,6 +40,7 @@ interface Success<C, R> {
 }
 
 export const FailureTag = Symbol('Failure');
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 type FailureTag = typeof FailureTag;
 
 interface Failure<C> {
@@ -79,8 +82,8 @@ export function ChoiceModal<T extends object, C, R, K>({ choice, contract, submi
   const [successOrFailure, setSuccessOrFailure] = React.useState<MaybeSuccessOrFailure<C, R> >(Nothing);
   const setModalActive = (s : SetStateAction<boolean>) => {
     setModalActiveInner((p : boolean) => {
-      const shown = typeof s == 'function' ? s(p) : s;
-      if(!shown && successOrFailure != Nothing) setSuccessOrFailure(Nothing);
+      const shown = typeof s === 'function' ? s(p) : s;
+      if(!shown && successOrFailure !== Nothing) setSuccessOrFailure(Nothing);
       return shown;
     })};
   const ledger = useLedger();
@@ -100,7 +103,7 @@ export function ChoiceModal<T extends object, C, R, K>({ choice, contract, submi
     }
   };
   var content;
-  if(successOrFailure != Nothing) {
+  if(successOrFailure !== Nothing) {
   switch(successOrFailure.tag) {
       case SuccessTag: {
         content = (<div className="w-170 py-24 space-y-8 flex justify-center items-center flex-col text-center">
@@ -132,8 +135,8 @@ export function ChoiceModal<T extends object, C, R, K>({ choice, contract, submi
   } else {
       content = (
         <Formik initialValues={initialValues} onSubmit={ submitF } >
-          {({ errors, touched, isValidating, isSubmitting}) => (<Form className={className}>
-            {typeof children == "function" ? children({ errors, touched }) : children}
+          {({ errors, touched, isSubmitting}) => (<Form className={className}>
+            {typeof children === "function" ? children({ errors, touched }) : children}
             <div className="flex justify-center align-center">
               <SubmitButton submitTitle={submitTitle} isSubmitting={isSubmitting} />
             </div>
@@ -163,7 +166,7 @@ export type ChoiceErrorsType = { [_: string]: string | undefined };
 
 export const validateNonEmpty = (label: string) => (a: any) => {
   let error;
-  if (a == Nothing) {
+  if (a === Nothing) {
     error = `${label} is required`;
   }
   return error;
@@ -201,7 +204,7 @@ export const EField : React.FC<{
   label: string,
   errors?: ChoiceErrorsType,
 }> = ({name, e, label, errors}) => {
-  const [ field, meta, helpers ] = useField({
+  const [,, helpers ] = useField({
     name,
     validate: validateNonEmpty(label),
   });
@@ -214,7 +217,7 @@ export const EField : React.FC<{
         multi={false}
         options={e.keys.map((a:string)=>({value: a, label: a}))}
         onChange={(option) => setValue(option?.value)}
-        styles={({singleValue: (base) => ({ textOverflow: "ellipsis", maxWidth: "10em" }) })}
+        styles={({singleValue: () => ({ textOverflow: "ellipsis", maxWidth: "10em" }) })}
         validate={undefined}
       />
       <RenderError error={error} />
@@ -226,12 +229,12 @@ export const DayPickerField : React.FC<{
   name: string
   errors?: ChoiceErrorsType,
 }> = ({ name, errors }) => {
-  const [ field, meta, { setValue } ] = useField<string | Nothing>(name);
+  const [ field, , { setValue } ] = useField<string | Nothing>(name);
   const error = errors?.[name];
   return (
     <>
       <DayPicker
-        date={field.value == Nothing
+        date={field.value === Nothing
             ? new Date()
             : new Date(field.value + "T00:10:00")
         }
@@ -250,14 +253,14 @@ export const DayTimePickerField : React.FC<{
   name: string
   errors?: ChoiceErrorsType,
 }> = ({ name, errors }) => {
-  const [ field, meta, { setValue } ] = useField<Time | Nothing>(name);
-  if (field.value == Nothing) {
+  const [ field, , { setValue } ] = useField<Time | Nothing>(name);
+  if (field.value === Nothing) {
     // can't help but render some picked date, so might as well set it
     const f = new Date();
     console.log("default combined", f);
     setValue(dateToTime(f));
   }
-  const defaultField = field.value == Nothing ? new Date() : new Date(field.value);
+  const defaultField = field.value === Nothing ? new Date() : new Date(field.value);
   let date = new Date(defaultField.getFullYear(), defaultField.getMonth(), defaultField.getDate());
   let time = new Date(0, 0, 0, defaultField.getHours(), defaultField.getMinutes(), defaultField.getSeconds());
   const updateField = () => {

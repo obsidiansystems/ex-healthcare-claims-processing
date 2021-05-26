@@ -1,14 +1,14 @@
-import React, { useState } from 'react'
-import { Link, NavLink, Redirect, Route, Switch, useRouteMatch, useParams } from 'react-router-dom';
+import React from 'react'
+import { Redirect, Route, Switch, useRouteMatch, useParams } from 'react-router-dom';
 import { Main } from '@daml.js/healthcare-claims-processing';
 import { CreateEvent } from '@daml/ledger';
 import { useParty, useStreamQuery } from '@daml/react';
-import { CaretRight, Share, ArrowRight } from "phosphor-react";
-import { mapIter, innerJoin, intercalate, Field, FieldsRow, Message, PageTitleDiv, PageTitleSpan, PageSubTitleSpan, TabLink } from "./Common";
-import { Formik, Form, Field as FField, useField } from 'formik';
+import { Share } from "phosphor-react";
+import { mapIter, innerJoin, intercalate, FieldsRow, Message, PageTitleDiv, PageTitleSpan, PageSubTitleSpan, TabLink } from "./Common";
+import { useField } from 'formik';
 import Select from 'react-select';
-import { LField, EField, ChoiceModal, ChoiceErrorsType, FollowUp, Nothing, creations, validateNonEmpty, RenderError } from "./ChoiceModal";
-import { TabularScreenRoutes, TabularView, SingleItemView } from "./TabularScreen";
+import { LField, EField, ChoiceModal, ChoiceErrorsType, Nothing, validateNonEmpty, RenderError } from "./ChoiceModal";
+import { TabularView } from "./TabularScreen";
 
 
 type PatientOverview =
@@ -63,54 +63,6 @@ const Patients: React.FC = () => {
     itemUrl={ o => o.policy.patient }
     />
   ;
-}
-
-const NotPatients: React.FC = () => {
-  const match = useRouteMatch();
-  const [search, setSearch] = useState("");
-  const searchedFor = (s: string) => s.toLowerCase().indexOf(search.toLowerCase()) != -1;
-  const visible = usePatients({}).overviews.filter(p => searchedFor(p.policy.patientName) || searchedFor(p.policy.insuranceID));
-
-  return (
-    <>
-      <PageTitleDiv><PageTitleSpan title="Patients" /></PageTitleDiv>
-      <div className="flex p-2 bg-white">
-        <input
-          type="text"
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          placeholder="Search by name or insurance ID..."
-          className="w-full px-3 py-2 h-10 bg-trueGray-100"
-        />
-      </div>
-      <table className="table-fixed">
-        <thead>
-          <tr className="text-left text-trueGray-500 text-sm">
-            <th className="w-1/6"> Name </th>
-            <th className="w-1/6"> PCP </th>
-            <th className="w-1/6"> Insurance ID </th>
-            <th> </th>
-          </tr>
-        </thead>
-        <tbody>
-          {visible.map((po) =>
-            <tr key={po.policy.patient} className="bg-white text-trueGray-500 hover:bg-trueGray-100 ">
-              <td className="border-red-600"> { po.policy.patientName } </td>
-              <td> </td>
-              <td> { po.policy.insuranceID } </td>
-              <td>
-                <div className="">
-                  <Link to={match.url + "/" + po.policy.patient} className="flex justify-end">
-                    <CaretRight />
-                  </Link>
-                </div>
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-    </>
-  )
 }
 
 const Patient: React.FC = () => {
@@ -222,7 +174,7 @@ const PolicySelect : React.FC< {
   disclosedRaw: readonly CreateEvent<Main.Policy.DisclosedPolicy>[],
   errors?: ChoiceErrorsType,
 } > = ({ name, label, disclosedRaw, errors }) => {
-  const [ field, meta, helpers ] = useField({
+  const [ , , helpers ] = useField({
     name,
     validate: validateNonEmpty(label),
   });

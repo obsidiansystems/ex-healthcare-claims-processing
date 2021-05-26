@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useState } from 'react';
+import React from 'react';
 
 import ReactDayPicker from 'react-day-picker';
 import 'react-day-picker/lib/style.css';
@@ -11,7 +11,6 @@ type Props = {
 
 const DayPicker: React.FC<Props> = ({date, setDate, theme}) => {
   const month = date;
-  let hovered = null;
 
   const modifiers = {
     hover: undefined,

@@ -1,13 +1,11 @@
-import React, { useState, useMemo } from 'react'
-import { Link, NavLink, Redirect, Route, Switch, useRouteMatch, useParams } from 'react-router-dom';
+import React, {  } from 'react'
+import { useParams } from 'react-router-dom';
 import { Main } from '@daml.js/healthcare-claims-processing';
 import { CreateEvent } from '@daml/ledger';
 import { useStreamQuery, useLedger } from '@daml/react';
-import { CalendarBlank, CaretRight } from "phosphor-react";
-import { mapIter, leftJoin, intercalate, Field, FieldsRow, TabLink, useAsync, Message } from "./Common";
-import { Formik, Form, Field as FField, useField } from 'formik';
-import Select from 'react-select';
-import { LField, EField, ChoiceModal, Nothing } from "./ChoiceModal";
+import { CalendarBlank } from "phosphor-react";
+import { mapIter, leftJoin, useAsync, Message } from "./Common";
+import { ChoiceModal } from "./ChoiceModal";
 import { TabularScreenRoutes, TabularView, SingleItemView } from "./TabularScreen";
 import { Party } from '@daml/types';
 
