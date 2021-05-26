@@ -16,6 +16,8 @@ Be sure you have the following installed.
 - [Daml SDK](https://docs.daml.com/)
 - Java 8 or higher
 - Make
+- Node v12.13.0 or higher
+- NPM v7.14.0 or higher
 
 ### Starting the App
 
