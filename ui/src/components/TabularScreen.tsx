@@ -1,13 +1,7 @@
-import React, { useState, useMemo, ReactNode, PropsWithChildren } from 'react'
-import { Link, NavLink, Redirect, Route, Switch, useRouteMatch, useParams } from 'react-router-dom';
-import { Main } from '@daml.js/healthcare-claims-processing';
-import { CreateEvent } from '@daml/ledger';
-import { useStreamQuery, useLedger } from '@daml/react';
-import { CaretRight, Share } from "phosphor-react";
-import { intercalate, Field, FieldsRow, PageTitleDiv, PageTitleSpan, PageSubTitleSpan, TabLink, useAsync } from "./Common";
-import { Formik, Form, Field as FField, useField } from 'formik';
-import Select from 'react-select';
-import { LField, EField, ChoiceModal, Nothing } from "./ChoiceModal";
+import React, { useState, ReactNode, PropsWithChildren } from 'react'
+import { Link, Redirect, Route, Switch, useRouteMatch } from 'react-router-dom';
+import { CaretRight } from "phosphor-react";
+import { FieldsRow, PageTitleDiv, PageTitleSpan, PageSubTitleSpan } from "./Common";
 
 export const TabularScreenRoutes : React.FC<{metavar: string, table: ReactNode, detail: ReactNode }> = ( { metavar, table, detail } ) => {
   const match = useRouteMatch();

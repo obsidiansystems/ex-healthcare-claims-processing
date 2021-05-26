@@ -3,7 +3,7 @@
 
 import React, { useCallback } from 'react'
 import { ArrowRight } from "phosphor-react";
-import { Button, Form, Grid, Header, Image, Segment } from 'semantic-ui-react'
+import { Button } from 'semantic-ui-react'
 import Credentials, { computeCredentials } from '../Credentials';
 import Ledger from '@daml/ledger';
 // import { User } from '@daml.js/example-create-daml-app';

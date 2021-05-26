@@ -2,15 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import React from 'react'
-import { Image, Menu } from 'semantic-ui-react'
-import DayPicker from './DayPicker'
-import FormikMod, { Formik, Form, Field, FieldProps, FormikHelpers, FieldAttributes, useField } from 'formik';
+import { Formik, Form } from 'formik';
 import { SubmitButton, DayPickerField, Nothing } from "./ChoiceModal";
 import MainView from './MainView';
 import Modal from './Modal';
 import { useParty } from '@daml/react';
 import { Link, Route, useHistory } from 'react-router-dom';
-import { TabularScreenRoutes } from './TabularScreen';
 import '@fontsource/alata';
 import { formatDate } from './Common';
 

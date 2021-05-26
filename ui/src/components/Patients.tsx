@@ -1,14 +1,14 @@
 import React, { useState } from 'react'
-import { Link, NavLink, Redirect, Route, Switch, useRouteMatch, useParams } from 'react-router-dom';
+import { Link, Redirect, Route, Switch, useRouteMatch, useParams } from 'react-router-dom';
 import { Main } from '@daml.js/healthcare-claims-processing';
 import { CreateEvent } from '@daml/ledger';
 import { useParty, useStreamQuery } from '@daml/react';
-import { CaretRight, Share, ArrowRight } from "phosphor-react";
-import { mapIter, innerJoin, intercalate, Field, FieldsRow, Message, PageTitleDiv, PageTitleSpan, PageSubTitleSpan, TabLink } from "./Common";
-import { Formik, Form, Field as FField, useField } from 'formik';
+import { CaretRight, Share } from "phosphor-react";
+import { mapIter, innerJoin, intercalate, FieldsRow, Message, PageTitleDiv, PageTitleSpan, PageSubTitleSpan, TabLink } from "./Common";
+import { useField } from 'formik';
 import Select from 'react-select';
-import { LField, EField, ChoiceModal, ChoiceErrorsType, FollowUp, Nothing, creations, validateNonEmpty, RenderError } from "./ChoiceModal";
-import { TabularScreenRoutes, TabularView, SingleItemView } from "./TabularScreen";
+import { LField, EField, ChoiceModal, ChoiceErrorsType, Nothing, validateNonEmpty, RenderError } from "./ChoiceModal";
+import { TabularView } from "./TabularScreen";
 
 
 type PatientOverview =

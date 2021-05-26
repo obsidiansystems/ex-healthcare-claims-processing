@@ -1,11 +1,10 @@
 // Copyright (c) 2021 Digital Asset (Switzerland) GmbH and/or its affiliates. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import React, { useMemo } from 'react';
-import { Container, Grid, Header, Icon, Segment, Divider } from 'semantic-ui-react';
-import { Party } from '@daml/types';
+import React from 'react';
+import { Header } from 'semantic-ui-react';
 import { Main } from '@daml.js/healthcare-claims-processing';
-import { useParty, useLedger, useStreamFetchByKeys, useStreamQueries } from '@daml/react';
+import { useParty, useStreamQueries } from '@daml/react';
 import { Switch, Route } from 'react-router-dom';
 import PatientRoutes from './Patients';
 import ReferralRoutes from './Referrals';

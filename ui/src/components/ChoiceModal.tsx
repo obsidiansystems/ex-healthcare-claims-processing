@@ -1,12 +1,12 @@
-import React, { Dispatch, SetStateAction } from 'react'
+import React, { SetStateAction } from 'react'
 import { Choice, ContractId, Time } from '@daml/types';
 import { Event as DEvent, CreateEvent } from '@daml/ledger';
 import { useLedger } from '@daml/react';
 
-import FormikMod, { Formik, Form, Field, FieldProps, FormikHelpers, FieldAttributes, useField } from 'formik';
-import { ArrowRight, Share, Check, X } from 'phosphor-react';
+import FormikMod, { Formik, Form, Field, FormikHelpers, FieldAttributes, useField } from 'formik';
+import { ArrowRight, Check, X } from 'phosphor-react';
 import { Link } from 'react-router-dom';
-import Select, { Props } from 'react-select';
+import Select from 'react-select';
 import Modal from './Modal';
 import DayPicker from "./DayPicker";
 import TimePicker from 'react-time-picker';

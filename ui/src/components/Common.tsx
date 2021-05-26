@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react'
-import { NavLink, Route, Switch, useRouteMatch, useParams } from 'react-router-dom';
+import { NavLink, useRouteMatch } from 'react-router-dom';
 import dateFormat from 'dateformat';
 
 type FieldProps = {label: string, value: string};
