@@ -92,7 +92,7 @@ const MainScreen: React.FC<Props> = ({onLogout}) => {
   return (
     <div className="main-grid font-alata">
       <div className="bg-trueGray-50 flex flex-col justify-start text-sm text-trueGray-500"> {/*px-20 inset-y-0 bg-blue w-64 object-center">*/}
-        <img src="/logo-with-name.svg" className="inline-block ml-px30 mt-px25 mb-7 self-start"/>
+        <img src="/logo-with-name.svg" alt="Daml Health logo" className="inline-block ml-px30 mt-px25 mb-7 self-start"/>
 
         { roleTabs.map(({to, exact, icon, label}) =>
           <TabLink icon={icon} to={to} exact={exact} label={label}/>

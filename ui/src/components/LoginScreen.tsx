@@ -105,7 +105,7 @@ const LoginScreen: React.FC<Props> = ({onLogin}) => {
     }}>
       <Landing/>
       <div className="relative flex flex-col flex-grow justify-center items-center">
-        <img src="/logo-with-name.svg" className="absolute top-7 left-11"/>
+        <img src="/logo-with-name.svg" alt="Daml Health logo"  className="absolute top-7 left-11"/>
         <div className="flex flex-col justify-center items-stretch space-y-4 w-80">
           {deploymentMode === DeploymentMode.PROD_DABL
           ?
