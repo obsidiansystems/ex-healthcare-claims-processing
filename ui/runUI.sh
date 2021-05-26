@@ -13,7 +13,7 @@ run_backend() {
 
 run_triggers() {
     cd ..
-    scripts/startTriggers.sh localhost 6865 target/healthcare-claims-processing-triggers.dar &
+    scripts/startTriggers.py 6865 &
 }
 
 run_frontend() {
