@@ -12,6 +12,7 @@ import DayPicker from "./DayPicker";
 import TimePicker from 'react-time-picker';
 
 export const Nothing = Symbol('Nothing');
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 type Nothing = typeof Nothing;
 
 /// Each field is made optional without edge cases, provided nothing else uses `Nothing`.
@@ -29,6 +30,7 @@ function complete<T>(i: PartialMaybe<T>) : T | undefined {
 }
 
 export const SuccessTag = Symbol('Success');
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 type SuccessTag = typeof SuccessTag;
 
 interface Success<C, R> {
@@ -38,6 +40,7 @@ interface Success<C, R> {
 }
 
 export const FailureTag = Symbol('Failure');
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 type FailureTag = typeof FailureTag;
 
 interface Failure<C> {
