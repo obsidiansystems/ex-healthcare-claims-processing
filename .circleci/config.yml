@@ -115,7 +115,8 @@ jobs:
       - run:
           name: Integration tests
           command: |
-            mvn verify
+            cd model/
+            mvn -f ../pom.xml verify
       - run:
           command: |
             echo "Moving log files so they can be stored."
