@@ -11,7 +11,6 @@ type Props = {
 
 const DayPicker: React.FC<Props> = ({date, setDate, theme}) => {
   const month = date;
-  let hovered = null;
 
   const modifiers = {
     hover: undefined,

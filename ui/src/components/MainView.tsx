@@ -53,7 +53,6 @@ const ProfileKVCenter: React.FC<{keyS: string, value?: string | null}> = ({keyS,
   </div>;
 
 const Profile: React.FC = () => {
-  const username = useParty();
   const pcpResult = useStreamQueries(Main.Provider.Provider).contracts;
   const patientResult = useStreamQueries(Main.Patient.Patient).contracts;
   const policyResult = useStreamQueries(Main.Policy.InsurancePolicy).contracts;
@@ -89,7 +88,6 @@ const Profile: React.FC = () => {
 // USERS_BEGIN
 const MainView: React.FC = () => {
   const username = useParty();
-  const pcpResult = useStreamQueries(Main.Provider.Provider).contracts;
 
   // kept for the moment as an example of exercising an option
   /* const ledger = useLedger();

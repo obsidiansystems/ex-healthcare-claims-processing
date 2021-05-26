@@ -34,7 +34,6 @@ type TabularViewConfig<T, F> = {
 export function TabularView<T, > ( { title, fields, tableKey, itemUrl, useData, searchFunc } : PropsWithChildren<TabularViewConfig<T, TabularViewFields<T>[]> > ) {
   const match = useRouteMatch();
   const [search, setSearch] = useState("");
-  const searchedFor = (s: string) => s.toLowerCase().indexOf(search.toLowerCase()) !== -1;
   const data = useData().filter((searchFunc || (a=>b=>true))(search));
   return (<>
       <PageTitleDiv><PageTitleSpan title={title} /></PageTitleDiv>

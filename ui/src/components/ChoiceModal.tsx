@@ -20,7 +20,7 @@ type PartialMaybe<T> = {
 };
 
 function complete<T>(i: PartialMaybe<T>) : T | undefined {
-  for( const [key, value] of Object.entries(i) ) {
+  for( const [, value] of Object.entries(i) ) {
     if (value === Nothing) {
       return undefined;
     }
@@ -132,7 +132,7 @@ export function ChoiceModal<T extends object, C, R, K>({ choice, contract, submi
   } else {
       content = (
         <Formik initialValues={initialValues} onSubmit={ submitF } >
-          {({ errors, touched, isValidating, isSubmitting}) => (<Form className={className}>
+          {({ errors, touched, isSubmitting}) => (<Form className={className}>
             {typeof children === "function" ? children({ errors, touched }) : children}
             <div className="flex justify-center align-center">
               <SubmitButton submitTitle={submitTitle} isSubmitting={isSubmitting} />
@@ -201,7 +201,7 @@ export const EField : React.FC<{
   label: string,
   errors?: ChoiceErrorsType,
 }> = ({name, e, label, errors}) => {
-  const [ field, meta, helpers ] = useField({
+  const [,, helpers ] = useField({
     name,
     validate: validateNonEmpty(label),
   });
@@ -214,7 +214,7 @@ export const EField : React.FC<{
         multi={false}
         options={e.keys.map((a:string)=>({value: a, label: a}))}
         onChange={(option) => setValue(option?.value)}
-        styles={({singleValue: (base) => ({ textOverflow: "ellipsis", maxWidth: "10em" }) })}
+        styles={({singleValue: () => ({ textOverflow: "ellipsis", maxWidth: "10em" }) })}
         validate={undefined}
       />
       <RenderError error={error} />
@@ -226,7 +226,7 @@ export const DayPickerField : React.FC<{
   name: string
   errors?: ChoiceErrorsType,
 }> = ({ name, errors }) => {
-  const [ field, meta, { setValue } ] = useField<string | Nothing>(name);
+  const [ field, , { setValue } ] = useField<string | Nothing>(name);
   const error = errors?.[name];
   return (
     <>
@@ -250,7 +250,7 @@ export const DayTimePickerField : React.FC<{
   name: string
   errors?: ChoiceErrorsType,
 }> = ({ name, errors }) => {
-  const [ field, meta, { setValue } ] = useField<Time | Nothing>(name);
+  const [ field, , { setValue } ] = useField<Time | Nothing>(name);
   if (field.value === Nothing) {
     // can't help but render some picked date, so might as well set it
     const f = new Date();

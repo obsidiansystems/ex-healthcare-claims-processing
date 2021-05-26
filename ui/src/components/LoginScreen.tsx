@@ -24,12 +24,6 @@ const LoginScreen: React.FC<Props> = ({onLogin}) => {
       console.log("Attempting Login");
       const ledger = new Ledger({token: credentials.token, httpBaseUrl});
       console.log("Got ledger" + ledger);
-//      let userContract = await ledger.fetchByKey(User.User, credentials.party);
-      let userContract = null;
-      if (userContract === null) {
-        const user = {username: credentials.party, following: []};
-//        userContract = await ledger.create(User.User, user);
-      }
       console.log(credentials);
       onLogin(credentials);
     } catch(error) {

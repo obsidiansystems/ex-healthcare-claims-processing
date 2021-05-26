@@ -81,11 +81,8 @@ const roleRoutes: Map<string, string> = new Map([
 
 const MainScreen: React.FC<Props> = ({onLogout}) => {
   const [modalActive,setModalActive] = React.useState(false);
-  const [date, setDate] = React.useState(new Date());
+  const [date] = React.useState(new Date());
   const role = useParty();
-  const theme = {
-    blue: '#4c6fea',
-  }
 
   // Navigate to the role's start page
   useHistory().push(roleRoutes.get(role) || '/');
