@@ -125,7 +125,7 @@ const MainScreen: React.FC<Props> = ({onLogout}) => {
         </button>
       </div>
       <Modal active={modalActive} setActive={setModalActive} hasCloseButton={true}>
-        <Formik initialValues={{newDate: Nothing }} onSubmit={({}) => {} /* change time itself */}>
+        <Formik initialValues={{newDate: Nothing }} onSubmit={() => {} /* change time itself */}>
           {({ errors, touched, isValidating, isSubmitting}) => (
             <Form>
               <DayPickerField name="newDate" />
