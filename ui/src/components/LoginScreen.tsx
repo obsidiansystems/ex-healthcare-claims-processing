@@ -3,10 +3,9 @@
 
 import React, { useCallback } from 'react'
 import { ArrowRight } from "phosphor-react";
-import { Button } from 'semantic-ui-react'
 import Credentials, { computeCredentials } from '../Credentials';
 import Ledger from '@daml/ledger';
-import { DeploymentMode, deploymentMode, ledgerId, httpBaseUrl} from '../config';
+import { ledgerId } from '../config';
 import { Landing } from './Landing';
 import { useEffect } from 'react';
 
@@ -21,7 +20,7 @@ const LoginScreen: React.FC<Props> = ({onLogin}) => {
   const login = useCallback(async (credentials: Credentials) => {
     try {
       console.log("Attempting Login");
-      const ledger = new Ledger({token: credentials.token, httpBaseUrl});
+      const ledger = new Ledger({token: credentials.token});
       console.log("Got ledger" + ledger);
       console.log(credentials);
       onLogin(credentials);
@@ -33,10 +32,6 @@ const LoginScreen: React.FC<Props> = ({onLogin}) => {
   const handleLogin = (username: string) => async (event : any) => {
     event.preventDefault();
     await login(computeCredentials(username));
-  }
-
-  const handleDablLogin = () => {
-    window.location.assign(`https://login.projectdabl.com/auth/login?ledgerId=${ledgerId}`);
   }
 
   useEffect(() => {
@@ -104,13 +99,7 @@ const LoginScreen: React.FC<Props> = ({onLogin}) => {
       <div className="relative flex flex-col flex-grow justify-center items-center">
         <img src="/logo-with-name.svg" alt="Daml Health logo"  className="absolute top-7 left-11"/>
         <div className="flex flex-col justify-center items-stretch space-y-4 w-80">
-          {deploymentMode === DeploymentMode.PROD_DABL
-          ?
-           <Button primary fluid onClick={handleDablLogin}>
-             Log in with DABL
-           </Button>
-          : <SelectRole />
-          }
+          <SelectRole />
         </div>
       </div>
     </div>

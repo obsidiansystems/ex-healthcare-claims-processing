@@ -8,7 +8,6 @@ import DamlLedger from '@daml/react';
 import Credentials from '../Credentials';
 import { Router } from 'react-router';
 import { createBrowserHistory as createHistory } from 'history';
-import { httpBaseUrl } from '../config';
 
 /**
  * React component for the entry point into the application.
@@ -29,7 +28,6 @@ const App: React.FC = () => {
     ? <DamlLedger
         token={credentials.token}
         party={credentials.party}
-        httpBaseUrl={httpBaseUrl}
       >
         <Router history={history}><MainScreen onLogout={onLogout}/></Router>
       </DamlLedger>
