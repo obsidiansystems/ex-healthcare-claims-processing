@@ -25,6 +25,7 @@ import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -109,7 +110,8 @@ public class HealthcareClaimsProcessingIT {
         ledgerAdapter.getCreatedContractId(
             RADIOLOGIST_PARTY, ReferralDetails.TEMPLATE_ID, ReferralDetails.ContractId::new);
 
-    LocalDate appointmentTime = LocalDate.of(2019, 7, 7);
+    LocalDate appointmentDate = LocalDate.of(2019, 7, 7);
+    Instant appointmentTime = appointmentDate.atStartOfDay(ZoneId.systemDefault()).toInstant();
     sandbox
         .getLedgerAdapter()
         .exerciseChoice(
@@ -118,7 +120,7 @@ public class HealthcareClaimsProcessingIT {
     // Check-in should happen on appointment date
     sandbox
         .getLedgerAdapter()
-        .setCurrentTime(Instant.ofEpochSecond(appointmentTime.toEpochDay() * 24 * 60 * 60));
+        .setCurrentTime(appointmentTime);
     Appointment.ContractId appointment =
         ledgerAdapter.getCreatedContractId(
             RADIOLOGIST_PARTY, Appointment.TEMPLATE_ID, Appointment.ContractId::new);
@@ -179,7 +181,8 @@ public class HealthcareClaimsProcessingIT {
         ledgerAdapter.getCreatedContractId(
             RADIOLOGIST_PARTY, ReferralDetails.TEMPLATE_ID, ReferralDetails.ContractId::new);
 
-    LocalDate appointmentTime = LocalDate.of(2019, 7, 7);
+    LocalDate appointmentDate = LocalDate.of(2019, 7, 7);
+    Instant appointmentTime = appointmentDate.atStartOfDay(ZoneId.systemDefault()).toInstant();
     sandbox
         .getLedgerAdapter()
         .exerciseChoice(
