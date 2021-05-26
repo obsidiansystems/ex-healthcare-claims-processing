@@ -42,6 +42,6 @@ $(TRIGGERS_DAR): $(TRIGGERS_DAML_SRC) triggers/daml.yaml $(MODELS_DAR)
 
 .PHONY: test-dars
 test-dars: build-dars
-	daml test --junit target/daml-test-reports/model.xml
+	(cd model && daml test --junit ../target/daml-test-reports/model.xml)
 	cd triggers && daml test --junit ../target/daml-test-reports/triggers.xml
 
