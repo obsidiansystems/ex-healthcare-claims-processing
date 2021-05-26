@@ -49,7 +49,7 @@ export function TabularView<T, > ( { title, fields, tableKey, itemUrl, useData, 
       <table className="table-fixed m-6 table-widths-eq">
         <thead>
           <tr className="text-left text-trueGray-500 text-sm">
-            { fields.map(a=> <th className=""> { a.label } </th>) }
+            { fields.map(a=> <th className="" key={a.label}> { a.label } </th>) }
             <th />
           </tr>
         </thead>

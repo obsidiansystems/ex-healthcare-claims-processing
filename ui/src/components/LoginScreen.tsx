@@ -81,6 +81,7 @@ const LoginScreen: React.FC<Props> = ({onLogin}) => {
           <button
             className="flex flex-row justify-between items-center rounded h-10 p-4 bg-trueGray-100 border-trueGray-100 focus:bg-blue focus:text-white hover:bg-white hover:border-blue border-2 text-sm text-gray-600"
             onClick={handleLogin(username)}
+            key={username}
           >
             {label}
             <ArrowRight size={21} color="var(--blue)"/>

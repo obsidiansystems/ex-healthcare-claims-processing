@@ -75,7 +75,7 @@ const FieldsRow: React.FC<{fields: FieldProps[]}> = ({fields}) => {
   return (
     <div className="flex space-x-12">
       { fields.map(f =>
-        <Field label={f.label} value={f.value} />
+        <Field label={f.label} value={f.value} key={f.label} />
         )}
     </div>
   )
