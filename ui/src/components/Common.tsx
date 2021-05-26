@@ -114,12 +114,15 @@ const Message: React.FC<{title: string, content: string}> = ({title, content}) =
   )
 }
 
-function useAsync<T>(f: () => Promise<T>, memoKeys: [any]) : T | null {
+// Requirement: do not pass an array as "memoKeys" argument,
+//  since it's assumed that "useMemo" doesn't look at the content
+//  of arrays.
+function useAsync<T>(f: () => Promise<T>, memoKeys: any) : T | null {
   const [[v, lastMemoKeys], setV] = useState<[T | null, any]>([null, null]);
   useMemo(
     // some false positives so we do the extra comparison to avoid extra `setV`
     () => { if(JSON.stringify(memoKeys) !== JSON.stringify(lastMemoKeys)) { f().then(nv => setV([nv, memoKeys])) } },
-    memoKeys);
+    [f, memoKeys, lastMemoKeys]);
   return v;
 }
 

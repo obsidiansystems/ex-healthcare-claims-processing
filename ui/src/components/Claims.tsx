@@ -18,7 +18,7 @@ const ClaimRoutes : React.FC<Props> = ({role}) =>
 
 const useClaims = (query: any) => {
   const ledger = useLedger();
-  const claim = useAsync(async () => query.claimId ? await ledger.fetch(Main.Claim.Claim, query.claimId) : null, [query]);
+  const claim = useAsync(async () => query.claimId ? await ledger.fetch(Main.Claim.Claim, query.claimId) : null, query);
   const claimsStream = useStreamQuery(Main.Claim.Claim, () => query).contracts;
   const claims : readonly CreateEvent<Main.Claim.Claim>[] = query.claimId && claim ? [claim] : claimsStream;
   const receipts = useStreamQuery(Main.Claim.PaymentReceipt, () => ({ })).contracts;

@@ -13,7 +13,7 @@ const BillRoutes : React.FC = () =>
 
 const useBills = (query: any) => {
   const ledger = useLedger();
-  const bill = useAsync(async () => query.billId ? await ledger.fetch(Main.Claim.PatientObligation, query.billId) : null, [query]);
+  const bill = useAsync(async () => query.billId ? await ledger.fetch(Main.Claim.PatientObligation, query.billId) : null, query);
   const billsStream = useStreamQuery(Main.Claim.PatientObligation, () => query).contracts;
   const bills : readonly CreateEvent<Main.Claim.PatientObligation>[] = query.billId && bill ? [bill] : billsStream;
   const receipts = useStreamQuery(Main.Claim.PaymentReceipt, () => ({ })).contracts;
