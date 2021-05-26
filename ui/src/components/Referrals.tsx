@@ -77,9 +77,8 @@ const Referral: React.FC<Props> = ({role}) => {
                            <>
                              <Message
                                title="Appointment Created!"
-                               content={"An appointment has been scheduled for " + d.overview?.policy?.payload?.patientName + "." /* TODO: date */}
+                               content={"An appointment has been scheduled for " + d.overview?.policy?.payload?.patientName + "."}
                              />
-                             {  /* TODO: "View Appointment" link */ }
                            </>}
             >
               <h1 className="text-center">Schedule Appointment</h1>
