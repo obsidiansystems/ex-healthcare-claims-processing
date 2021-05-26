@@ -15,7 +15,6 @@ import { httpBaseUrl } from '../config';
  */
 // APP_BEGIN
 const App: React.FC = () => {
-  // const [user, setUser] = React.useState<String | undefined>();
   const [credentials, setCredentials] = React.useState<Credentials | undefined>();
 
   const history = createHistory();
@@ -26,7 +25,6 @@ const App: React.FC = () => {
     history.replace('')
   };
 
-  // return <LoginScreen onLogin={setCredentials} />
   return credentials
     ? <DamlLedger
         token={credentials.token}

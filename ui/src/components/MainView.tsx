@@ -89,18 +89,6 @@ const Profile: React.FC = () => {
 const MainView: React.FC = () => {
   const username = useParty();
 
-  // kept for the moment as an example of exercising an option
-  /* const ledger = useLedger();
-
-  const follow = async (userToFollow: Party): Promise<boolean> => {
-    try {
-      await ledger.exerciseByKey(User.User.Follow, username, {userToFollow});
-      return true;
-    } catch (error) {
-      alert(`Unknown error:\n${error}`);
-      return false;
-    }
-  }*/
   return (
     <div className="min-h-full flex flex-col">
       <Switch>

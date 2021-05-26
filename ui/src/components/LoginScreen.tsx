@@ -6,7 +6,6 @@ import { ArrowRight } from "phosphor-react";
 import { Button } from 'semantic-ui-react'
 import Credentials, { computeCredentials } from '../Credentials';
 import Ledger from '@daml/ledger';
-// import { User } from '@daml.js/example-create-daml-app';
 import { DeploymentMode, deploymentMode, ledgerId, httpBaseUrl} from '../config';
 import { Landing } from './Landing';
 import { useEffect } from 'react';
@@ -35,8 +34,6 @@ const LoginScreen: React.FC<Props> = ({onLogin}) => {
     event.preventDefault();
     await login(computeCredentials(username));
   }
-
-  // handleLogin({preventDefault: (() => 1)}); // Hotwiring for dev convenience.
 
   const handleDablLogin = () => {
     window.location.assign(`https://login.projectdabl.com/auth/login?ledgerId=${ledgerId}`);
