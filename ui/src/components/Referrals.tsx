@@ -65,7 +65,7 @@ const Referral: React.FC<Props> = ({role}) => {
     ]] }
     tableKey={ o => o.overview.referral.contractId }
     itemUrl={ o => "" }
-    choices={ d => d?.overview?.referral?.payload?.renderingProvider == role ? [
+    choices={ d => d?.overview?.referral?.payload?.renderingProvider === role ? [
             <ChoiceModal className="flex flex-col"
                          choice={Main.Provider.ReferralDetails.ScheduleAppointment}
                          contract={d.overview?.referral?.contractId}

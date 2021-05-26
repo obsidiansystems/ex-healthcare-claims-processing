@@ -34,7 +34,7 @@ type TabularViewConfig<T, F> = {
 export function TabularView<T, > ( { title, fields, tableKey, itemUrl, useData, searchFunc } : PropsWithChildren<TabularViewConfig<T, TabularViewFields<T>[]> > ) {
   const match = useRouteMatch();
   const [search, setSearch] = useState("");
-  const searchedFor = (s: string) => s.toLowerCase().indexOf(search.toLowerCase()) != -1;
+  const searchedFor = (s: string) => s.toLowerCase().indexOf(search.toLowerCase()) !== -1;
   const data = useData().filter((searchFunc || (a=>b=>true))(search));
   return (<>
       <PageTitleDiv><PageTitleSpan title={title} /></PageTitleDiv>
@@ -66,7 +66,7 @@ export function TabularView<T, > ( { title, fields, tableKey, itemUrl, useData, 
                             // NOTE 2: Adding the "flex" className makes the entire table cell
                             //  become a link, instead of just the text inside the table cell.
                             <td>
-                              <Link to={url} className="flex" {...idx == 0 ? {} : {'tabIndex': -1}}>
+                              <Link to={url} className="flex" {...idx === 0 ? {} : {'tabIndex': -1}}>
                                 {g.getter(po)}
                               </Link>
                             </td>
@@ -102,7 +102,7 @@ export function SingleItemView<T, > ( { title, fields, tableKey, itemUrl, useDat
               <FieldsRow fields={
               row.map(f=>({label: f.label, value: f.getter(po)}))
               } />
-              { i == fields.length - 1 ? <> </> : <hr/> }
+              { i === fields.length - 1 ? <> </> : <hr/> }
             </>
           )}
         </Route>

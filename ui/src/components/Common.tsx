@@ -119,7 +119,7 @@ function useAsync<T>(f: () => Promise<T>, memoKeys: [any]) : T | null {
   const [[v, lastMemoKeys], setV] = useState<[T | null, any]>([null, null]);
   useMemo(
     // some false positives so we do the extra comparison to avoid extra `setV`
-    () => { if(JSON.stringify(memoKeys) != JSON.stringify(lastMemoKeys)) { f().then(nv => setV([nv, memoKeys])) } },
+    () => { if(JSON.stringify(memoKeys) !== JSON.stringify(lastMemoKeys)) { f().then(nv => setV([nv, memoKeys])) } },
     memoKeys);
   return v;
 }

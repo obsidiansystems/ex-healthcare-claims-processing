@@ -80,7 +80,7 @@ const Appointment : React.FC<Props> = ({role}) => {
     ] }
     tableKey={ o => o.overview?.appointment.contractId }
     itemUrl={ o => "" }
-    choices={ d => d?.overview?.appointment?.payload?.provider == role ? [
+    choices={ d => d?.overview?.appointment?.payload?.provider === role ? [
             <ChoiceModal className="flex flex-col space-y-6 w-170 mt-3"
                          choice={Main.Appointment.Appointment.CheckInPatient}
                          contract={d.overview?.appointment?.contractId}

@@ -21,7 +21,7 @@ type PartialMaybe<T> = {
 
 function complete<T>(i: PartialMaybe<T>) : T | undefined {
   for( const [key, value] of Object.entries(i) ) {
-    if (value == Nothing) {
+    if (value === Nothing) {
       return undefined;
     }
   }
@@ -79,8 +79,8 @@ export function ChoiceModal<T extends object, C, R, K>({ choice, contract, submi
   const [successOrFailure, setSuccessOrFailure] = React.useState<MaybeSuccessOrFailure<C, R> >(Nothing);
   const setModalActive = (s : SetStateAction<boolean>) => {
     setModalActiveInner((p : boolean) => {
-      const shown = typeof s == 'function' ? s(p) : s;
-      if(!shown && successOrFailure != Nothing) setSuccessOrFailure(Nothing);
+      const shown = typeof s === 'function' ? s(p) : s;
+      if(!shown && successOrFailure !== Nothing) setSuccessOrFailure(Nothing);
       return shown;
     })};
   const ledger = useLedger();
@@ -100,7 +100,7 @@ export function ChoiceModal<T extends object, C, R, K>({ choice, contract, submi
     }
   };
   var content;
-  if(successOrFailure != Nothing) {
+  if(successOrFailure !== Nothing) {
   switch(successOrFailure.tag) {
       case SuccessTag: {
         content = (<div className="w-170 py-24 space-y-8 flex justify-center items-center flex-col text-center">
@@ -133,7 +133,7 @@ export function ChoiceModal<T extends object, C, R, K>({ choice, contract, submi
       content = (
         <Formik initialValues={initialValues} onSubmit={ submitF } >
           {({ errors, touched, isValidating, isSubmitting}) => (<Form className={className}>
-            {typeof children == "function" ? children({ errors, touched }) : children}
+            {typeof children === "function" ? children({ errors, touched }) : children}
             <div className="flex justify-center align-center">
               <SubmitButton submitTitle={submitTitle} isSubmitting={isSubmitting} />
             </div>
@@ -163,7 +163,7 @@ export type ChoiceErrorsType = { [_: string]: string | undefined };
 
 export const validateNonEmpty = (label: string) => (a: any) => {
   let error;
-  if (a == Nothing) {
+  if (a === Nothing) {
     error = `${label} is required`;
   }
   return error;
@@ -231,7 +231,7 @@ export const DayPickerField : React.FC<{
   return (
     <>
       <DayPicker
-        date={field.value == Nothing
+        date={field.value === Nothing
             ? new Date()
             : new Date(field.value + "T00:10:00")
         }
@@ -251,13 +251,13 @@ export const DayTimePickerField : React.FC<{
   errors?: ChoiceErrorsType,
 }> = ({ name, errors }) => {
   const [ field, meta, { setValue } ] = useField<Time | Nothing>(name);
-  if (field.value == Nothing) {
+  if (field.value === Nothing) {
     // can't help but render some picked date, so might as well set it
     const f = new Date();
     console.log("default combined", f);
     setValue(dateToTime(f));
   }
-  const defaultField = field.value == Nothing ? new Date() : new Date(field.value);
+  const defaultField = field.value === Nothing ? new Date() : new Date(field.value);
   let date = new Date(defaultField.getFullYear(), defaultField.getMonth(), defaultField.getDate());
   let time = new Date(0, 0, 0, defaultField.getHours(), defaultField.getMinutes(), defaultField.getSeconds());
   const updateField = () => {

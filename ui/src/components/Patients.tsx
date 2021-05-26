@@ -68,7 +68,7 @@ const Patients: React.FC = () => {
 const NotPatients: React.FC = () => {
   const match = useRouteMatch();
   const [search, setSearch] = useState("");
-  const searchedFor = (s: string) => s.toLowerCase().indexOf(search.toLowerCase()) != -1;
+  const searchedFor = (s: string) => s.toLowerCase().indexOf(search.toLowerCase()) !== -1;
   const visible = usePatients({}).overviews.filter(p => searchedFor(p.policy.patientName) || searchedFor(p.policy.insuranceID));
 
   return (
