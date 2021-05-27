@@ -2,7 +2,7 @@ import React, {  } from 'react'
 import { useParams } from 'react-router-dom';
 import { Main } from '@daml.js/healthcare-claims-processing';
 import { CreateEvent } from '@daml/ledger';
-import { useStreamQueries, useLedger } from '@daml/react';
+import { useStreamQuery, useLedger } from '@daml/react';
 import { Clock } from "phosphor-react";
 import { mapIter, innerJoin, Message, useAsync, formatDate } from "./Common";
 import { ChoiceModal, FollowUp, creations } from "./ChoiceModal";
@@ -21,10 +21,10 @@ const AppointmentRoutes : React.FC<Props> = ({role}) =>
 const useAppointments = (query: any) => {
   const ledger = useLedger();
   const appointment = useAsync(async () => query.appointmentId ? await ledger.fetch(Main.Appointment.Appointment, query.appointmentId) : null, [query]);
-  const appointmentsStream = useStreamQueries(Main.Appointment.Appointment, () => query).contracts;
+  const appointmentsStream = useStreamQuery(Main.Appointment.Appointment, () => query).contracts;
   const appointments : readonly CreateEvent<Main.Appointment.Appointment>[] = query.appointmentId && appointment ? [appointment] : appointmentsStream;
 
-  const disclosed = useStreamQueries(Main.Policy.DisclosedPolicy).contracts;
+  const disclosed = useStreamQuery(Main.Policy.DisclosedPolicy).contracts;
 
   const keyedAppointments = new Map(appointments.map(p => [p.payload.policy, p]));
   const keyedDisclosed = new Map(disclosed.map(p => [p.contractId, p]));
