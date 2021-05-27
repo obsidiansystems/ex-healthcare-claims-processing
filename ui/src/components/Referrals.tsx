@@ -50,7 +50,7 @@ const Referrals: React.FC = () => {
 
 const useReferralData = () => {
   const { referralId } = useParams< { referralId: string } >();
-  const overviews = useReferrals( { referralId: referralId } ); // { referralId: referralId });
+  const overviews = useReferrals( { referralId: referralId } );
   return [ { referralId, overview: overviews[0] } ];
 }
 
