@@ -183,7 +183,7 @@ const PolicySelect : React.FC< {
     <div className="">
       Policy Provider: <b>{a.payload.payer}</b><br/>
       Disclosed Parties: <b>{a.payload.receivers}</b><br/>
-      <div style={ {textOverflow: "ellipsis", display: "inline-block", maxWidth: "20em", overflow: "hidden", whiteSpace: "nowrap" } }>
+      <div className="overflow-ellipsis-20">
         Contract ID: <b>{a.contractId}</b></div>
     </div>
   );

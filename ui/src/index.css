@@ -23,9 +23,16 @@ code {
 
 .main-grid {
   display: grid;
-  grid-template-columns: 256px 1fr;
   grid-template-rows: 1fr;
   min-height: 100vh;
+}
+
+.main-grid-narrow {
+  grid-template-columns: 256px 1fr;
+}
+
+.main-grid-wide {
+  grid-template-columns: 420px auto;
 }
 
 .tab-active {
@@ -120,4 +127,12 @@ table {
 }
 .react-select-modal-enum__indicators {
   @apply bg-trueGray-100;
+}
+
+.overflow-ellipsis-20 {
+  text-overflow: ellipsis;
+  display: inline-block;
+  max-width: 20em;
+  overflow: hidden;
+  white-space: nowrap;
 }
