@@ -118,9 +118,7 @@ public class HealthcareClaimsProcessingIT {
             RADIOLOGIST_PARTY, updatedReferral.exerciseScheduleAppointment(appointmentTime));
 
     // Check-in should happen on appointment date
-    sandbox
-        .getLedgerAdapter()
-        .setCurrentTime(appointmentTime);
+    sandbox.getLedgerAdapter().setCurrentTime(appointmentTime);
     Appointment.ContractId appointment =
         ledgerAdapter.getCreatedContractId(
             RADIOLOGIST_PARTY, Appointment.TEMPLATE_ID, Appointment.ContractId::new);
