@@ -20,8 +20,8 @@ const UserIcon: React.FC<{className: string}> = ({className}) => {
     <svg className={className} width="89" height="85" viewBox="0 0 89 85">
       <defs>
         <linearGradient id="userIconGradient" gradientTransform="rotate(90)">
-          <stop offset="0%" stop-color="#83a8f6"/>
-          <stop offset="100%" stop-color="#4c6fea"/>
+          <stop offset="0%" stopColor="#83a8f6"/>
+          <stop offset="100%" stopColor="#4c6fea"/>
         </linearGradient>
       </defs>
       <mask id="userMask">

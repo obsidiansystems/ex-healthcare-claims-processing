@@ -12,8 +12,8 @@ const Modal: React.FC<Props> = ({active, setActive, hasCloseButton, children}) =
   const styles = {
     overlay: {
       display: 'flex',
-      'justify-content': 'center',
-      'align-items': 'center',
+      'justifyContent': 'center',
+      'alignItems': 'center',
     },
     content: {
       inset: 'unset',
