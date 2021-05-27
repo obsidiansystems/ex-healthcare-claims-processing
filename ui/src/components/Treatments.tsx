@@ -14,7 +14,7 @@ const TreatmentRoutes : React.FC<{role: Party}> = ({role}) =>
 
 const useTreatments = (query: any) => {
   const ledger = useLedger();
-  const treatment = useAsync(async () => query.treatmentId ? await ledger.fetch(Main.Treatment.Treatment, query.treatmentId) : null, [query]);
+  const treatment = useAsync(async () => query.treatmentId ? await ledger.fetch(Main.Treatment.Treatment, query.treatmentId) : null, query);
   const treatmentsStream = useStreamQuery(Main.Treatment.Treatment, () => query).contracts;
   const treatments : readonly CreateEvent<Main.Treatment.Treatment>[] = query.treatmentId && treatment ? [treatment] : treatmentsStream;
 

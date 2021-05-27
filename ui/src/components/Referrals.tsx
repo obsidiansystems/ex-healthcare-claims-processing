@@ -18,7 +18,7 @@ const ReferralRoutes : React.FC<Props> = ({role}) =>
 
 const useReferrals = (query: any) => {
   const ledger = useLedger();
-  const referral = useAsync(async () => query.referralId ? await ledger.fetch(Main.Provider.ReferralDetails, query.referralId) : null, [query]);
+  const referral = useAsync(async () => query.referralId ? await ledger.fetch(Main.Provider.ReferralDetails, query.referralId) : null, query);
   const referralsStream = useStreamQuery(Main.Provider.ReferralDetails, () => query).contracts;
   const referrals : readonly CreateEvent<Main.Provider.ReferralDetails>[] = query.referralId && referral ? [referral] : referralsStream;
 

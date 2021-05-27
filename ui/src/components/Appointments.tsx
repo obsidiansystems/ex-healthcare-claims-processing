@@ -20,7 +20,7 @@ const AppointmentRoutes : React.FC<Props> = ({role}) =>
 
 const useAppointments = (query: any) => {
   const ledger = useLedger();
-  const appointment = useAsync(async () => query.appointmentId ? await ledger.fetch(Main.Appointment.Appointment, query.appointmentId) : null, [query]);
+  const appointment = useAsync(async () => query.appointmentId ? await ledger.fetch(Main.Appointment.Appointment, query.appointmentId) : null, query);
   const appointmentsStream = useStreamQuery(Main.Appointment.Appointment, () => query).contracts;
   const appointments : readonly CreateEvent<Main.Appointment.Appointment>[] = query.appointmentId && appointment ? [appointment] : appointmentsStream;
 
