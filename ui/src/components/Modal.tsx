@@ -26,6 +26,7 @@ const Modal: React.FC<Props> = ({active, setActive, hasCloseButton, children}) =
       onRequestClose={() => setActive(false)}
       contentLabel="Example Modal"
       style={styles}
+      appElement={document.getElementById('root') || undefined}
     >
       {hasCloseButton &&
        <div className="flex flex-auto flex-row-reverse">
