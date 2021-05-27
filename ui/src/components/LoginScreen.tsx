@@ -99,10 +99,7 @@ const LoginScreen: React.FC<Props> = ({onLogin}) => {
   );
 
   return (
-    <div className="main-grid font-alata" style={{
-      display: "grid",
-      gridTemplateColumns: "420px auto",
-    }}>
+    <div className="main-grid main-grid-wide font-alata">
       <Landing/>
       <div className="relative flex flex-col flex-grow justify-center items-center">
         <img src="/logo-with-name.svg" alt="Daml Health logo"  className="absolute top-7 left-11"/>
