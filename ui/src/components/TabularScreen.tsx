@@ -64,7 +64,7 @@ export function TabularView<T, > ( { title, fields, tableKey, itemUrl, useData, 
                             //
                             // NOTE 2: Adding the "flex" className makes the entire table cell
                             //  become a link, instead of just the text inside the table cell.
-                            <td>
+                            <td key={idx}>
                               <Link to={url} className="flex" {...idx === 0 ? {} : {'tabIndex': -1}}>
                                 {g.getter(po)}
                               </Link>
@@ -98,7 +98,7 @@ export function SingleItemView<T, > ( { title, fields, tableKey, itemUrl, useDat
           <hr />
           { fields.map((row, i) =>
             <>
-              <FieldsRow fields={
+              <FieldsRow key={i} fields={
               row.map(f=>({label: f.label, value: f.getter(po)}))
               } />
               { i === fields.length - 1 ? <> </> : <hr/> }
