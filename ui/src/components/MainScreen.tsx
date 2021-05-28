@@ -2,10 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import React from 'react'
-import { Formik, Form } from 'formik';
-import { SubmitButton, DayPickerField, Nothing } from "./ChoiceModal";
 import MainView from './MainView';
-import Modal from './Modal';
 import { useParty } from '@daml/react';
 import { Link, Route, useHistory } from 'react-router-dom';
 import '@fontsource/alata';
@@ -80,7 +77,6 @@ const roleRoutes: Map<string, string> = new Map([
 ])
 
 const MainScreen: React.FC<Props> = ({onLogout}) => {
-  const [modalActive,setModalActive] = React.useState(false);
   const [date] = React.useState(new Date());
   const role = useParty();
 
@@ -91,7 +87,7 @@ const MainScreen: React.FC<Props> = ({onLogout}) => {
 
   return (
     <div className="main-grid main-grid-narrow font-alata">
-      <div className="bg-trueGray-50 flex flex-col justify-start text-sm text-trueGray-500"> {/*px-20 inset-y-0 bg-blue w-64 object-center">*/}
+      <div className="bg-trueGray-50 flex flex-col justify-start text-sm text-trueGray-500">
         <img src="/logo-with-name.svg" alt="Daml Health logo" className="inline-block ml-px30 mt-px25 mb-7 self-start"/>
 
         { roleTabs.map(({to, exact, icon, label}) =>
@@ -104,12 +100,8 @@ const MainScreen: React.FC<Props> = ({onLogout}) => {
             <div>Today's Date:</div>
             <div className="text-sm text-trueGray-400">
               {formatDate(date)}
-              {/*<button className="text-blue ml-2" onClick={() => setModalActive(true)}>
-                Set Date
-              </button>*/}
             </div>
           </div>
-          {/*<div className="my-2">Show developer tabs</div>*/}
           <div className="my-2">
             Selected Role:
             <div className="text-sm text-trueGray-400">{role}</div>
@@ -120,23 +112,6 @@ const MainScreen: React.FC<Props> = ({onLogout}) => {
           Change Roles
         </button>
       </div>
-      <Modal active={modalActive} setActive={setModalActive} hasCloseButton={true}>
-        <Formik initialValues={{newDate: Nothing }} onSubmit={() => {} /* change time itself */}>
-          {({ errors, touched, isValidating, isSubmitting}) => (
-            <Form>
-              <DayPickerField name="newDate" />
-              <div className="flex justify-center align-center">
-                <SubmitButton submitTitle={"Set Date"} isSubmitting={isSubmitting} />
-              </div>
-              {/* <Field name="email" validate={validateEmail} />
-                  {errors.email && touched.email && <div>{errors.email}</div>}
-                  <Field name="username" validate={validateUsername} />
-                  {errors.username && touched.username && <div>{errors.username}</div>}
-                  <button type="submit">Submit</button> */}
-            </Form>)}
-        </Formik>
-      </Modal>
-
       <div className="relative bg-trueGray-100">
         <MainView />
       </div>

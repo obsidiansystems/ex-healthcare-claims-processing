@@ -140,11 +140,6 @@ export function ChoiceModal<T extends object, C, R, K>({ choice, contract, submi
             <div className="flex justify-center align-center">
               <SubmitButton submitTitle={submitTitle} isSubmitting={isSubmitting} />
             </div>
-            {/* <Field name="email" validate={validateEmail} />
-                {errors.email && touched.email && <div>{errors.email}</div>}
-                <Field name="username" validate={validateUsername} />
-                {errors.username && touched.username && <div>{errors.username}</div>}
-                <button type="submit">Submit</button> */}
           </Form>)}
         </Formik>
       );
@@ -174,7 +169,7 @@ export const validateNonEmpty = (label: string) => (a: any) => {
 
 export const RenderError: React.FC<{ error: string | undefined }> = ({ error }) => (
   <>
-  {error /* && touched */ && (
+  {error && (
     <div className="text-sm text-red-800">{error}</div>
   )}
   </>
