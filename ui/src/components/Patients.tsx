@@ -4,7 +4,7 @@ import { Main } from '@daml.js/healthcare-claims-processing';
 import { CreateEvent } from '@daml/ledger';
 import { useParty, useStreamQuery } from '@daml/react';
 import { Share } from "phosphor-react";
-import { mapIter, innerJoin, intercalate, FieldsRow, Message, PageTitleDiv, PageTitleSpan, PageSubTitleSpan, TabLink } from "./Common";
+import { mapIter, innerJoin, FieldsRow, Message, PageTitleDiv, PageTitleSpan, PageSubTitleSpan, TabLink } from "./Common";
 import { useField } from 'formik';
 import Select from 'react-select';
 import { LField, EField, ChoiceModal, ChoiceErrorsType, Nothing, validateNonEmpty, RenderError } from "./ChoiceModal";
@@ -73,12 +73,13 @@ const Patient: React.FC = () => {
   const { overviews, disclosed, disclosedRaw } = usePatients({ patient: patientId }, controlled);
   const match = useRouteMatch();
 
-  const policyRows = disclosed.map((d) =>
-    <div>
+  const policyRows = disclosed.map((d, i) =>
+    <div key={d.receivers.join() + d.insuranceID}>
       <FieldsRow fields={[
         { label: "Receivers", value: d.receivers.join() },
         { label: "Insurance ID", value: d.insuranceID },
       ]} />
+      { i === disclosed.length - 1 ? <></> : <hr /> }
     </div>
   )
 
@@ -90,7 +91,7 @@ const Patient: React.FC = () => {
       <Switch>
         <Route exact path={match.path + "/policies"}>
           <div className="flex flex-col space-y-4">
-            { intercalate(policyRows, <hr />) }
+            { policyRows }
           </div>
         </Route>
         <Route exact path={match.path}>

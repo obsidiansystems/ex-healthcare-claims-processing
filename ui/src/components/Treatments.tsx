@@ -72,7 +72,7 @@ const Treatment : React.FC<{role: Party}> = ({role}) => {
     ] }
     tableKey={ o => o.overview?.treatment.contractId }
     itemUrl={ o => "" }
-    choices={ d => d?.overview?.treatment?.payload?.provider === role ? [
+    choices={ d => d?.overview?.treatment?.payload?.provider === role ?
       <ChoiceModal className="flex flex-col space-y-6 w-170 mt-3"
                    choice={Main.Treatment.Treatment.CompleteTreatment}
                    contract={d.overview?.treatment?.contractId}
@@ -94,7 +94,7 @@ const Treatment : React.FC<{role: Party}> = ({role}) => {
                 content={d.overview?.policy?.payload?.patientName + " is present and ready for treatment?"}
               />
             </ChoiceModal>
-    ] : [] }
+    : <></> }
 
     />
   ;

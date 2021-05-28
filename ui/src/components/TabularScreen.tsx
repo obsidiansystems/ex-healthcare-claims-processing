@@ -97,12 +97,12 @@ export function SingleItemView<T, > ( { title, fields, tableKey, itemUrl, useDat
           </div>
           <hr />
           { fields.map((row, i) =>
-            <>
-              <FieldsRow key={i} fields={
+            <div key={row.map(r => r.label).join()}>
+              <FieldsRow fields={
               row.map(f=>({label: f.label, value: f.getter(po)}))
               } />
               { i === fields.length - 1 ? <> </> : <hr/> }
-            </>
+            </div>
           )}
         </Route>
         <Route>
