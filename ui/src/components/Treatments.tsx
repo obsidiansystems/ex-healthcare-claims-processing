@@ -2,7 +2,7 @@ import React, {  } from 'react'
 import { useParams } from 'react-router-dom';
 import { Main } from '@daml.js/healthcare-claims-processing';
 import { CreateEvent } from '@daml/ledger';
-import { useStreamQuery, useLedger } from '@daml/react';
+import { useStreamQueries, useLedger } from '@daml/react';
 import { Share } from "phosphor-react";
 import { mapIter, innerJoin, Message, useAsync } from "./Common";
 import { ChoiceModal } from "./ChoiceModal";
@@ -15,10 +15,10 @@ const TreatmentRoutes : React.FC<{role: Party}> = ({role}) =>
 const useTreatments = (query: any) => {
   const ledger = useLedger();
   const treatment = useAsync(async () => query.treatmentId ? await ledger.fetch(Main.Treatment.Treatment, query.treatmentId) : null, query);
-  const treatmentsStream = useStreamQuery(Main.Treatment.Treatment, () => query).contracts;
+  const treatmentsStream = useStreamQueries(Main.Treatment.Treatment, () => [query]).contracts;
   const treatments : readonly CreateEvent<Main.Treatment.Treatment>[] = query.treatmentId && treatment ? [treatment] : treatmentsStream;
 
-  const disclosed = useStreamQuery(Main.Policy.DisclosedPolicy).contracts;
+  const disclosed = useStreamQueries(Main.Policy.DisclosedPolicy).contracts;
 
   const keyedTreatments = new Map(treatments.map(p => [p.payload.policy, p]));
   const keyedDisclosed = new Map(disclosed.map(p => [p.contractId, p]));
