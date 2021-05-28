@@ -73,7 +73,7 @@ const Bill : React.FC = () => {
     ] }
     tableKey={ o => o.overview?.bill?.contractId }
     itemUrl={ o => "" }
-    choices={ d => [
+    choices={ d =>
             <ChoiceModal className="flex flex-col space-y-6 w-170 mt-3"
                          choice={Main.Claim.PatientObligation.PayPatientObligation}
                          contract={d.overview?.bill?.contractId}
@@ -92,7 +92,7 @@ const Bill : React.FC = () => {
                 content={"This bill is accurate and ready to be paid?"}
               />
             </ChoiceModal>
-    ] }
+    }
     />
   ;
 }
