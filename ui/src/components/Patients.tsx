@@ -2,7 +2,7 @@ import React from 'react'
 import { Redirect, Route, Switch, useRouteMatch, useParams } from 'react-router-dom';
 import { Main } from '@daml.js/healthcare-claims-processing';
 import { CreateEvent } from '@daml/ledger';
-import { useParty, useStreamQuery } from '@daml/react';
+import { useParty, useStreamQueries } from '@daml/react';
 import { Share } from "phosphor-react";
 import { mapIter, innerJoin, FieldsRow, Message, PageTitleDiv, PageTitleSpan, PageSubTitleSpan, TabLink } from "./Common";
 import { useField } from 'formik';
@@ -32,10 +32,10 @@ const PatientRoutes: React.FC = () => {
 }
 
 const usePatients = (query: any, predicate: any = () => true) => {
-  const acceptances = useStreamQuery(Main.Patient.NotifyPatientOfPCPAcceptance, () => query)
+  const acceptances = useStreamQueries(Main.Patient.NotifyPatientOfPCPAcceptance, () => [query])
     .contracts
     .map(resp => resp.payload)
-  const disclosedRaw = useStreamQuery(Main.Policy.DisclosedPolicy, () => query)
+  const disclosedRaw = useStreamQueries(Main.Policy.DisclosedPolicy, () => [query])
     .contracts
     .filter(resp => predicate(resp.payload))
   const disclosed = disclosedRaw.map(resp => resp.payload)
@@ -83,7 +83,7 @@ const Patient: React.FC = () => {
     </div>
   )
 
-  const pcpResult = useStreamQuery(Main.Provider.Provider).contracts;
+  const pcpResult = useStreamQueries(Main.Provider.Provider).contracts;
   const pcpContract = pcpResult[0];
 
   const content = (po: PatientOverview) => (
