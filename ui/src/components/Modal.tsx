@@ -12,8 +12,8 @@ const Modal: React.FC<Props> = ({active, setActive, hasCloseButton, children}) =
   const styles = {
     overlay: {
       display: 'flex',
-      'justify-content': 'center',
-      'align-items': 'center',
+      'justifyContent': 'center',
+      'alignItems': 'center',
     },
     content: {
       inset: 'unset',
@@ -26,6 +26,7 @@ const Modal: React.FC<Props> = ({active, setActive, hasCloseButton, children}) =
       onRequestClose={() => setActive(false)}
       contentLabel="Example Modal"
       style={styles}
+      appElement={document.getElementById('root') || undefined}
     >
       {hasCloseButton &&
        <div className="flex flex-auto flex-row-reverse">
