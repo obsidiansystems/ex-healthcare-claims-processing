@@ -116,7 +116,7 @@ export function SingleItemView<T, > ( { title, fields, tableKey, itemUrl, useDat
     <>
       <PageTitleDiv>
         <PageTitleSpan title={title} />
-        <PageSubTitleSpan title={/* patientId */ "" } />
+        <PageSubTitleSpan title={""} />
       </PageTitleDiv>
 
       <div className="flex flex-col space-y-2">

@@ -56,7 +56,6 @@ const Patients: React.FC = () => {
     useData={useAllPatients}
     fields={ [
       { label: "Name", getter : o => o.policy.patientName },
-      /* { label: "PCP", getter : o => "" }, */
       { label: "Insurance ID", getter : o => o.policy.insuranceID },
     ] }
     tableKey={ o => o.policy.patient }
