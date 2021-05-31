@@ -1,15 +1,15 @@
-import React from 'react';
+import React from "react";
 
-import ReactDayPicker from 'react-day-picker';
-import 'react-day-picker/lib/style.css';
+import ReactDayPicker from "react-day-picker";
+import "react-day-picker/lib/style.css";
 
 type Props = {
   date: Date;
-  setDate: (date:Date) => void;
+  setDate: (date: Date) => void;
   theme: { blue: string };
-}
+};
 
-const DayPicker: React.FC<Props> = ({date, setDate, theme}) => {
+const DayPicker: React.FC<Props> = ({ date, setDate, theme }) => {
   const month = date;
 
   const modifiers = {
@@ -23,8 +23,8 @@ const DayPicker: React.FC<Props> = ({date, setDate, theme}) => {
       border: theme.blue,
     },
     outside: {
-      background: '#fafafa',
-      cursor: 'pointer',
+      background: "#fafafa",
+      cursor: "pointer",
     },
     selected: {
       background: theme.blue,
@@ -33,7 +33,7 @@ const DayPicker: React.FC<Props> = ({date, setDate, theme}) => {
 
   const onClick = (date: Date) => {
     setDate(date);
-  }
+  };
 
   return (
     <ReactDayPicker
@@ -43,7 +43,7 @@ const DayPicker: React.FC<Props> = ({date, setDate, theme}) => {
       onDayClick={onClick}
       showOutsideDays={true}
     />
-  )
-}
+  );
+};
 
 export default DayPicker;

@@ -9,12 +9,11 @@ export enum DeploymentMode {
 }
 
 export const deploymentMode: DeploymentMode =
-  process.env.NODE_ENV === 'development'
-  ? DeploymentMode.DEV
-  : DeploymentMode.PROD_OTHER;
+  process.env.NODE_ENV === "development"
+    ? DeploymentMode.DEV
+    : DeploymentMode.PROD_OTHER;
 
 // Decide the ledger ID based on
 // an environment variable, falling back on the sandbox ledger ID.
 export const ledgerId: string =
-  process.env.REACT_APP_LEDGER_ID
-  ?? 'example-create-daml-app-sandbox';
+  process.env.REACT_APP_LEDGER_ID ?? "example-create-daml-app-sandbox";

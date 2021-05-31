@@ -13,7 +13,8 @@ const httpJsonDevUrl =
  */
 const filter = function (pathname, req) {
   // Proxy requests to the http json api when in development
-  const proxied = pathname.match("^/v1") && process.env.NODE_ENV === "development";
+  const proxied =
+    pathname.match("^/v1") && process.env.NODE_ENV === "development";
 
   if (proxied) {
     console.log(
@@ -32,4 +33,3 @@ module.exports = function (app) {
     })
   );
 };
-
