@@ -18,7 +18,7 @@ body {
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
 
@@ -107,20 +107,22 @@ code {
 }
 
 .card-gdots-pos1 {
-  top: calc( 50% - 326.1px );
-  left: calc( 50% - 335.7px );
+  top: calc(50% - 326.1px);
+  left: calc(50% - 335.7px);
 }
 .card-gdots-pos2 {
-  top: calc( 50% + 79px );
-  left: calc( 50% + 78.9px );
+  top: calc(50% + 79px);
+  left: calc(50% + 78.9px);
 }
 
 table {
-/*  align-content: stretch; */
+  /*  align-content: stretch; */
 }
 
 @for $i from 2 to 10 {
-  .table-widths-eq > thead > tr > *:nth-last-child($i) ~ * { width: calc(100% / $i); }
+  .table-widths-eq > thead > tr > *:nth-last-child($i) ~ * {
+    width: calc(100% / $i);
+  }
 }
 
 .react-select-modal-enum__value-container {
