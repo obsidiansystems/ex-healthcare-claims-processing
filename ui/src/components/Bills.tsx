@@ -61,7 +61,7 @@ const Bills: React.FC = () => {
       title="Bills"
       useData={useBillsData}
       fields={[
-        // NB: outputs provider role (e.g. "Radiologist") instead of provider name (e.g. "Beta Imaging Labs")
+        // NB: outputs provider party name (e.g. "Radiologist") instead of human-friendly provider name (e.g. "Beta Imaging Labs").
         { label: "Provider", getter: (o) => o.bill?.payload?.provider },
         { label: "Amount", getter: (o) => o?.bill?.payload?.amount },
         {
