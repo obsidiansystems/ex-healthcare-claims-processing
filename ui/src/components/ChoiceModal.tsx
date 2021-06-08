@@ -167,11 +167,7 @@ export function ChoiceModal<T extends object, C, R, K>({
               <>
                 <h3> Could not {submitTitle} </h3>
                 <p>
-                  {successOrFailure.error.errors.map((a: string) =>
-                    a
-                      ?.match("Error: (.*\\().*:.*:(.*)(\\).*) Details:")
-                      ?.slice(1, 4)
-                  )}
+                  {successOrFailure.error.errors}
                 </p>
               </>
             )}
