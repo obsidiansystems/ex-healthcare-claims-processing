@@ -166,9 +166,7 @@ export function ChoiceModal<T extends object, C, R, K>({
             ) : (
               <>
                 <h3> Could not {submitTitle} </h3>
-                <p>
-                  {successOrFailure.error.errors}
-                </p>
+                <p>{successOrFailure.error.errors}</p>
               </>
             )}
           </div>
